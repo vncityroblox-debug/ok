@@ -1,0 +1,373 @@
+/* Admin Layout */
+.adminContainer {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: 30px auto;
+  background: hsl(var(--bg-card));
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  min-height: calc(100vh - 200px);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: hsl(var(--bg-main));
+  border-right: 1px solid var(--border-glass);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 40px;
+  background: transparent;
+  overflow-y: auto;
+}
+
+@media (max-width: 992px) {
+  .adminContainer {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 20px;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .mainContent {
+    padding: 24px;
+  }
+}
+
+/* Sidebar Nav items */
+.sidebarLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: hsl(var(--text-secondary));
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.sidebarLink:hover {
+  background: rgba(139, 92, 246, 0.1);
+  color: hsl(var(--text-primary));
+}
+
+.activeSidebarLink {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: hsl(var(--text-primary));
+}
+
+.logoutBtn {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: hsl(var(--color-danger));
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: var(--transition-smooth);
+}
+
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 992px) {
+  .logoutBtn {
+    margin-top: 0;
+    width: auto;
+  }
+}
+
+/* Dashboard Statistics */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.statCard {
+  padding: 24px;
+  background: hsl(var(--bg-card));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, hsl(var(--color-primary)), hsl(var(--color-secondary)));
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: hsl(var(--text-secondary));
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.statValue {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: hsl(var(--text-primary));
+  line-height: 1.1;
+}
+
+/* Analytics Graph simulation */
+.graphSection {
+  background: hsl(var(--bg-card));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.graphHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.barChart {
+  display: flex;
+  align-items: flex-end;
+  height: 250px;
+  gap: 16px;
+  padding-top: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 100%;
+  max-width: 40px;
+  background: linear-gradient(to top, hsl(var(--color-primary)), hsl(var(--color-secondary)));
+  border-radius: 6px 6px 0 0;
+  transition: height 1s ease-in-out;
+  position: relative;
+  min-height: 4px;
+}
+
+.barTooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff; /* tooltip bg is dark, so text should be white always */
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.bar:hover .barTooltip {
+  opacity: 1;
+}
+
+.barLabel {
+  font-size: 0.75rem;
+  color: hsl(var(--text-secondary));
+  text-align: center;
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Forms styling */
+.formGroup {
+  margin-bottom: 24px;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: hsl(var(--text-primary));
+}
+
+.formInput {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-glass);
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: hsl(var(--text-primary));
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.formInput:focus {
+  border-color: hsl(var(--color-primary));
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.2);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: hsl(var(--text-secondary));
+  font-size: 0.9rem;
+}
+
+.checkboxLabel input {
+  accent-color: hsl(var(--color-primary));
+}
+
+/* Table styling */
+.tableContainer {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: hsl(var(--bg-card));
+  margin-top: 30px;
+}
+
+.adminTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.adminTable th {
+  background: rgba(139, 92, 246, 0.05);
+  padding: 16px 24px;
+  font-weight: 600;
+  color: hsl(var(--text-primary));
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.adminTable td {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: hsl(var(--text-secondary));
+}
+
+.adminTable tr:hover td {
+  background: rgba(139, 92, 246, 0.05);
+  color: hsl(var(--text-primary));
+}
+
+.actionCell {
+  display: flex;
+  gap: 12px;
+}
+
+.actionBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.editBtn {
+  color: hsl(var(--color-secondary));
+}
+.editBtn:hover {
+  color: #00e5ff;
+}
+
+.deleteBtn {
+  color: hsl(var(--color-danger));
+}
+.deleteBtn:hover {
+  color: #ff3333;
+}
+
+/* Badge status */
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badgeSuccess {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.badgeDanger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.badgeWarning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+/* Login Page Wrapper */
+.loginWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  background: hsl(var(--bg-card));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  box-shadow: var(--shadow-card);
+}
