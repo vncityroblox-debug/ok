@@ -1,0 +1,214 @@
+.hero {
+  text-align: center;
+  padding: 60px 0 40px;
+}
+
+.heroTitle {
+  font-size: 2.75rem;
+  font-weight: 850;
+  line-height: 1.15;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+}
+
+.heroTitle span {
+  background: linear-gradient(135deg, hsl(var(--color-primary)), hsl(var(--color-secondary)), hsl(var(--color-accent)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  color: hsl(var(--text-secondary));
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 24px;
+  margin-bottom: 80px;
+}
+
+.formPanel,
+.listPanel {
+  padding: 28px;
+}
+
+.formGroup {
+  margin-bottom: 18px;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: hsl(var(--text-secondary));
+}
+
+.formInput {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  background: hsl(var(--bg-card));
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: hsl(var(--text-primary));
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.formInput:focus {
+  border-color: hsl(var(--color-primary));
+  box-shadow: var(--shadow-neon);
+}
+
+.formHint {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: hsl(var(--text-muted));
+  line-height: 1.5;
+}
+
+.errorText {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: hsl(var(--color-danger));
+}
+
+.accountList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: hsl(var(--text-muted));
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+
+.accountCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: hsl(var(--bg-card));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: var(--transition-smooth);
+}
+
+.accountCard:hover {
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-neon);
+}
+
+.accountInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.accountName {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accountMeta {
+  font-size: 0.8rem;
+  color: hsl(var(--text-muted));
+}
+
+.codeBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.codeValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--color-primary));
+}
+
+.timerRing {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.timerRing svg {
+  transform: rotate(-90deg);
+}
+
+.timerText {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: hsl(var(--text-secondary));
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: hsl(var(--text-muted));
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtn:hover {
+  color: hsl(var(--color-primary));
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.notice {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  font-size: 0.85rem;
+  color: hsl(var(--text-secondary));
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .heroTitle {
+    font-size: 2.1rem;
+  }
+
+  .accountCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .codeBlock {
+    justify-content: space-between;
+  }
+}

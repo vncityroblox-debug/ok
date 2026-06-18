@@ -42,7 +42,10 @@ export default function Footer({ siteName = 'App Store', siteDescription, footer
             <h4>Danh Mục</h4>
             <ul>
               <li>
-                <Link href="/?cat=utilities">Tiện Ích</Link>
+                <Link href="/tien-ich">Tiện Ích</Link>
+              </li>
+              <li>
+                <Link href="/tien-ich/2fa">Lấy Mã 2FA</Link>
               </li>
               <li>
                 <Link href="/?cat=games">Trò Chơi</Link>
