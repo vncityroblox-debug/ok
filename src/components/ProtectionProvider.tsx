@@ -34,12 +34,12 @@ export default function ProtectionProvider() {
     `;
     document.head.appendChild(style);
 
-    const blockEvent = (e) => { e.preventDefault(); e.stopPropagation(); return false; };
+    const blockEvent = (e: Event) => { e.preventDefault(); e.stopPropagation(); return false; };
 
     const events = ['contextmenu', 'copy', 'cut', 'paste', 'selectstart', 'dragstart'];
     events.forEach(ev => document.addEventListener(ev, blockEvent, true));
 
-    const blockKeys = (e) => {
+    const blockKeys = (e: KeyboardEvent) => {
       if (
         e.key === 'F12' ||
         e.key === 'PrintScreen' || e.key === 'PrtScn' ||
@@ -62,7 +62,7 @@ export default function ProtectionProvider() {
       }
     }, 2000);
 
-    if (window.top !== window.self) {
+    if (window.top !== window.self && window.top) {
       window.top.location.href = window.self.location.href;
     }
 
