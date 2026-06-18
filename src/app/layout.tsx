@@ -3,6 +3,7 @@ import { getSupabaseServer } from '@/lib/supabase';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
+import ProtectionProvider from '@/components/ProtectionProvider';
 
 export async function generateMetadata() {
   try {
@@ -85,6 +86,7 @@ export default async function RootLayout({
       </head>
       <body>
         <Header siteName={siteName} siteIconUrl={siteIconUrl} />
+        <ProtectionProvider />
         <main style={{ minHeight: 'calc(100vh - 250px)' }}>
           {children}
         </main>
