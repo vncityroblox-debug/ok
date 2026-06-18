@@ -74,7 +74,8 @@
   left: 18px;
   top: 52%;
   transform: translateY(-50%);
-  color: hsl(var(--text-muted));
+  color: hsl(var(--text-secondary));
+  opacity: 0.6;
   pointer-events: none;
 }
 
