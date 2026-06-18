@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FileText, Pencil, Trash2, Check, X, Eye, Edit3 } from 'lucide-react';
-import { adminFetch } from '@/lib/admin-fetch';
+import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 
 interface Post {
@@ -36,10 +36,9 @@ export default function AdminPosts() {
   async function fetchPosts() {
     setIsLoading(true);
     try {
-      const res = await adminFetch('/api/admin/query?type=posts');
-      const json = await res.json();
-      if (!json.data) throw new Error('No data');
-      setPosts(json.data || []);
+      const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+      if (error || !data) throw new Error(error?.message || 'No data');
+      setPosts(data || []);
     } catch (err: any) {
       console.error('Fetch posts error:', err);
       setErrorMsg('Lỗi khi tải danh sách bài viết.');
@@ -68,21 +67,14 @@ export default function AdminPosts() {
     const slug = makeSlug(title);
 
     try {
-      const res = await adminFetch('/api/admin/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resource: 'post',
-          action: 'insert',
-          data: { title: title.trim(), slug, content: content.trim() }
-        })
+      const { error } = await supabase.from('posts').insert({
+        title: title.trim(), slug, content: content.trim()
       });
-      const json = await res.json();
-      if (!res.ok) {
-        if (json.error?.includes('duplicate') || res.status === 500) {
+      if (error) {
+        if (error.message?.includes('duplicate')) {
           throw new Error('Tiêu đề bài viết này đã trùng lặp!');
         }
-        throw new Error(json.error);
+        throw new Error(error.message);
       }
 
       setSuccessMsg('Đăng bài viết thành công!');
@@ -114,18 +106,10 @@ export default function AdminPosts() {
     const slug = makeSlug(editTitle);
 
     try {
-      const res = await adminFetch('/api/admin/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resource: 'post',
-          action: 'update',
-          id,
-          data: { title: editTitle.trim(), slug, content: editContent.trim() }
-        })
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
+      const { error } = await supabase.from('posts').update({
+        title: editTitle.trim(), slug, content: editContent.trim()
+      }).eq('id', id);
+      if (error) throw new Error(error.message);
 
       setSuccessMsg('Cập nhật bài viết thành công!');
       setEditingId(null);
@@ -140,13 +124,8 @@ export default function AdminPosts() {
       setErrorMsg('');
       setSuccessMsg('');
       try {
-        const res = await adminFetch('/api/admin/mutate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resource: 'post', action: 'delete', id })
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error);
+        const { error } = await supabase.from('posts').delete().eq('id', id);
+        if (error) throw new Error(error.message);
         setSuccessMsg(`Đã xóa bài viết "${postTitle}".`);
         fetchPosts();
       } catch (err: any) {

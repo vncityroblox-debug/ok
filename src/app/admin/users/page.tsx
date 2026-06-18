@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { UserPlus, Users, Trash2, Shield, ShieldCheck, RefreshCw, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
-import { adminFetch } from '@/lib/admin-fetch';
 import styles from '../admin.module.css';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -25,12 +24,6 @@ const ALL_PERMISSIONS = [
   { key: 'keys', label: 'Quản Lý Key' },
   { key: 'posts', label: 'Viết Bài (Blog)' },
 ];
-
-// ─── Helper: get auth token ────────────────────────────────────────────────────
-async function getToken(): Promise<string | null> {
-  const { data } = await supabase.auth.getSession();
-  return data.session?.access_token ?? null;
-}
 
 // ─── Component: Create Form ───────────────────────────────────────────────────
 function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
@@ -62,12 +55,13 @@ function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
     setLoading(true);
     setMsg(null);
     try {
-      const token = await getToken();
-      const res = await adminFetch('/api/admin/create-user', {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch('/api/admin/create-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           email,
@@ -78,15 +72,16 @@ function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
       });
       const json = await res.json();
       if (!res.ok) {
-        setMsg({ type: 'error', text: json.error ?? 'Có lỗi xảy ra.' });
-      } else {
-        setMsg({ type: 'success', text: `✅ Tạo tài khoản "${email}" thành công!` });
-        setEmail('');
-        setPassword('');
-        setRoleType(1);
-        setSelectedPerms([]);
-        onCreated();
+        setMsg({ type: 'error', text: json.error || 'Lỗi không xác định' });
+        setLoading(false);
+        return;
       }
+      setMsg({ type: 'success', text: `✅ Tạo tài khoản "${email}" thành công!` });
+      setEmail('');
+      setPassword('');
+      setRoleType(1);
+      setSelectedPerms([]);
+      onCreated();
     } catch {
       setMsg({ type: 'error', text: 'Không kết nối được server.' });
     } finally {
@@ -410,15 +405,14 @@ export default function AdminUsersPage() {
     setLoadingList(true);
     setListError('');
     try {
-      const token = await getToken();
-      const res = await adminFetch('/api/admin/list-users', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        setListError(json.error ?? 'Không tải được danh sách.');
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('id, email, role_type, permissions, created_at')
+        .order('created_at', { ascending: false });
+      if (error) {
+        setListError(error.message);
       } else {
-        setUsers(json.users ?? []);
+        setUsers(data ?? []);
       }
     } catch {
       setListError('Không kết nối được server.');
@@ -437,21 +431,22 @@ export default function AdminUsersPage() {
 
   const handleDelete = async (id: string, email: string) => {
     if (!confirm(`Bạn có chắc muốn xóa admin "${email}"?\nHành động này không thể hoàn tác!`)) return;
-    const token = await getToken();
-    const res = await adminFetch('/api/admin/delete-user', {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const res = await fetch('/api/admin/delete-user', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({ id }),
     });
     const json = await res.json();
     if (!res.ok) {
-      alert('Lỗi: ' + (json.error ?? 'Không xóa được.'));
-    } else {
-      fetchUsers();
+      alert('Lỗi: ' + (json.error || 'Không thể xóa'));
+      return;
     }
+    fetchUsers();
   };
 
   return (

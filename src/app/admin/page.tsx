@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { BarChart3, Users, Download, ArrowUpRight } from 'lucide-react';
-import { adminFetch } from '@/lib/admin-fetch';
+import { supabase } from '@/lib/supabase';
 import styles from './admin.module.css';
 
 interface AppClickStat {
@@ -27,31 +27,37 @@ export default function AdminDashboard() {
     async function fetchStats() {
       setIsLoading(true);
       try {
-        const res = await adminFetch('/api/admin/query?type=dashboard');
-        const json = await res.json();
-        if (!json.data) throw new Error('No data');
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-        setTotalVisits(json.data.totalVisits || 0);
-        setTodayVisits(json.data.recentVisits || 0);
-        setTotalDownloads(json.data.totalDownloads || 0);
+        const [totalVisitsRes, recentVisitsRes, totalDownloadsRes, recentDownloadsRes, visitsTimelineRes] = await Promise.all([
+          supabase.from('analytics_visits').select('*', { count: 'exact', head: true }),
+          supabase.from('analytics_visits').select('*', { count: 'exact', head: true }).gte('visited_at', thirtyDaysAgo),
+          supabase.from('analytics_downloads').select('*', { count: 'exact', head: true }),
+          supabase.from('analytics_downloads').select('app_id, apps(name)'),
+          supabase.from('analytics_visits').select('visited_at').order('visited_at', { ascending: true }),
+        ]);
 
-        if (json.data.recentDownloads) {
+        setTotalVisits(totalVisitsRes.count || 0);
+        setTodayVisits(recentVisitsRes.count || 0);
+        setTotalDownloads(totalDownloadsRes.count || 0);
+
+        if (recentDownloadsRes.data) {
           const aggMap: { [key: string]: number } = {};
-          json.data.recentDownloads.forEach((row: any) => {
+          recentDownloadsRes.data.forEach((row: any) => {
             const appName = row.apps?.name || 'Ứng dụng không xác định';
             aggMap[appName] = (aggMap[appName] || 0) + 1;
           });
           setAppClicks(Object.keys(aggMap).map(name => ({ name, count: aggMap[name] })).sort((a, b) => b.count - a.count).slice(0, 5));
         }
 
-        if (json.data.visitsTimeline) {
+        if (visitsTimelineRes.data) {
           const dailyMap: { [key: string]: number } = {};
           for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
             dailyMap[d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })] = 0;
           }
-          json.data.visitsTimeline.forEach((v: any) => {
+          visitsTimelineRes.data.forEach((v: any) => {
             const dateStr = new Date(v.visited_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
             if (dailyMap[dateStr] !== undefined) dailyMap[dateStr]++;
           });

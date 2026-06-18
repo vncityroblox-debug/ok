@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { KeyRound, Check, X, Trash2, Calendar, ShieldCheck, HelpCircle, Pencil } from 'lucide-react';
-import { adminFetch } from '@/lib/admin-fetch';
+import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 
 interface AppItem {
@@ -56,15 +56,13 @@ export default function AdminKeys() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      const [appsRes, keysRes] = await Promise.all([
-        adminFetch('/api/admin/query?type=app_names'),
-        adminFetch('/api/admin/query?type=keys')
+      const [appsResult, keysResult] = await Promise.all([
+        supabase.from('apps').select('id, name').order('name', { ascending: true }),
+        supabase.from('keys').select('*, app_keys(app_id, apps(name))').order('created_at', { ascending: false })
       ]);
-      const appsJson = await appsRes.json();
-      const keysJson = await keysRes.json();
-      if (!appsJson.data || !keysJson.data) throw new Error('No data');
-      setApps(appsJson.data || []);
-      setKeys((keysJson.data as any) || []);
+      if (appsResult.error || !appsResult.data || keysResult.error || !keysResult.data) throw new Error('No data');
+      setApps(appsResult.data || []);
+      setKeys((keysResult.data as any) || []);
     } catch (err: any) {
       console.error('Fetch keys error:', err);
       setErrorMsg('Lỗi khi tải dữ liệu Keys.');
@@ -123,27 +121,20 @@ export default function AdminKeys() {
     }
 
     try {
-      const res = await adminFetch('/api/admin/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resource: 'key',
-          action: 'insert',
-          data: {
-            key: {
-              key_value: finalKey,
-              expiration_date: new Date(expirationDate).toISOString(),
-              usage_limit: usageLimit,
-              usage_count: 0,
-            },
-            appKeys: selectedAppIds
-          }
-        })
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error('Key này đã tồn tại trong hệ thống!');
-      }
+      const { data: newKey, error: keyError } = await supabase.from('keys').insert({
+        key_value: finalKey,
+        expiration_date: new Date(expirationDate).toISOString(),
+        usage_limit: usageLimit,
+        usage_count: 0,
+      }).select().single();
+      if (keyError) throw new Error('Key này đã tồn tại trong hệ thống!');
+
+      const appKeysData = selectedAppIds.map(appId => ({
+        key_id: newKey.id,
+        app_id: appId
+      }));
+      const { error: appKeysError } = await supabase.from('app_keys').insert(appKeysData);
+      if (appKeysError) throw new Error(appKeysError.message);
 
       setSuccessMsg(`Tạo thành công Key "${finalKey}"!`);
       // Reset form
@@ -184,24 +175,21 @@ export default function AdminKeys() {
     }
 
     try {
-      const res = await adminFetch('/api/admin/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resource: 'key',
-          action: 'update',
-          id,
-          data: {
-            key: {
-              expiration_date: new Date(editExpirationDate).toISOString(),
-              usage_limit: editUsageLimit,
-            },
-            appKeys: editSelectedAppIds
-          }
-        })
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
+      const { error: keyUpdateError } = await supabase.from('keys').update({
+        expiration_date: new Date(editExpirationDate).toISOString(),
+        usage_limit: editUsageLimit,
+      }).eq('id', id);
+      if (keyUpdateError) throw new Error(keyUpdateError.message);
+
+      // Re-assign app_keys
+      const { error: deleteOldError } = await supabase.from('app_keys').delete().eq('key_id', id);
+      if (deleteOldError) throw new Error(deleteOldError.message);
+
+      if (editSelectedAppIds.length > 0) {
+        const appKeysData = editSelectedAppIds.map(appId => ({ key_id: id, app_id: appId }));
+        const { error: insertNewError } = await supabase.from('app_keys').insert(appKeysData);
+        if (insertNewError) throw new Error(insertNewError.message);
+      }
 
       setSuccessMsg('Cập nhật Key thành công!');
       setEditingId(null);
@@ -216,13 +204,10 @@ export default function AdminKeys() {
       setErrorMsg('');
       setSuccessMsg('');
       try {
-        const res = await adminFetch('/api/admin/mutate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resource: 'key', action: 'delete', id })
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error);
+        const { error: deleteAppKeysError } = await supabase.from('app_keys').delete().eq('key_id', id);
+        if (deleteAppKeysError) throw new Error(deleteAppKeysError.message);
+        const { error: deleteKeyError } = await supabase.from('keys').delete().eq('id', id);
+        if (deleteKeyError) throw new Error(deleteKeyError.message);
         setSuccessMsg(`Đã xóa Key "${keyValue}".`);
         fetchData();
       } catch (err: any) {

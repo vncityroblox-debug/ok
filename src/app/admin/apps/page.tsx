@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AppWindow, Pencil, Trash2, Check, X, ShieldAlert, Lock, Unlock, Link2, Loader2 } from 'lucide-react';
-import { adminFetch } from '@/lib/admin-fetch';
+import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 
 interface Category {
@@ -61,14 +61,12 @@ export default function AdminApps() {
     setIsLoading(true);
     try {
       const [catsRes, appsRes] = await Promise.all([
-        adminFetch('/api/admin/query?type=categories'),
-        adminFetch('/api/admin/query?type=apps')
+        supabase.from('categories').select('*').order('name', { ascending: true }),
+        supabase.from('apps').select('*, categories(name)').eq('app_type', 'app').order('created_at', { ascending: false })
       ]);
-      const catsJson = await catsRes.json();
-      const appsJson = await appsRes.json();
-      if (!catsJson.data || !appsJson.data) throw new Error('No data');
-      setCategories(catsJson.data || []);
-      setApps(appsJson.data || []);
+      if (!catsRes.data || !appsRes.data) throw new Error('No data');
+      setCategories(catsRes.data || []);
+      setApps(appsRes.data || []);
     } catch (err: any) {
       console.error('Fetch data error:', err);
       setErrorMsg('Lỗi khi tải dữ liệu từ database.');
@@ -137,27 +135,18 @@ export default function AdminApps() {
       .filter((url) => url !== '');
 
     try {
-      const res = await adminFetch('/api/admin/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resource: 'app',
-          action: 'insert',
-          data: {
-            name: name.trim(),
-            slug,
-            description: description.trim(),
-            category_id: categoryId || null,
-            main_image_url: mainImageUrl.trim(),
-            detail_images: detailImages,
-            download_link: downloadLink.trim(),
-            is_locked: isLocked,
-            app_type: 'app',
-          }
-        })
+      const { error } = await supabase.from('apps').insert({
+        name: name.trim(),
+        slug,
+        description: description.trim(),
+        category_id: categoryId || null,
+        main_image_url: mainImageUrl.trim(),
+        detail_images: detailImages,
+        download_link: downloadLink.trim(),
+        is_locked: isLocked,
+        app_type: 'app',
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
+      if (error) throw error;
 
       setSuccessMsg('Đăng ứng dụng thành công!');
       // Reset form
@@ -207,27 +196,17 @@ export default function AdminApps() {
         newSlug = makeSlug(editName);
       }
 
-      const res = await adminFetch('/api/admin/mutate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resource: 'app',
-          action: 'update',
-          id,
-          data: {
-            name: editName.trim(),
-            slug: newSlug,
-            description: editDescription.trim(),
-            category_id: editCategoryId || null,
-            main_image_url: editMainImageUrl.trim(),
-            detail_images: detailImages,
-            download_link: editDownloadLink.trim(),
-            is_locked: editIsLocked,
-          }
-        })
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
+      const { error } = await supabase.from('apps').update({
+        name: editName.trim(),
+        slug: newSlug,
+        description: editDescription.trim(),
+        category_id: editCategoryId || null,
+        main_image_url: editMainImageUrl.trim(),
+        detail_images: detailImages,
+        download_link: editDownloadLink.trim(),
+        is_locked: editIsLocked,
+      }).eq('id', id);
+      if (error) throw error;
 
       setSuccessMsg('Cập nhật ứng dụng thành công!');
       setEditingId(null);
@@ -242,13 +221,8 @@ export default function AdminApps() {
       setErrorMsg('');
       setSuccessMsg('');
       try {
-        const res = await adminFetch('/api/admin/mutate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resource: 'app', action: 'delete', id })
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error);
+        const { error } = await supabase.from('apps').delete().eq('id', id);
+        if (error) throw error;
         setSuccessMsg(`Đã xóa ứng dụng "${appName}".`);
         fetchData();
       } catch (err: any) {

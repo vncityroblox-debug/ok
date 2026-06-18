@@ -6,15 +6,10 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-  // Return early if env variables are not yet set up
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
     return NextResponse.next();
   }
 
-  // Set up response with custom headers for downstream handlers
-  const requestHeaders = new Headers(request.headers);
-
-  // Create the SSR client
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() { return request.cookies.getAll(); },
@@ -25,35 +20,24 @@ export async function middleware(request: NextRequest) {
   });
 
   const { data: { user } } = await supabase.auth.getUser();
+  const path = request.nextUrl.pathname;
 
-  const isLoginPage = request.nextUrl.pathname === '/admin/login';
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-  const isAdminApi = request.nextUrl.pathname.startsWith('/api/admin');
-
-  // Set auth headers for API routes
-  if (user) {
-    requestHeaders.set('x-user-email', user.email ?? '');
-    requestHeaders.set('x-user-id', user.id);
+  // Admin page routes: redirect to login if not authenticated
+  if (path.startsWith('/admin') && !path.startsWith('/api') && path !== '/admin/login' && !user) {
+    return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
-  if (isAdminRoute && !isLoginPage && !user) {
-    const loginUrl = new URL('/admin/login', request.url);
-    return NextResponse.redirect(loginUrl);
+  // Login page: redirect to dashboard if already authenticated
+  if (path === '/admin/login' && user) {
+    return NextResponse.redirect(new URL('/admin', request.url));
   }
 
-  if (isLoginPage && user) {
-    const adminUrl = new URL('/admin', request.url);
-    return NextResponse.redirect(adminUrl);
-  }
-
-  // For API routes, forward the custom headers
-  if (isAdminApi && !user) {
+  // Admin API routes: return 401 if not authenticated
+  if (path.startsWith('/api/admin') && !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  return NextResponse.next({
-    request: { headers: requestHeaders },
-  });
+  return NextResponse.next();
 }
 
 export const config = {
