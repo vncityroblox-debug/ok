@@ -125,30 +125,10 @@ export default async function RootLayout({
       return false;
     }
 
-    // Toast system
-    var toastEl = null;
-    function ensureToast() {
-      if (!toastEl || !document.body.contains(toastEl)) {
-        toastEl = document.createElement('div');
-        toastEl.id = 'anti-toast-head';
-        toastEl.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;padding:16px 36px;border-radius:14px;font-weight:700;font-size:1.15rem;z-index:999999;box-shadow:0 10px 40px rgba(220,38,38,0.5);opacity:0;transition:opacity 0.35s ease;pointer-events:none;font-family:inherit;text-align:center;max-width:90vw;line-height:1.5;border:2px solid rgba(255,255,255,0.2)';
-        document.body.appendChild(toastEl);
-      }
-    }
-    var tTimer = null;
-    function showToast() {
-      ensureToast();
-      toastEl.textContent = 'DO NOT PRESS F12';
-      toastEl.style.opacity = '1';
-      if (tTimer) clearTimeout(tTimer);
-      tTimer = setTimeout(function(){ if(toastEl) toastEl.style.opacity = '0'; }, 3000);
-    }
-
-    // Block events: always prevent, toast only on text/image
+    // Block events silently
     var blockEvent = function(e) {
       e.preventDefault();
       e.stopPropagation();
-      if (isTextOrImage(e.target)) showToast();
       return false;
     };
     var events = ['contextmenu','copy','cut','paste','selectstart','dragstart'];

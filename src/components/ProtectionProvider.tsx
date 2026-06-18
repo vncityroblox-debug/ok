@@ -25,52 +25,15 @@ const DAO_LY = [
   'Không ai có thể trốn tránh luật nhân quả.',
 ];
 
-function isTextOrImage(target: EventTarget | null): boolean {
-  if (!target || !(target instanceof Node)) return false;
-  const el = target as HTMLElement;
-  const tag = el.tagName?.toUpperCase();
-  if (tag === 'IMG' || tag === 'SVG' || tag === 'CANVAS' || tag === 'VIDEO') return true;
-  for (let i = 0; i < el.childNodes.length; i++) {
-    if (el.childNodes[i].nodeType === 3 && el.childNodes[i].textContent?.trim()) return true;
-  }
-  return false;
-}
-
 export default function ProtectionProvider() {
   const pathname = usePathname();
 
   useEffect(() => {
     if (pathname?.startsWith('/admin')) return;
 
-    const toastStyle = document.createElement('style');
-    toastStyle.id = 'anti-toast-style';
-    toastStyle.textContent = `
-      #anti-toast {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, #dc2626, #991b1b);
-        color: #fff;
-        padding: 16px 36px;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 1.15rem;
-        z-index: 999999;
-        box-shadow: 0 10px 40px rgba(220,38,38,0.5);
-        opacity: 0;
-        transition: opacity 0.35s ease;
-        pointer-events: none;
-        font-family: inherit;
-        text-align: center;
-        max-width: 90vw;
-        line-height: 1.5;
-        border: 2px solid rgba(255,255,255,0.2);
-      }
-      #anti-toast.show {
-        opacity: 1;
-      }
-      #anti-moral-overlay {
+    const moralOverlayStyle = document.createElement('style');
+    moralOverlayStyle.id = 'anti-moral-style';
+    moralOverlayStyle.textContent = `
         position: fixed;
         inset: 0;
         background: linear-gradient(135deg, #0f0f1a, #1a0a0a);
@@ -118,20 +81,7 @@ export default function ProtectionProvider() {
         font-size: 0.9rem;
       }
     `;
-    document.head.appendChild(toastStyle);
-
-    const toast = document.createElement('div');
-    toast.id = 'anti-toast';
-    document.body.appendChild(toast);
-
-    let toastTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const showToast = (msg: string) => {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
-    };
+    document.head.appendChild(moralOverlayStyle);
 
     const showMoralLesson = () => {
       const overlay = document.createElement('div');
@@ -147,22 +97,10 @@ export default function ProtectionProvider() {
       document.body.appendChild(overlay);
     };
 
-    // Toast only on text/image right-click or text/image drag
-    const blockEventSmart = (e: Event) => {
-      if (!isTextOrImage(e.target)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      showToast('DO NOT PRESS F12');
-      return false;
-    };
-
-    // Silent block for everything (always prevent, toast only on text/image)
+    // Silent block for everything
     const blockEventHard = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
-      if (isTextOrImage(e.target)) {
-        showToast('DO NOT PRESS F12');
-      }
       return false;
     };
 
@@ -223,13 +161,10 @@ export default function ProtectionProvider() {
     }
 
     return () => {
-      const st = document.getElementById('anti-toast-style');
-      if (st) st.remove();
-      const el = document.getElementById('anti-toast');
-      if (el) el.remove();
+      const ms = document.getElementById('anti-moral-style');
+      if (ms) ms.remove();
       const ol = document.getElementById('anti-moral-overlay');
       if (ol) ol.remove();
-      if (toastTimer) clearTimeout(toastTimer);
       events.forEach(ev => document.removeEventListener(ev, blockEventHard, true));
       document.removeEventListener('keydown', blockKeys, true);
       clearInterval(devtoolsDetect);
