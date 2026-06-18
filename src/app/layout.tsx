@@ -23,7 +23,7 @@ export async function generateMetadata() {
         description: settings.seo_description || 'Download apps and read latest articles',
         keywords: settings.seo_tags || ['apps', 'download', 'blog'],
         icons: {
-          icon: settings.site_icon_url || '/favicon.ico',
+          icon: settings.favicon_url || settings.site_icon_url || '/favicon.ico',
         },
         openGraph: {
           title: settings.seo_title || 'App Share Platform',

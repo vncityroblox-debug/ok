@@ -8,6 +8,7 @@ import styles from '../admin.module.css';
 export default function AdminSettings() {
   const [siteName, setSiteName] = useState('');
   const [siteIconUrl, setSiteIconUrl] = useState('');
+  const [faviconUrl, setFaviconUrl] = useState('');
   const [seoTitle, setSeoTitle] = useState('');
   const [seoDescription, setSeoDescription] = useState('');
   const [seoTags, setSeoTags] = useState('');
@@ -32,6 +33,7 @@ export default function AdminSettings() {
         if (error || !data) throw new Error(error?.message || 'No data');
         setSiteName(data.site_name || '');
         setSiteIconUrl(data.site_icon_url || '');
+        setFaviconUrl(data.favicon_url || '');
         setSeoTitle(data.seo_title || '');
         setSeoDescription(data.seo_description || '');
         setSeoTags(data.seo_tags ? data.seo_tags.join(', ') : '');
@@ -72,6 +74,7 @@ export default function AdminSettings() {
         id: 1,
         site_name: siteName.trim(),
         site_icon_url: siteIconUrl.trim(),
+        favicon_url: faviconUrl.trim(),
         seo_title: seoTitle.trim(),
         seo_description: seoDescription.trim(),
         seo_tags: tagsArray,
@@ -151,6 +154,18 @@ export default function AdminSettings() {
               value={siteIconUrl}
               onChange={(e) => setSiteIconUrl(e.target.value)}
               placeholder="https://link-to-icon.png"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="faviconIcon">Favicon (Icon Tab, URL)</label>
+            <input
+              id="faviconIcon"
+              type="url"
+              className={styles.formInput}
+              value={faviconUrl}
+              onChange={(e) => setFaviconUrl(e.target.value)}
+              placeholder="https://link-to-favicon.ico"
             />
           </div>
         </div>

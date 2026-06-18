@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Terminal } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import styles from './components.module.css';
 
 interface HeaderProps {
@@ -37,9 +37,8 @@ export default function Header({ siteName = 'App Store', siteIconUrl }: HeaderPr
             {siteIconUrl ? (
               <img src={siteIconUrl} alt={siteName} className={styles.logoIcon} />
             ) : (
-              <Terminal className="text-violet-500" size={24} />
+              <span>{siteName}</span>
             )}
-            <span>{siteName}</span>
           </div>
         </Link>
 
