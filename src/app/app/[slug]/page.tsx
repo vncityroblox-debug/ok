@@ -288,13 +288,12 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
                 <label className={styles.formLabel} htmlFor="keyInput" style={{ fontSize: '0.85rem', opacity: 0.8 }}>
                   Nhập Key Tải Về
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <KeyRound size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                <div className="keyInputWrapper">
+                  <KeyRound size={18} className="keyInputIcon" />
                   <input
                     id="keyInput"
                     type="text"
-                    className={styles.formInput}
-                    style={{ paddingLeft: '38px', fontSize: '0.95rem' }}
+                    className="keyInput"
                     placeholder="Nhập mã key..."
                     value={keyInput}
                     onChange={(e) => setKeyInput(e.target.value)}
@@ -307,7 +306,7 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
             {/* Terms Checkbox */}
             {termsContent && (
               <div className={styles.formGroup} style={{ textAlign: 'left', marginBottom: '20px' }}>
-                <label className={styles.checkboxLabel} style={{ alignItems: 'flex-start', cursor: 'pointer' }}>
+                <label className="customCheckbox" style={{ alignItems: 'flex-start' }}>
                   <input
                     type="checkbox"
                     checked={termsAccepted}
@@ -319,7 +318,8 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
                       }
                     }}
                   />
-                  <span style={{ color: 'hsl(var(--text-secondary))', fontSize: '0.9rem', lineHeight: 1.5, marginTop: '-2px' }}>
+                  <span className="checkmark" style={{ marginTop: '2px' }} />
+                  <span style={{ color: 'hsl(var(--text-secondary))', fontSize: '0.9rem', lineHeight: 1.5 }}>
                     Tôi đã đọc và đồng ý với <span style={{ color: 'hsl(var(--color-primary))', textDecoration: 'underline' }}>Điều khoản tải xuống</span>
                   </span>
                 </label>

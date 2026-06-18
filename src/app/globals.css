@@ -95,6 +95,94 @@ input, textarea, select {
   color: inherit;
 }
 
+/* ── Custom Checkbox (modern toggle style) ── */
+.customCheckbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  color: hsl(var(--text-secondary));
+  font-size: 0.9rem;
+}
+
+.customCheckbox input {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid hsl(var(--border-light));
+  background: hsl(var(--bg-card));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+  flex-shrink: 0;
+}
+
+.customCheckbox input:checked + .checkmark {
+  background: hsl(var(--color-primary));
+  border-color: hsl(var(--color-primary));
+}
+
+.customCheckbox input:checked + .checkmark::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+.customCheckbox:hover .checkmark {
+  border-color: hsl(var(--color-primary));
+}
+
+/* ── Custom Key Input ── */
+.keyInputWrapper {
+  position: relative;
+}
+
+.keyInputIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: hsl(var(--text-muted));
+  pointer-events: none;
+}
+
+.keyInput {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  background: hsl(var(--bg-card));
+  border: 2px solid hsl(var(--border-light));
+  border-radius: 10px;
+  color: hsl(var(--text-primary));
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.keyInput:focus {
+  border-color: hsl(var(--color-primary));
+  box-shadow: 0 0 0 4px hsla(var(--color-primary) / 0.1);
+}
+
+.keyInput::placeholder {
+  letter-spacing: normal;
+  text-transform: none;
+  color: hsl(var(--text-muted));
+  font-family: var(--font-main);
+}
+
 /* Reusable UI Utilities */
 .glass-panel {
   background: hsl(var(--bg-card));
