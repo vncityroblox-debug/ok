@@ -2,7 +2,7 @@ import './globals.css';
 import { getSupabaseServer } from '@/lib/supabase';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import OnboardingTour from '@/components/OnboardingTour';
+import AnnouncementPopup from '@/components/AnnouncementPopup';
 
 export async function generateMetadata() {
   try {
@@ -89,7 +89,7 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer siteName={siteName} siteDescription={siteDescription} footerText={footerText} />
-        <OnboardingTour />
+        <AnnouncementPopup />
       </body>
     </html>
   );

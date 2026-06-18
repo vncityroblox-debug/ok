@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Save, Link2 } from 'lucide-react';
+import { Save, Link2, Megaphone } from 'lucide-react';
 import styles from '../admin.module.css';
 
 export default function AdminSettings() {
@@ -16,6 +16,7 @@ export default function AdminSettings() {
   const [theme, setTheme] = useState('light');
   const [termsContent, setTermsContent] = useState('');
   const [link4mToken, setLink4mToken] = useState('');
+  const [announcementHtml, setAnnouncementHtml] = useState('');
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -44,6 +45,7 @@ export default function AdminSettings() {
           setTheme(data.theme || 'light');
           setTermsContent(data.terms_content || '');
           setLink4mToken(data.link4m_api_token || '');
+          setAnnouncementHtml(data.announcement_html || '');
         }
       } catch (err) {
         console.error('Settings load error:', err);
@@ -81,6 +83,7 @@ export default function AdminSettings() {
           theme: theme,
           terms_content: termsContent.trim(),
           link4m_api_token: link4mToken.trim(),
+          announcement_html: announcementHtml,
           updated_at: new Date().toISOString(),
         });
 
@@ -251,6 +254,43 @@ export default function AdminSettings() {
             placeholder="Nhập điều khoản người dùng phải đồng ý trước khi tải..."
           />
         </div>
+
+        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />
+
+        <div style={{ marginBottom: '12px' }}>
+          <h4 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <Megaphone size={18} style={{ color: 'hsl(var(--color-accent, var(--color-primary)))' }} />
+            Thông Báo Popup
+          </h4>
+          <p style={{ color: 'hsl(var(--text-muted))', fontSize: '0.85rem' }}>
+            Nội dung HTML sẽ hiện popup khi người dùng truy cập trang chủ. Để trống nếu không muốn hiện thông báo. Hỗ trợ nhúng HTML đầy đủ (thẻ &lt;img&gt;, &lt;a&gt;, &lt;b&gt;, &lt;iframe&gt;...).
+          </p>
+        </div>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel} htmlFor="announcementHtml">Nội Dung Thông Báo (HTML)</label>
+          <textarea
+            id="announcementHtml"
+            rows={8}
+            className={styles.formInput}
+            style={{ resize: 'vertical', fontFamily: 'monospace', fontSize: '0.88rem' }}
+            value={announcementHtml}
+            onChange={(e) => setAnnouncementHtml(e.target.value)}
+            placeholder='Ví dụ: <h2>🎉 Chào mừng!</h2><p>Website đã <b>cập nhật</b> phiên bản mới.</p>'
+          />
+        </div>
+        {announcementHtml.trim() && (
+          <div style={{ marginBottom: '20px' }}>
+            <label className={styles.formLabel}>Xem Trước Thông Báo</label>
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'rgba(139, 92, 246, 0.05)',
+              border: '1px solid rgba(139, 92, 246, 0.2)',
+              lineHeight: 1.7,
+              color: 'hsl(var(--text-primary))',
+            }} dangerouslySetInnerHTML={{ __html: announcementHtml }} />
+          </div>
+        )}
 
         <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />
 
