@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FileText, Pencil, Trash2, Check, X, Eye, Edit3 } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from '../admin.module.css';
 
 interface Post {
@@ -35,7 +36,7 @@ export default function AdminPosts() {
   async function fetchPosts() {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/admin/query?type=posts');
+      const res = await adminFetch('/api/admin/query?type=posts');
       const json = await res.json();
       if (!json.data) throw new Error('No data');
       setPosts(json.data || []);
@@ -67,7 +68,7 @@ export default function AdminPosts() {
     const slug = makeSlug(title);
 
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -113,7 +114,7 @@ export default function AdminPosts() {
     const slug = makeSlug(editTitle);
 
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -139,7 +140,7 @@ export default function AdminPosts() {
       setErrorMsg('');
       setSuccessMsg('');
       try {
-        const res = await fetch('/api/admin/mutate', {
+        const res = await adminFetch('/api/admin/mutate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ resource: 'post', action: 'delete', id })

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AppWindow, Pencil, Trash2, Check, X, ShieldAlert, Lock, Unlock, Link2, Loader2 } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from '../admin.module.css';
 
 interface Category {
@@ -60,8 +61,8 @@ export default function AdminApps() {
     setIsLoading(true);
     try {
       const [catsRes, appsRes] = await Promise.all([
-        fetch('/api/admin/query?type=categories'),
-        fetch('/api/admin/query?type=apps')
+        adminFetch('/api/admin/query?type=categories'),
+        adminFetch('/api/admin/query?type=apps')
       ]);
       const catsJson = await catsRes.json();
       const appsJson = await appsRes.json();
@@ -136,7 +137,7 @@ export default function AdminApps() {
       .filter((url) => url !== '');
 
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -206,7 +207,7 @@ export default function AdminApps() {
         newSlug = makeSlug(editName);
       }
 
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -241,7 +242,7 @@ export default function AdminApps() {
       setErrorMsg('');
       setSuccessMsg('');
       try {
-        const res = await fetch('/api/admin/mutate', {
+        const res = await adminFetch('/api/admin/mutate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ resource: 'app', action: 'delete', id })

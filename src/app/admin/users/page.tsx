@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { UserPlus, Users, Trash2, Shield, ShieldCheck, RefreshCw, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from '../admin.module.css';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -62,7 +63,7 @@ function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
     setMsg(null);
     try {
       const token = await getToken();
-      const res = await fetch('/api/admin/create-user', {
+      const res = await adminFetch('/api/admin/create-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -410,7 +411,7 @@ export default function AdminUsersPage() {
     setListError('');
     try {
       const token = await getToken();
-      const res = await fetch('/api/admin/list-users', {
+      const res = await adminFetch('/api/admin/list-users', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
@@ -437,7 +438,7 @@ export default function AdminUsersPage() {
   const handleDelete = async (id: string, email: string) => {
     if (!confirm(`Bạn có chắc muốn xóa admin "${email}"?\nHành động này không thể hoàn tác!`)) return;
     const token = await getToken();
-    const res = await fetch('/api/admin/delete-user', {
+    const res = await adminFetch('/api/admin/delete-user', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

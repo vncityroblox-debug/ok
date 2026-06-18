@@ -5,18 +5,41 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+async function getUserFromRequest(request: NextRequest) {
+  const key = supabaseServiceKey || supabaseAnonKey;
+  const supabase = createClient(supabaseUrl, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  // 1. Try Authorization header (Bearer token from adminFetch)
+  const authHeader = request.headers.get('Authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.slice(7);
+    const { data: { user } } = await supabase.auth.getUser(token);
+    if (user) return user;
+  }
+
+  // 2. Try x-user-email header (set by middleware)
+  const email = request.headers.get('x-user-email');
+  if (email) {
+    const { data: admin } = await supabase.from('admin_users').select('email').eq('email', email).single();
+    if (admin) return { email: admin.email } as any;
+  }
+
+  return null;
+}
+
 export async function GET(request: NextRequest) {
   try {
-    // Auth is verified by middleware — read email from headers
-    const email = request.headers.get('x-user-email');
-    if (!email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getUserFromRequest(request);
+    if (!user || !user.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const key = supabaseServiceKey || supabaseAnonKey;
     const supabase = createClient(supabaseUrl, key, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', email).single();
+    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', user.email).single();
     if (!admin?.role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const url = new URL(request.url);

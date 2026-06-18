@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { KeyRound, Check, X, Trash2, Calendar, ShieldCheck, HelpCircle, Pencil } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from '../admin.module.css';
 
 interface AppItem {
@@ -56,8 +57,8 @@ export default function AdminKeys() {
     setIsLoading(true);
     try {
       const [appsRes, keysRes] = await Promise.all([
-        fetch('/api/admin/query?type=app_names'),
-        fetch('/api/admin/query?type=keys')
+        adminFetch('/api/admin/query?type=app_names'),
+        adminFetch('/api/admin/query?type=keys')
       ]);
       const appsJson = await appsRes.json();
       const keysJson = await keysRes.json();
@@ -122,7 +123,7 @@ export default function AdminKeys() {
     }
 
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -183,7 +184,7 @@ export default function AdminKeys() {
     }
 
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -215,7 +216,7 @@ export default function AdminKeys() {
       setErrorMsg('');
       setSuccessMsg('');
       try {
-        const res = await fetch('/api/admin/mutate', {
+        const res = await adminFetch('/api/admin/mutate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ resource: 'key', action: 'delete', id })

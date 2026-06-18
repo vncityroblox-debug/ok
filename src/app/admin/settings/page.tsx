@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Save, Link2, Megaphone, LayoutTemplate } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from '../admin.module.css';
 
 export default function AdminSettings() {
@@ -27,7 +28,7 @@ export default function AdminSettings() {
     async function loadSettings() {
       setIsLoading(true);
       try {
-        const res = await fetch('/api/admin/query?type=settings');
+        const res = await adminFetch('/api/admin/query?type=settings');
         const json = await res.json();
         if (json.data) {
           setSiteName(json.data.site_name || '');
@@ -69,7 +70,7 @@ export default function AdminSettings() {
       .filter((tag) => tag !== '');
 
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

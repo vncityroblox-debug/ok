@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { BarChart3, Users, Download, ArrowUpRight } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from './admin.module.css';
 
 interface AppClickStat {
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
     async function fetchStats() {
       setIsLoading(true);
       try {
-        const res = await fetch('/api/admin/query?type=dashboard');
+        const res = await adminFetch('/api/admin/query?type=dashboard');
         const json = await res.json();
         if (!json.data) throw new Error('No data');
 

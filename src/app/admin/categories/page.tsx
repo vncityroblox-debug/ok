@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FolderPlus, Pencil, Trash2, Check, X } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from '../admin.module.css';
 
 interface Category {
@@ -30,7 +31,7 @@ export default function AdminCategories() {
   async function fetchCategories() {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/admin/query?type=categories');
+      const res = await adminFetch('/api/admin/query?type=categories');
       const json = await res.json();
       if (!json.data) throw new Error('No data');
       setCategories(json.data || []);
@@ -59,7 +60,7 @@ export default function AdminCategories() {
 
     const slug = makeSlug(name);
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -99,7 +100,7 @@ export default function AdminCategories() {
     setErrorMsg('');
     const slug = makeSlug(editName);
     try {
-      const res = await fetch('/api/admin/mutate', {
+      const res = await adminFetch('/api/admin/mutate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -125,7 +126,7 @@ export default function AdminCategories() {
     if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${name}"? Các ứng dụng thuộc danh mục này sẽ mất liên kết danh mục.`)) {
       setErrorMsg('');
       try {
-        const res = await fetch('/api/admin/mutate', {
+        const res = await adminFetch('/api/admin/mutate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ resource: 'category', action: 'delete', id })
