@@ -1,35 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Pure White Theme */
-  --bg-main: 0 0% 98%;
+  /* AdminLTE v4 / Bootstrap Theme */
+  --bg-main: 210 16% 95%;
   --bg-card: 0 0% 100%;
-  --bg-subtle: 220 14% 96%;
-  --bg-hover: 220 14% 94%;
+  --bg-subtle: 210 16% 93%;
+  --bg-hover: 210 14% 90%;
   --bg-glass: 0 0% 100% / 0.92;
-  --border-glass: 220 10% 88%;
-  --border-light: 220 12% 92%;
+  --border-glass: 210 10% 85%;
+  --border-light: 210 10% 88%;
 
-  --text-primary: 220 20% 10%;
-  --text-secondary: 220 8% 46%;
-  --text-muted: 220 6% 63%;
+  --text-primary: 210 10% 14%;
+  --text-secondary: 210 8% 40%;
+  --text-muted: 210 6% 58%;
 
-  /* Google Blue primary */
-  --color-primary: 217 89% 50%;
-  --color-primary-hover: 217 89% 40%;
-  --color-secondary: 141 53% 43%;
+  /* Bootstrap Blue primary */
+  --color-primary: 213 93% 52%;
+  --color-primary-hover: 213 93% 42%;
+  --color-secondary: 141 55% 42%;
   --color-accent: 4 82% 56%;
-  --color-success: 141 53% 43%;
-  --color-danger: 4 82% 56%;
+  --color-success: 141 55% 42%;
+  --color-danger: 4 82% 54%;
   --color-warning: 38 92% 50%;
 
   /* Fonts */
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-main: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
-  /* Box Shadows - Light */
-  --shadow-neon: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-neon-strong: 0 4px 12px rgba(0, 0, 0, 0.10);
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  /* Box Shadows */
+  --shadow-neon: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-neon-strong: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.08);
 
   /* Transitions */
   --transition-smooth: all 0.2s ease;
@@ -49,9 +49,9 @@
   --text-secondary: 216 6% 63%;
   --text-muted: 216 8% 46%;
 
-  --color-primary: 217 89% 60%;
-  --color-primary-hover: 217 89% 70%;
-  --color-secondary: 141 53% 53%;
+  --color-primary: 213 93% 60%;
+  --color-primary-hover: 213 93% 70%;
+  --color-secondary: 141 55% 53%;
   --color-accent: 4 82% 66%;
 
   --shadow-neon: 0 1px 3px rgba(0, 0, 0, 0.3);

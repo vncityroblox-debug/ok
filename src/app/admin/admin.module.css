@@ -8,24 +8,26 @@
   background: hsl(var(--bg-subtle));
 }
 
+/* ── Dark Sidebar (AdminLTE style) ── */
 .sidebar {
-  width: 250px;
-  background: hsl(var(--bg-card));
-  border-right: 1px solid hsl(var(--border-light));
-  padding: 20px 12px;
+  width: 260px;
+  background: #343a40;
+  border-right: none;
+  padding: 0 0 16px 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
   position: sticky;
   top: 0;
   height: calc(100vh - 70px);
   overflow-y: auto;
   flex-shrink: 0;
+  color: #c2c7d0;
 }
 
 .mainContent {
   flex: 1;
-  padding: 32px 40px;
+  padding: 28px 32px;
   max-width: 100%;
   overflow-y: auto;
 }
@@ -36,20 +38,20 @@
   }
 }
 
-/* Sidebar header with logo */
+/* ── Sidebar brand / header (AdminLTE brand-link) ── */
 .sidebarHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 6px 16px 6px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid hsl(var(--border-light));
+  height: 3.5rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .sidebarLogo {
-  width: 120px;
-  height: auto;
-  max-height: 36px;
+  max-height: 30px;
+  width: auto;
   object-fit: contain;
   display: block;
 }
@@ -57,29 +59,31 @@
 .sidebarLogoPlaceholder {
   font-size: 1.1rem;
   font-weight: 700;
-  color: hsl(var(--text-primary));
+  color: #fff;
+  opacity: 0.8;
 }
 
 .sidebarCloseBtn {
   display: none;
   background: transparent;
   border: none;
-  color: hsl(var(--text-secondary));
+  color: #adb5bd;
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
 }
-
 .sidebarCloseBtn:hover {
-  color: hsl(var(--text-primary));
-  background: hsl(var(--bg-hover));
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
+/* ── Sidebar nav items (AdminLTE nav-link style) ── */
 .sidebarNav {
   display: flex;
   flex-direction: column;
   gap: 2px;
   flex: 1;
+  padding: 0.5rem;
 }
 
 /* Mobile header (hamburger button) */
@@ -123,7 +127,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 40;
   }
 
@@ -134,14 +138,14 @@
     z-index: 50;
     width: 280px;
     height: 100vh;
-    border-right: 1px solid hsl(var(--border-light));
+    border-right: none;
     border-bottom: none;
     flex-direction: column;
     overflow-y: auto;
-    gap: 4px;
+    gap: 0;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    padding: 20px 12px;
+    padding: 0;
   }
 
   .sidebarOpen {
@@ -159,48 +163,52 @@
 
   .logoutBtn {
     margin-top: auto;
-    width: 100%;
+    width: auto;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
 
-/* Sidebar Nav items */
+/* ── Sidebar nav links (AdminLTE dark sidebar style) ── */
 .sidebarLink {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  color: hsl(var(--text-secondary));
-  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #c2c7d0;
+  font-weight: 400;
   font-size: 0.9rem;
   transition: var(--transition-smooth);
 }
 
 .sidebarLink:hover {
-  background: hsl(var(--bg-hover));
-  color: hsl(var(--text-primary));
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
   text-decoration: none;
 }
 
 .activeSidebarLink {
-  background: hsla(var(--color-primary) / 0.08);
-  color: hsl(var(--color-primary));
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
   font-weight: 600;
 }
 
 .activeSidebarLink:hover {
-  background: hsla(var(--color-primary) / 0.12);
+  background: rgba(255, 255, 255, 0.15);
 }
 
+/* ── Logout button (dark sidebar) ── */
 .logoutBtn {
   margin-top: auto;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  color: hsl(var(--color-danger));
-  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #e8747a;
+  font-weight: 400;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -208,10 +216,14 @@
   text-align: left;
   font-size: 0.9rem;
   transition: var(--transition-smooth);
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .logoutBtn:hover {
-  background: hsla(var(--color-danger) / 0.06);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8a0a5;
 }
 
 /* Page Header */
@@ -243,7 +255,7 @@
   padding: 24px;
   background: hsl(var(--bg-card));
   border: 1px solid hsl(var(--border-light));
-  border-radius: 12px;
+  border-radius: 0.5rem;
   box-shadow: var(--shadow-card);
   transition: var(--transition-smooth);
 }
@@ -273,7 +285,7 @@
 .graphSection {
   background: hsl(var(--bg-card));
   border: 1px solid hsl(var(--border-light));
-  border-radius: 12px;
+  border-radius: 0.5rem;
   padding: 24px;
   box-shadow: var(--shadow-card);
 }
@@ -344,7 +356,7 @@
   text-overflow: ellipsis;
 }
 
-/* Forms */
+/* Forms (AdminLTE Bootstrap style) */
 .formGroup {
   margin-bottom: 20px;
 }
@@ -362,7 +374,7 @@
   background: hsl(var(--bg-card));
   border: 1px solid hsl(var(--border-light));
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 0.375rem;
   color: hsl(var(--text-primary));
   outline: none;
   transition: var(--transition-smooth);
@@ -382,7 +394,7 @@
   overflow-y: auto;
   background: hsl(var(--bg-subtle));
   padding: 14px;
-  border-radius: 8px;
+  border-radius: 0.375rem;
   border: 1px solid hsl(var(--border-light));
 }
 
@@ -399,10 +411,10 @@
   accent-color: hsl(var(--color-primary));
 }
 
-/* Table styling */
+/* Table styling (AdminLTE Bootstrap style) */
 .tableContainer {
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: 0.5rem;
   border: 1px solid hsl(var(--border-light));
   background: hsl(var(--bg-card));
   box-shadow: var(--shadow-card);
@@ -416,17 +428,15 @@
 
 .adminTable th {
   background: hsl(var(--bg-subtle));
-  padding: 14px 20px;
+  padding: 12px 16px;
   font-weight: 600;
   font-size: 0.85rem;
   color: hsl(var(--text-secondary));
   border-bottom: 1px solid hsl(var(--border-light));
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .adminTable td {
-  padding: 14px 20px;
+  padding: 12px 16px;
   border-bottom: 1px solid hsl(var(--border-light));
   color: hsl(var(--text-primary));
   font-size: 0.9rem;
@@ -499,15 +509,17 @@
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 70px);
-  background: hsl(var(--bg-subtle));
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%230d6efd" fill-opacity="0.05" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,128C672,107,768,117,864,138.7C960,160,1056,192,1152,186.7C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+  background-size: cover;
+  background-color: hsl(var(--bg-subtle));
 }
 
 .loginCard {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   padding: 36px;
   background: hsl(var(--bg-card));
   border: 1px solid hsl(var(--border-light));
-  border-radius: 12px;
-  box-shadow: var(--shadow-neon-strong);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
 }

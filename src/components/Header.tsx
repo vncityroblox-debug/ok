@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import styles from './components.module.css';
 
 interface HeaderProps {
@@ -11,9 +12,25 @@ interface HeaderProps {
   siteIconUrl?: string;
 }
 
-export default function Header({ siteName = 'App Store', siteIconUrl }: HeaderProps) {
+export default function Header({ siteName = 'App Store', siteIconUrl: serverIconUrl }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [localIconUrl, setLocalIconUrl] = useState('');
   const pathname = usePathname();
+  const siteIconUrl = serverIconUrl || localIconUrl;
+
+  useEffect(() => {
+    if (serverIconUrl) return;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('site_settings')
+          .select('site_icon_url')
+          .eq('id', 1)
+          .single();
+        if (data?.site_icon_url) setLocalIconUrl(data.site_icon_url);
+      } catch {}
+    })();
+  }, [serverIconUrl]);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
