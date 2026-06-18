@@ -25,21 +25,16 @@ const DAO_LY = [
   'Không ai có thể trốn tránh luật nhân quả.',
 ];
 
-const DAO_LY_DIEU = `NHỮNG ĐIỀU HAY VỀ ĐẠO LÝ LÀM NGƯỜI
-
-“Đối xử với người khác như cách bạn muốn được đối xử” - Đó là vàng trong mọi nền văn hóa.
-
-Người xưa dạy: "Tiên học lễ, hậu học văn". Học làm người trước, học kiến thức sau. Một người có tài mà không có đức thì cũng như con thú dữ.
-
-XÂM PHẠM WEB CỦA NGƯỜI KHÁC LÀ:
-• Vi phạm pháp luật
-• Vi phạm đạo đức
-• Tự hạ thấp giá trị bản thân
-
-Hãy sống tốt, làm điều đúng đắn, và bạn sẽ nhận lại được điều tốt đẹp.
-
-NHÂN QUẢ - KHÔNG AI THOÁT ĐƯỢC
-Mọi hành động đều có hệ quả. Gió bão táp không thể che được mặt trời, tội lỗi không thể che được sự thật.`;
+function isTextOrImage(target: EventTarget | null): boolean {
+  if (!target || !(target instanceof Node)) return false;
+  const el = target as HTMLElement;
+  const tag = el.tagName?.toUpperCase();
+  if (tag === 'IMG' || tag === 'SVG' || tag === 'CANVAS' || tag === 'VIDEO') return true;
+  for (let i = 0; i < el.childNodes.length; i++) {
+    if (el.childNodes[i].nodeType === 3 && el.childNodes[i].textContent?.trim()) return true;
+  }
+  return false;
+}
 
 export default function ProtectionProvider() {
   const pathname = usePathname();
@@ -122,10 +117,6 @@ export default function ProtectionProvider() {
         color: #666;
         font-size: 0.9rem;
       }
-      #anti-moral-overlay .highlight {
-        color: #f0c040;
-        font-weight: bold;
-      }
     `;
     document.head.appendChild(toastStyle);
 
@@ -156,16 +147,29 @@ export default function ProtectionProvider() {
       document.body.appendChild(overlay);
     };
 
-    const blockEvent = (e: Event) => {
+    // Toast only on text/image right-click or text/image drag
+    const blockEventSmart = (e: Event) => {
+      if (!isTextOrImage(e.target)) return;
       e.preventDefault();
       e.stopPropagation();
-      showToast('⚠️ XÂM PHẠM WEB LÀ CON CHÓ');
+      showToast('DO NOT PRESS F12');
+      return false;
+    };
+
+    // Silent block for everything (always prevent, toast only on text/image)
+    const blockEventHard = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isTextOrImage(e.target)) {
+        showToast('DO NOT PRESS F12');
+      }
       return false;
     };
 
     const events = ['contextmenu', 'copy', 'cut', 'paste', 'selectstart', 'dragstart'];
-    events.forEach(ev => document.addEventListener(ev, blockEvent, true));
+    events.forEach(ev => document.addEventListener(ev, blockEventHard, true));
 
+    // F12 and dev keys → SILENT block, no toast
     const blockKeys = (e: KeyboardEvent) => {
       const isBadKey =
         e.key === 'F12' ||
@@ -174,12 +178,13 @@ export default function ProtectionProvider() {
         (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P'));
       if (isBadKey) {
         e.preventDefault();
-        showToast('⚠️ XÂM PHẠM WEB LÀ CON CHÓ');
+        e.stopPropagation();
         return false;
       }
     };
     document.addEventListener('keydown', blockKeys, true);
 
+    // DevTools detection: debugger trick
     const devtoolsDetect = setInterval(() => {
       const start = performance.now();
       debugger;
@@ -191,12 +196,28 @@ export default function ProtectionProvider() {
       }
     }, 2000);
 
+    // DevTools detection: dimension trick
+    const dimensionCheck = setInterval(() => {
+      const threshold = 160;
+      if (
+        window.outerWidth - window.innerWidth > threshold ||
+        window.outerHeight - window.innerHeight > threshold
+      ) {
+        clearInterval(devtoolsDetect);
+        clearInterval(dimensionCheck);
+        clearInterval(reattachInterval);
+        showMoralLesson();
+      }
+    }, 2000);
+
+    // Re-attach every 800ms
     const reattachInterval = setInterval(() => {
-      events.forEach(ev => document.addEventListener(ev, blockEvent, true));
+      events.forEach(ev => document.addEventListener(ev, blockEventHard, true));
       document.removeEventListener('keydown', blockKeys, true);
       document.addEventListener('keydown', blockKeys, true);
-    }, 1000);
+    }, 800);
 
+    // Anti-iframe
     if (window.top !== window.self && window.top) {
       window.top.location.href = window.self.location.href;
     }
@@ -209,9 +230,10 @@ export default function ProtectionProvider() {
       const ol = document.getElementById('anti-moral-overlay');
       if (ol) ol.remove();
       if (toastTimer) clearTimeout(toastTimer);
-      events.forEach(ev => document.removeEventListener(ev, blockEvent, true));
+      events.forEach(ev => document.removeEventListener(ev, blockEventHard, true));
       document.removeEventListener('keydown', blockKeys, true);
       clearInterval(devtoolsDetect);
+      clearInterval(dimensionCheck);
       clearInterval(reattachInterval);
     };
   }, [pathname]);

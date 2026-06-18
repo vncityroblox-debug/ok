@@ -113,28 +113,44 @@ export default async function RootLayout({
 
 (function(){
   try {
-    // Admin check
     if (location.pathname.startsWith('/admin')) return;
 
-    var DAO_LY = [
-      'ĐẠO LÝ LÀM NGƯỜI',
-      '',
-      '1. Tôn trọng là nền tảng của mọi mối quan hệ.',
-      '   Web này là tài sản của người khác, xâm phạm là vi phạm đạo đức.',
-      '',
-      '2. Nhân quả không sai một ai.',
-      '   Gieo nhân nào gặt quả nấy. Làm điều xấu sẽ nhận điều xấu.',
-      '',
-      '3. Người khôn không sợ, chỉ có kẻ tiểu nhân mới lén lút.',
-      '   Hãy sống đường hoàng, chính trực, không cần gian dối.',
-      '',
-      '4. Hãy dùng thời gian và kiến thức vào việc tốt,',
-      '   đừng phí hoài cuộc đời vào những trò xâm phạm vô bổ.',
-      '',
-      '5. Một người tử tế không cần phá hoại người khác để khẳng định mình.',
-    ];
+    function isTextOrImage(t) {
+      if (!t) return false;
+      var tag = (t.tagName || '').toUpperCase();
+      if (tag === 'IMG' || tag === 'SVG' || tag === 'CANVAS' || tag === 'VIDEO') return true;
+      for (var i = 0; i < t.childNodes.length; i++) {
+        if (t.childNodes[i].nodeType === 3 && (t.childNodes[i].textContent || '').trim()) return true;
+      }
+      return false;
+    }
 
-    var blockEvent = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+    // Toast system
+    var toastEl = null;
+    function ensureToast() {
+      if (!toastEl || !document.body.contains(toastEl)) {
+        toastEl = document.createElement('div');
+        toastEl.id = 'anti-toast-head';
+        toastEl.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;padding:16px 36px;border-radius:14px;font-weight:700;font-size:1.15rem;z-index:999999;box-shadow:0 10px 40px rgba(220,38,38,0.5);opacity:0;transition:opacity 0.35s ease;pointer-events:none;font-family:inherit;text-align:center;max-width:90vw;line-height:1.5;border:2px solid rgba(255,255,255,0.2)';
+        document.body.appendChild(toastEl);
+      }
+    }
+    var tTimer = null;
+    function showToast() {
+      ensureToast();
+      toastEl.textContent = 'DO NOT PRESS F12';
+      toastEl.style.opacity = '1';
+      if (tTimer) clearTimeout(tTimer);
+      tTimer = setTimeout(function(){ if(toastEl) toastEl.style.opacity = '0'; }, 3000);
+    }
+
+    // Block events: always prevent, toast only on text/image
+    var blockEvent = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isTextOrImage(e.target)) showToast();
+      return false;
+    };
     var events = ['contextmenu','copy','cut','paste','selectstart','dragstart'];
 
     var bindAll = function() {
@@ -144,6 +160,7 @@ export default async function RootLayout({
     };
     bindAll();
 
+    // F12/dev keys: SILENT block, no toast
     var blockKeys = function(e) {
       if (
         e.key === 'F12' ||
@@ -158,19 +175,12 @@ export default async function RootLayout({
     };
     document.addEventListener('keydown', blockKeys, true);
 
-    // Re-bind every 500ms to prevent removal
+    // Re-bind every 500ms
     setInterval(bindAll, 500);
     setInterval(function() {
       document.removeEventListener('keydown', blockKeys, true);
       document.addEventListener('keydown', blockKeys, true);
     }, 500);
-
-    // Moral lesson in console for anyone who opens DevTools
-    setTimeout(function() {
-      console.log('%c⚠️ XÂM PHẠM WEB LÀ CON CHÓ ⚠️', 'font-size:24px;font-weight:bold;color:#dc2626');
-      console.log('%c' + DAO_LY.join('\\n'), 'font-size:14px;color:#f0e6d0;line-height:1.8');
-      console.log('%cHãy tắt DevTools và sống tử tế. Nhân quả sẽ đến với tất cả.', 'font-size:16px;font-style:italic;color:#b8860b');
-    }, 1000);
   } catch(e) {}
 })();
 `
