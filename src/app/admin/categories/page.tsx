@@ -141,11 +141,11 @@ export default function AdminCategories() {
 
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>
           Quản Lý Danh Mục
         </h1>
-        <p style={{ color: 'hsl(var(--text-secondary))' }}>
+        <p className={styles.pageSubtitle}>
           Tạo và điều chỉnh các danh mục ứng dụng. Hỗ trợ tất cả định dạng ảnh (gif, png, jpg, svg)
         </p>
       </div>

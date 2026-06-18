@@ -1,12 +1,13 @@
 /* Header Styling */
 .header {
-  position: relative;
+  position: sticky;
+  top: 0;
   width: 100%;
   z-index: 100;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border-glass);
+  background: hsl(var(--bg-glass));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid hsl(var(--border-light));
   height: 70px;
   display: flex;
   align-items: center;
@@ -27,39 +28,41 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, hsl(var(--text-primary)), hsl(var(--color-primary)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: hsl(var(--text-primary));
   cursor: pointer;
 }
 
+.logo:hover {
+  text-decoration: none;
+}
+
 .logoIcon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   object-fit: cover;
-  border: 1.5px solid hsl(var(--color-primary));
 }
 
 .nav {
   display: flex;
-  gap: 28px;
+  gap: 24px;
   align-items: center;
 }
 
 .navLink {
   color: hsl(var(--text-secondary));
   font-weight: 500;
-  font-size: 0.95rem;
-  position: relative;
+  font-size: 0.9rem;
   padding: 6px 0;
   transition: var(--transition-smooth);
+  position: relative;
 }
 
 .navLink:hover {
   color: hsl(var(--text-primary));
+  text-decoration: none;
 }
 
 .navLink::after {
@@ -69,9 +72,9 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, hsl(var(--color-primary)), hsl(var(--color-secondary)));
-  transition: var(--transition-smooth);
-  border-radius: 2px;
+  background: hsl(var(--color-primary));
+  transition: width 0.2s ease;
+  border-radius: 1px;
 }
 
 .navLink:hover::after {
@@ -79,11 +82,12 @@
 }
 
 .activeNavLink {
-  color: hsl(var(--text-primary));
+  color: hsl(var(--color-primary));
 }
 
 .activeNavLink::after {
   width: 100%;
+  background: hsl(var(--color-primary));
 }
 
 .menuBtn {
@@ -97,35 +101,35 @@
 /* Footer Styling */
 .footer {
   background: hsl(var(--bg-card));
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 60px 0 30px 0;
-  margin-top: 100px;
+  border-top: 1px solid hsl(var(--border-light));
+  padding: 48px 0 24px 0;
+  margin-top: 80px;
 }
 
 .footerGrid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 48px;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 @media (max-width: 768px) {
   .footerGrid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
   }
 }
 
 .footerCol h4 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: hsl(var(--text-primary));
 }
 
 .footerCol p {
   color: hsl(var(--text-secondary));
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   line-height: 1.6;
 }
 
@@ -133,23 +137,24 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .footerCol ul a {
   color: hsl(var(--text-secondary));
   transition: var(--transition-smooth);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .footerCol ul a:hover {
   color: hsl(var(--color-primary));
+  text-decoration: none;
   padding-left: 4px;
 }
 
 .footerBottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 30px;
+  border-top: 1px solid hsl(var(--border-light));
+  padding-top: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -159,129 +164,32 @@
   font-size: 0.85rem;
 }
 
-/* Onboarding Tour Overlay styling */
-.tourOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(4, 6, 12, 0.85);
-  z-index: 1000;
-  transition: opacity 0.3s ease;
-  pointer-events: auto;
-}
-
-.tourHighlight {
-  position: absolute;
-  box-shadow: 0 0 0 9999px rgba(4, 6, 12, 0.85);
-  border-radius: 8px;
-  border: 2px dashed hsl(var(--color-primary));
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  z-index: 1001;
-  pointer-events: none;
-}
-
-.tourTooltip {
-  position: absolute;
-  width: 320px;
-  padding: 24px;
-  border-radius: 16px;
-  background: hsl(var(--bg-card));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.8), var(--shadow-neon);
-  z-index: 1002;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  animation: fadeIn 0.3s ease;
-}
-
-.tourStep {
-  font-size: 0.8rem;
-  color: hsl(var(--color-primary));
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-}
-
-.tourTitle {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: hsl(var(--text-primary));
-}
-
-.tourContent {
-  font-size: 0.95rem;
-  color: hsl(var(--text-secondary));
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-.tourButtons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.tourSkip {
-  background: transparent;
-  border: none;
-  color: hsl(var(--text-muted));
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: var(--transition-smooth);
-}
-
-.tourSkip:hover {
-  color: hsl(var(--text-primary));
-}
-
-.tourNext {
-  background: hsl(var(--color-primary));
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-}
-
-.tourNext:hover {
-  background: hsl(var(--color-primary-hover));
-}
-
-/* Mobile responsive menu */
+/* Mobile responsive */
 @media (max-width: 768px) {
   .menuBtn {
     display: block;
     z-index: 100;
   }
-  
+
   .nav {
     position: fixed;
     top: 0;
     left: 0;
-    right: auto;
     bottom: 0;
     width: 260px;
     height: 100vh;
-    background: var(--bg-glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: hsl(var(--bg-card));
     flex-direction: column;
     align-items: flex-start;
-    padding: 90px 30px 30px 30px;
-    border-right: 1px solid var(--border-glass);
-    gap: 25px;
+    padding: 90px 24px 24px 24px;
+    border-right: 1px solid hsl(var(--border-light));
+    gap: 20px;
     transform: translateX(-100%);
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.3s ease;
     z-index: 99;
-    box-shadow: 10px 0 40px rgba(0,0,0,0.6);
+    box-shadow: var(--shadow-neon-strong);
   }
-  
+
   .navOpen {
     transform: translateX(0);
   }

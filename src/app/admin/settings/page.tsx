@@ -113,11 +113,11 @@ export default function AdminSettings() {
 
   return (
     <div style={{ maxWidth: '800px' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>
           Cấu Hình Hệ Thống & SEO
         </h1>
-        <p style={{ color: 'hsl(var(--text-secondary))' }}>
+        <p className={styles.pageSubtitle}>
           Thay đổi thương hiệu, biểu tượng và các thẻ SEO hỗ trợ tìm kiếm trên Google
         </p>
       </div>

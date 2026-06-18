@@ -80,11 +80,11 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>
           Thống Kê Tổng Quan
         </h1>
-        <p style={{ color: 'hsl(var(--text-secondary))' }}>
+        <p className={styles.pageSubtitle}>
           Xem lưu lượng truy cập và hoạt động tải về trên toàn trang web
         </p>
       </div>

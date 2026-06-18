@@ -240,11 +240,11 @@ export default function AdminKeys() {
 
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>
           Quản Lý Key Tải Về
         </h1>
-        <p style={{ color: 'hsl(var(--text-secondary))' }}>
+        <p className={styles.pageSubtitle}>
           Cấp phát Key tải xuống cho các ứng dụng bị Khóa. Có thể áp dụng 1 Key cho nhiều ứng dụng cùng lúc.
         </p>
       </div>

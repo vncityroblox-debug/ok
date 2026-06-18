@@ -9,7 +9,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isLoginPage = pathname === '/admin/login';
 
   if (isLoginPage) {
-    return <div style={{ minHeight: 'calc(100vh - 70px)' }}>{children}</div>;
+    return <div className={styles.loginWrapper}>{children}</div>;
   }
 
   return (

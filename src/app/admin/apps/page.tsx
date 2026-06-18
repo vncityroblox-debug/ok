@@ -258,11 +258,11 @@ export default function AdminApps() {
 
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>
           Quản Lý Ứng Dụng
         </h1>
-        <p style={{ color: 'hsl(var(--text-secondary))' }}>
+        <p className={styles.pageSubtitle}>
           Đăng tải ứng dụng mới, thiết lập trạng thái Khóa/Mở, và cấu hình thông tin tải về.
         </p>
       </div>

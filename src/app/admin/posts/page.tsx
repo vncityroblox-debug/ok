@@ -156,11 +156,11 @@ export default function AdminPosts() {
 
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>
           Quản Lý Bài Viết (Blog)
         </h1>
-        <p style={{ color: 'hsl(var(--text-secondary))' }}>
+        <p className={styles.pageSubtitle}>
           Đăng bài viết mới, nhúng mã HTML tùy chọn để tùy chỉnh thiết kế bài viết hoặc viết dạng text đơn giản.
         </p>
       </div>
