@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Save, Link2, Megaphone } from 'lucide-react';
+import { Save, Link2, Megaphone, LayoutTemplate } from 'lucide-react';
 import styles from '../admin.module.css';
 
 export default function AdminSettings() {
@@ -17,6 +17,8 @@ export default function AdminSettings() {
   const [termsContent, setTermsContent] = useState('');
   const [link4mToken, setLink4mToken] = useState('');
   const [announcementHtml, setAnnouncementHtml] = useState('');
+  const [homeHeroTitle, setHomeHeroTitle] = useState('');
+  const [homeHeroSubtitle, setHomeHeroSubtitle] = useState('');
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -46,6 +48,11 @@ export default function AdminSettings() {
           setTermsContent(data.terms_content || '');
           setLink4mToken(data.link4m_api_token || '');
           setAnnouncementHtml(data.announcement_html || '');
+          setHomeHeroTitle(data.home_hero_title || 'Kho Tài Nguyên|Tuyển Chọn');
+          setHomeHeroSubtitle(
+            data.home_hero_subtitle ||
+              'Khám phá và tải xuống hàng loạt ứng dụng, mã nguồn, công cụ tiện ích và tài nguyên công nghệ tốt nhất hoàn toàn miễn phí.'
+          );
         }
       } catch (err) {
         console.error('Settings load error:', err);
@@ -84,6 +91,8 @@ export default function AdminSettings() {
           terms_content: termsContent.trim(),
           link4m_api_token: link4mToken.trim(),
           announcement_html: announcementHtml,
+          home_hero_title: homeHeroTitle.trim(),
+          home_hero_subtitle: homeHeroSubtitle.trim(),
           updated_at: new Date().toISOString(),
         });
 
@@ -158,6 +167,45 @@ export default function AdminSettings() {
               placeholder="https://link-to-icon.png"
             />
           </div>
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />
+
+        <div style={{ marginBottom: '12px' }}>
+          <h4 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <LayoutTemplate size={18} style={{ color: 'hsl(var(--color-primary))' }} />
+            Hero Trang Chủ
+          </h4>
+          <p style={{ color: 'hsl(var(--text-muted))', fontSize: '0.85rem' }}>
+            Tiêu đề và mô tả hiển thị ở đầu trang chủ. Dùng dấu <strong>|</strong> trong tiêu đề để tách phần chữ gradient, ví dụ: <code>Kho Tài Nguyên|Tuyển Chọn</code>
+          </p>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel} htmlFor="homeHeroTitle">Tiêu Đề Trang Chủ</label>
+          <input
+            id="homeHeroTitle"
+            type="text"
+            required
+            className={styles.formInput}
+            value={homeHeroTitle}
+            onChange={(e) => setHomeHeroTitle(e.target.value)}
+            placeholder="Kho Tài Nguyên|Tuyển Chọn"
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel} htmlFor="homeHeroSubtitle">Mô Tả Trang Chủ</label>
+          <textarea
+            id="homeHeroSubtitle"
+            rows={3}
+            required
+            className={styles.formInput}
+            style={{ resize: 'vertical' }}
+            value={homeHeroSubtitle}
+            onChange={(e) => setHomeHeroSubtitle(e.target.value)}
+            placeholder="Khám phá và tải xuống hàng loạt ứng dụng..."
+          />
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />

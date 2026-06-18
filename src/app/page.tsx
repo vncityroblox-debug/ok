@@ -30,6 +30,10 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [heroTitle, setHeroTitle] = useState('Kho Tài Nguyên|Tuyển Chọn');
+  const [heroSubtitle, setHeroSubtitle] = useState(
+    'Khám phá và tải xuống hàng loạt ứng dụng, mã nguồn, công cụ tiện ích và tài nguyên công nghệ tốt nhất hoàn toàn miễn phí.'
+  );
 
   // 1. Log visit and Fetch initial data
   useEffect(() => {
@@ -64,19 +68,13 @@ export default function HomePage() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      // Fetch categories
-      const { data: cats, error: catsErr } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (catsErr) throw catsErr;
-      setCategories(cats || []);
-
-      // Fetch apps
-      const { data: appData, error: appsErr } = await supabase
-        .from('apps')
-        .select(`
+      const [{ data: cats, error: catsErr }, { data: settings, error: settingsErr }, { data: appData, error: appsErr }] =
+        await Promise.all([
+          supabase.from('categories').select('*').order('name', { ascending: true }),
+          supabase.from('site_settings').select('home_hero_title, home_hero_subtitle').eq('id', 1).single(),
+          supabase
+            .from('apps')
+            .select(`
           id,
           name,
           slug,
@@ -86,8 +84,17 @@ export default function HomePage() {
           category_id,
           categories ( name, slug )
         `)
-        .eq('app_type', 'app')
-        .order('created_at', { ascending: false });
+            .eq('app_type', 'app')
+            .order('created_at', { ascending: false }),
+        ]);
+
+      if (catsErr) throw catsErr;
+      setCategories(cats || []);
+
+      if (!settingsErr && settings) {
+        if (settings.home_hero_title) setHeroTitle(settings.home_hero_title);
+        if (settings.home_hero_subtitle) setHeroSubtitle(settings.home_hero_subtitle);
+      }
 
       if (appsErr) throw appsErr;
       setApps(appData as any || []);
@@ -107,15 +114,20 @@ export default function HomePage() {
     return matchesCategory && matchesSearch;
   });
 
+  const [heroMain, heroHighlight] = heroTitle.includes('|')
+    ? heroTitle.split('|', 2).map((part) => part.trim())
+    : [heroTitle.trim(), ''];
+
   return (
     <div className="container">
       {/* Hero Header */}
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
-          Kho Tài Nguyên <span>Tuyển Chọn</span>
+          {heroMain}
+          {heroHighlight ? <> <span>{heroHighlight}</span></> : null}
         </h1>
         <p className={styles.heroSubtitle}>
-          Khám phá và tải xuống hàng loạt ứng dụng, mã nguồn, công cụ tiện ích và tài nguyên công nghệ tốt nhất hoàn toàn miễn phí.
+          {heroSubtitle}
         </p>
       </section>
 

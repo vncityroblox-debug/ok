@@ -14,6 +14,9 @@ create table public.site_settings (
     theme text default 'light',
     terms_content text default '',
     link4m_api_token text default '',
+    announcement_html text default '',
+    home_hero_title text default 'Kho Tài Nguyên|Tuyển Chọn',
+    home_hero_subtitle text default 'Khám phá và tải xuống hàng loạt ứng dụng, mã nguồn, công cụ tiện ích và tài nguyên công nghệ tốt nhất hoàn toàn miễn phí.',
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
     constraint only_one_row check (id = 1)
 );
