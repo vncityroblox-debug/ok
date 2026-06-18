@@ -1,43 +1,52 @@
-import { getSupabaseServer } from '@/lib/supabase';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { NextRequest, NextResponse } from 'next/server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-async function verifyAdmin() {
-  const supabase = getSupabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return false;
-  const { data: admin } = await supabase.from('admin_users').select('role').eq('email', user.email).single();
-  return !!admin?.role;
+function createClient(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+  const key = supabaseServiceKey || supabaseAnonKey;
+  return {
+    supabase: createServerClient(supabaseUrl, key, {
+      cookies: {
+        getAll() { return request.cookies.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
+        },
+      },
+    }),
+    supabaseResponse,
+  };
 }
 
-const db = () => supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false, autoRefreshToken: false } })
-  : getSupabaseServer();
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    if (!(await verifyAdmin())) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const { supabase } = createClient(request);
+
+    // Verify admin
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', user.email).single();
+    if (!admin?.role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const body = await request.json();
-    const { resource, action, data, id, filters } = body;
-
-    if (!resource || !action) return Response.json({ error: 'Missing resource or action' }, { status: 400 });
-
-    const supabase = db();
-    let query;
+    const { resource, action, data: payload, id } = body;
+    if (!resource || !action) return NextResponse.json({ error: 'Missing resource or action' }, { status: 400 });
 
     switch (`${resource}:${action}`) {
       case 'app:insert':
       case 'source_code:insert': {
-        const { error } = await supabase.from('apps').insert(data);
+        const { error } = await supabase.from('apps').insert(payload);
         if (error) throw error;
         break;
       }
       case 'app:update':
       case 'source_code:update': {
-        const { error } = await supabase.from('apps').update(data).eq('id', id);
+        const { error } = await supabase.from('apps').update(payload).eq('id', id);
         if (error) throw error;
         break;
       }
@@ -48,12 +57,12 @@ export async function POST(request: Request) {
         break;
       }
       case 'category:insert': {
-        const { error } = await supabase.from('categories').insert(data);
+        const { error } = await supabase.from('categories').insert(payload);
         if (error) throw error;
         break;
       }
       case 'category:update': {
-        const { error } = await supabase.from('categories').update(data).eq('id', id);
+        const { error } = await supabase.from('categories').update(payload).eq('id', id);
         if (error) throw error;
         break;
       }
@@ -63,12 +72,12 @@ export async function POST(request: Request) {
         break;
       }
       case 'post:insert': {
-        const { error } = await supabase.from('posts').insert(data);
+        const { error } = await supabase.from('posts').insert(payload);
         if (error) throw error;
         break;
       }
       case 'post:update': {
-        const { error } = await supabase.from('posts').update(data).eq('id', id);
+        const { error } = await supabase.from('posts').update(payload).eq('id', id);
         if (error) throw error;
         break;
       }
@@ -78,20 +87,19 @@ export async function POST(request: Request) {
         break;
       }
       case 'key:insert': {
-        const { data: keyData, error: keyErr } = await supabase.from('keys').insert(data.key).select('id').single();
-        if (keyErr) throw keyErr;
-        if (data.appKeys?.length) {
-          const { error: jErr } = await supabase.from('app_keys').insert(data.appKeys.map((ak: any) => ({ key_id: keyData.id, app_id: ak })));
+        const { data: keyData, error: keyErr } = await supabase.from('keys').insert(payload.key).select('id').single();
+        if (keyErr) { if (keyErr.code === '23505') throw new Error('Key đã tồn tại!'); throw keyErr; }
+        if (payload.appKeys?.length) {
+          const { error: jErr } = await supabase.from('app_keys').insert(payload.appKeys.map((ak: any) => ({ key_id: keyData.id, app_id: ak })));
           if (jErr) throw jErr;
         }
         break;
       }
       case 'key:update': {
-        const { error: keyErr } = await supabase.from('keys').update(data.key).eq('id', id);
-        if (keyErr) throw keyErr;
+        await supabase.from('keys').update(payload.key).eq('id', id);
         await supabase.from('app_keys').delete().eq('key_id', id);
-        if (data.appKeys?.length) {
-          const { error: jErr } = await supabase.from('app_keys').insert(data.appKeys.map((ak: any) => ({ key_id: id, app_id: ak })));
+        if (payload.appKeys?.length) {
+          const { error: jErr } = await supabase.from('app_keys').insert(payload.appKeys.map((ak: any) => ({ key_id: id, app_id: ak })));
           if (jErr) throw jErr;
         }
         break;
@@ -103,16 +111,17 @@ export async function POST(request: Request) {
         break;
       }
       case 'settings:upsert': {
-        const { error } = await supabase.from('site_settings').upsert({ id: 1, ...data, updated_at: new Date().toISOString() });
+        const { error } = await supabase.from('site_settings').upsert({ id: 1, ...payload, updated_at: new Date().toISOString() });
         if (error) throw error;
         break;
       }
       default:
-        return Response.json({ error: 'Invalid resource/action' }, { status: 400 });
+        return NextResponse.json({ error: 'Invalid resource/action' }, { status: 400 });
     }
 
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (err: any) {
-    return Response.json({ error: err.message || 'Mutation error' }, { status: 500 });
+    console.error('Admin mutate error:', err);
+    return NextResponse.json({ error: err.message || 'Mutation error' }, { status: 500 });
   }
 }

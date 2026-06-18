@@ -1,36 +1,40 @@
-import { getSupabaseServer } from '@/lib/supabase';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { NextRequest, NextResponse } from 'next/server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-async function verifyAdmin() {
-  const supabase = getSupabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data: admin } = await supabase
-    .from('admin_users')
-    .select('role')
-    .eq('email', user.email)
-    .single();
-
-  return admin?.role || null;
+function createClient(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+  return {
+    supabase: createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() { return request.cookies.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
+        },
+      },
+    }),
+    supabaseResponse,
+  };
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const role = await verifyAdmin();
-    if (!role) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const { supabase, supabaseResponse } = createClient(request);
+
+    // Verify admin via session cookie
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', user.email).single();
+    if (!admin?.role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const url = new URL(request.url);
     const type = url.searchParams.get('type') || '';
-
-    const supabase = supabaseServiceKey
-      ? createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false, autoRefreshToken: false } })
-      : getSupabaseServer();
-
-    let data;
+    let data: any;
 
     switch (type) {
       case 'dashboard': {
@@ -51,60 +55,48 @@ export async function GET(request: Request) {
         };
         break;
       }
-
       case 'app_names': {
         const res = await supabase.from('apps').select('id, name').order('name', { ascending: true });
         data = res.data;
         break;
       }
-
       case 'categories': {
         const res = await supabase.from('categories').select('*').order('name', { ascending: true });
         data = res.data;
         break;
       }
-
       case 'apps': {
-        const res = await supabase.from('apps').select('*, categories(name)')
-          .eq('app_type', 'app').order('created_at', { ascending: false });
+        const res = await supabase.from('apps').select('*, categories(name)').eq('app_type', 'app').order('created_at', { ascending: false });
         data = res.data;
         break;
       }
-
       case 'source_codes': {
-        const res = await supabase.from('apps').select('*, categories(name)')
-          .eq('app_type', 'source_code').order('created_at', { ascending: false });
+        const res = await supabase.from('apps').select('*, categories(name)').eq('app_type', 'source_code').order('created_at', { ascending: false });
         data = res.data;
         break;
       }
-
       case 'posts': {
         const res = await supabase.from('posts').select('*').order('created_at', { ascending: false });
         data = res.data;
         break;
       }
-
       case 'keys': {
-        const res = await supabase.from('keys')
-          .select('*, app_keys(app_id, apps(name))')
-          .order('created_at', { ascending: false });
+        const res = await supabase.from('keys').select('*, app_keys(app_id, apps(name))').order('created_at', { ascending: false });
         data = res.data;
         break;
       }
-
       case 'settings': {
         const res = await supabase.from('site_settings').select('*').eq('id', 1).single();
         data = res.data;
         break;
       }
-
       default:
-        return Response.json({ error: 'Invalid type' }, { status: 400 });
+        return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
 
-    return Response.json({ data });
+    return NextResponse.json({ data }, { headers: supabaseResponse.headers });
   } catch (err) {
     console.error('Admin query error:', err);
-    return Response.json({ error: 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
