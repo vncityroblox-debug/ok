@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { supabase } from '@/lib/supabase';
 import { Lock, Unlock, Download, KeyRound, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import Link from 'next/link';
 import styles from '../../home.module.css';
@@ -36,32 +35,19 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
     async function loadAppDetails() {
       setIsLoading(true);
       try {
-        const [appRes, settingsRes] = await Promise.all([
-          supabase
-            .from('apps')
-            .select(`
-              *,
-              categories ( name )
-            `)
-            .eq('slug', slug)
-            .single(),
-          supabase
-            .from('site_settings')
-            .select('terms_content')
-            .single()
-        ]);
+        const res = await fetch(`/api/public?type=app&slug=${encodeURIComponent(slug)}`);
+        const json = await res.json();
 
-        if (appRes.error || !appRes.data) {
-          console.error('Error fetching app:', appRes.error);
+        if (!json.data?.app) {
           setErrorMessage('Không tìm thấy ứng dụng yêu cầu.');
         } else {
-          setApp(appRes.data as any);
+          setApp(json.data.app);
         }
 
-        if (settingsRes.data?.terms_content) {
-          setTermsContent(settingsRes.data.terms_content);
+        if (json.data?.settings?.terms_content) {
+          setTermsContent(json.data.settings.terms_content);
         } else {
-          setTermsAccepted(true); // If no terms, auto-accept
+          setTermsAccepted(true);
         }
       } catch (err) {
         console.error('App load error:', err);

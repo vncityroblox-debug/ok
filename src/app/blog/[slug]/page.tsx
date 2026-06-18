@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { supabase } from '@/lib/supabase';
 import { Calendar, ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';
 import styles from '../../home.module.css';
@@ -25,17 +24,13 @@ export default function BlogPostDetailPage({ params }: { params: Promise<{ slug:
     async function loadPostDetails() {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('*')
-          .eq('slug', slug)
-          .single();
+        const res = await fetch(`/api/public?type=post&slug=${encodeURIComponent(slug)}`);
+        const json = await res.json();
 
-        if (error || !data) {
-          console.error('Error fetching blog post:', error);
+        if (!json.data) {
           setErrorMessage('Không tìm thấy bài viết yêu cầu.');
         } else {
-          setPost(data);
+          setPost(json.data);
         }
       } catch (err) {
         console.error('Blog load error:', err);

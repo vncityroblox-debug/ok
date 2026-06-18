@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { Save, Link2, Megaphone, LayoutTemplate } from 'lucide-react';
 import styles from '../admin.module.css';
 
@@ -28,29 +27,23 @@ export default function AdminSettings() {
     async function loadSettings() {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('site_settings')
-          .select('*')
-          .eq('id', 1)
-          .single();
-
-        if (error) {
-          console.error('Error fetching settings:', error);
-        } else if (data) {
-          setSiteName(data.site_name || '');
-          setSiteIconUrl(data.site_icon_url || '');
-          setSeoTitle(data.seo_title || '');
-          setSeoDescription(data.seo_description || '');
-          setSeoTags(data.seo_tags ? data.seo_tags.join(', ') : '');
-          setSeoThumbnailUrl(data.seo_thumbnail_url || '');
-          setFooterText(data.footer_text || '');
-          setTheme(data.theme || 'light');
-          setTermsContent(data.terms_content || '');
-          setLink4mToken(data.link4m_api_token || '');
-          setAnnouncementHtml(data.announcement_html || '');
-          setHomeHeroTitle(data.home_hero_title || 'Kho Tài Nguyên|Tuyển Chọn');
+        const res = await fetch('/api/admin/query?type=settings');
+        const json = await res.json();
+        if (json.data) {
+          setSiteName(json.data.site_name || '');
+          setSiteIconUrl(json.data.site_icon_url || '');
+          setSeoTitle(json.data.seo_title || '');
+          setSeoDescription(json.data.seo_description || '');
+          setSeoTags(json.data.seo_tags ? json.data.seo_tags.join(', ') : '');
+          setSeoThumbnailUrl(json.data.seo_thumbnail_url || '');
+          setFooterText(json.data.footer_text || '');
+          setTheme(json.data.theme || 'light');
+          setTermsContent(json.data.terms_content || '');
+          setLink4mToken(json.data.link4m_api_token || '');
+          setAnnouncementHtml(json.data.announcement_html || '');
+          setHomeHeroTitle(json.data.home_hero_title || 'Kho Tài Nguyên|Tuyển Chọn');
           setHomeHeroSubtitle(
-            data.home_hero_subtitle ||
+            json.data.home_hero_subtitle ||
               'Khám phá và tải xuống hàng loạt ứng dụng, mã nguồn, công cụ tiện ích và tài nguyên công nghệ tốt nhất hoàn toàn miễn phí.'
           );
         }
@@ -76,29 +69,31 @@ export default function AdminSettings() {
       .filter((tag) => tag !== '');
 
     try {
-      const { error } = await supabase
-        .from('site_settings')
-        .upsert({
-          id: 1,
-          site_name: siteName.trim(),
-          site_icon_url: siteIconUrl.trim(),
-          seo_title: seoTitle.trim(),
-          seo_description: seoDescription.trim(),
-          seo_tags: tagsArray,
-          seo_thumbnail_url: seoThumbnailUrl.trim(),
-          footer_text: footerText.trim(),
-          theme: theme,
-          terms_content: termsContent.trim(),
-          link4m_api_token: link4mToken.trim(),
-          announcement_html: announcementHtml,
-          home_hero_title: homeHeroTitle.trim(),
-          home_hero_subtitle: homeHeroSubtitle.trim(),
-          updated_at: new Date().toISOString(),
-        });
-
-      if (error) {
-        throw error;
-      }
+      const res = await fetch('/api/admin/mutate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resource: 'settings',
+          action: 'upsert',
+          data: {
+            site_name: siteName.trim(),
+            site_icon_url: siteIconUrl.trim(),
+            seo_title: seoTitle.trim(),
+            seo_description: seoDescription.trim(),
+            seo_tags: tagsArray,
+            seo_thumbnail_url: seoThumbnailUrl.trim(),
+            footer_text: footerText.trim(),
+            theme: theme,
+            terms_content: termsContent.trim(),
+            link4m_api_token: link4mToken.trim(),
+            announcement_html: announcementHtml,
+            home_hero_title: homeHeroTitle.trim(),
+            home_hero_subtitle: homeHeroSubtitle.trim(),
+          }
+        })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
       
       setMessage({ text: 'Cấu hình website đã được lưu thành công!', type: 'success' });
     } catch (err: any) {

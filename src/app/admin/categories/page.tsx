@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { FolderPlus, Pencil, Trash2, Check, X } from 'lucide-react';
 import styles from '../admin.module.css';
 
@@ -31,13 +30,10 @@ export default function AdminCategories() {
   async function fetchCategories() {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (error) throw error;
-      setCategories(data || []);
+      const res = await fetch('/api/admin/query?type=categories');
+      const json = await res.json();
+      if (!json.data) throw new Error('No data');
+      setCategories(json.data || []);
     } catch (err: any) {
       console.error('Fetch categories error:', err);
     } finally {
@@ -63,19 +59,18 @@ export default function AdminCategories() {
 
     const slug = makeSlug(name);
     try {
-      const { error } = await supabase
-        .from('categories')
-        .insert({
-          name: name.trim(),
-          slug,
-          image_url: imageUrl.trim(),
-        });
-
-      if (error) {
-        if (error.code === '23505') {
-          throw new Error('Tên danh mục hoặc slug đã tồn tại!');
-        }
-        throw error;
+      const res = await fetch('/api/admin/mutate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resource: 'category',
+          action: 'insert',
+          data: { name: name.trim(), slug, image_url: imageUrl.trim() }
+        })
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error('Tên danh mục hoặc slug đã tồn tại!');
       }
 
       setName('');
@@ -104,20 +99,19 @@ export default function AdminCategories() {
     setErrorMsg('');
     const slug = makeSlug(editName);
     try {
-      const { error } = await supabase
-        .from('categories')
-        .update({
-          name: editName.trim(),
-          slug,
-          image_url: editImageUrl.trim(),
+      const res = await fetch('/api/admin/mutate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resource: 'category',
+          action: 'update',
+          id,
+          data: { name: editName.trim(), slug, image_url: editImageUrl.trim() }
         })
-        .eq('id', id);
-
-      if (error) {
-        if (error.code === '23505') {
-          throw new Error('Tên danh mục hoặc slug đã tồn tại!');
-        }
-        throw error;
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error('Tên danh mục hoặc slug đã tồn tại!');
       }
 
       setEditingId(null);
@@ -131,12 +125,13 @@ export default function AdminCategories() {
     if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${name}"? Các ứng dụng thuộc danh mục này sẽ mất liên kết danh mục.`)) {
       setErrorMsg('');
       try {
-        const { error } = await supabase
-          .from('categories')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
+        const res = await fetch('/api/admin/mutate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resource: 'category', action: 'delete', id })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error);
         fetchCategories();
       } catch (err: any) {
         setErrorMsg(err.message || 'Lỗi khi xóa danh mục.');

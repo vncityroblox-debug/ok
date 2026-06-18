@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 import { Search, Lock, Unlock, Download, AppWindow, ArrowRight } from 'lucide-react';
 import styles from './home.module.css';
 
@@ -68,36 +67,23 @@ export default function HomePage() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      const [{ data: cats, error: catsErr }, { data: settings, error: settingsErr }, { data: appData, error: appsErr }] =
-        await Promise.all([
-          supabase.from('categories').select('*').order('name', { ascending: true }),
-          supabase.from('site_settings').select('home_hero_title, home_hero_subtitle').eq('id', 1).single(),
-          supabase
-            .from('apps')
-            .select(`
-          id,
-          name,
-          slug,
-          description,
-          main_image_url,
-          is_locked,
-          category_id,
-          categories ( name, slug )
-        `)
-            .eq('app_type', 'app')
-            .order('created_at', { ascending: false }),
-        ]);
+      const [catsRes, settRes, appsRes] = await Promise.all([
+        fetch('/api/public?type=categories'),
+        fetch('/api/public?type=home&app_type=app'),
+        fetch('/api/public?type=apps&app_type=app'),
+      ]);
+      const catsData = await catsRes.json();
+      const homeData = await settRes.json();
+      const appsData = await appsRes.json();
 
-      if (catsErr) throw catsErr;
-      setCategories(cats || []);
+      setCategories(catsData.data || []);
 
-      if (!settingsErr && settings) {
-        if (settings.home_hero_title) setHeroTitle(settings.home_hero_title);
-        if (settings.home_hero_subtitle) setHeroSubtitle(settings.home_hero_subtitle);
+      if (homeData.data?.settings) {
+        if (homeData.data.settings.home_hero_title) setHeroTitle(homeData.data.settings.home_hero_title);
+        if (homeData.data.settings.home_hero_subtitle) setHeroSubtitle(homeData.data.settings.home_hero_subtitle);
       }
 
-      if (appsErr) throw appsErr;
-      setApps(appData as any || []);
+      setApps(appsData.data || []);
     } catch (err) {
       console.error('Fetch home page data error:', err);
     } finally {

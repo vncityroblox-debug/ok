@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { BarChart3, Users, Download, ArrowUpRight } from 'lucide-react';
 import styles from './admin.module.css';
 
@@ -27,95 +26,35 @@ export default function AdminDashboard() {
     async function fetchStats() {
       setIsLoading(true);
       try {
-        // 1. Fetch total visits count
-        const { count: visitsCount, error: visitsErr } = await supabase
-          .from('analytics_visits')
-          .select('*', { count: 'exact', head: true });
+        const res = await fetch('/api/admin/query?type=dashboard');
+        const json = await res.json();
+        if (!json.data) throw new Error('No data');
 
-        if (!visitsErr && visitsCount !== null) {
-          setTotalVisits(visitsCount);
-        }
+        setTotalVisits(json.data.totalVisits || 0);
+        setTodayVisits(json.data.recentVisits || 0);
+        setTotalDownloads(json.data.totalDownloads || 0);
 
-        // 2. Fetch today's visits count
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        
-        const { count: todayVisitsCount, error: todayVisitsErr } = await supabase
-          .from('analytics_visits')
-          .select('*', { count: 'exact', head: true })
-          .gte('visited_at', startOfToday.toISOString());
-
-        if (!todayVisitsErr && todayVisitsCount !== null) {
-          setTodayVisits(todayVisitsCount);
-        }
-
-        // 3. Fetch total downloads count
-        const { count: downloadsCount, error: downloadsErr } = await supabase
-          .from('analytics_downloads')
-          .select('*', { count: 'exact', head: true });
-
-        if (!downloadsErr && downloadsCount !== null) {
-          setTotalDownloads(downloadsCount);
-        }
-
-        // 4. Fetch downloads per app
-        // We get download rows + join with app name
-        const { data: downloadRows, error: dlRowsErr } = await supabase
-          .from('analytics_downloads')
-          .select(`
-            app_id,
-            apps ( name )
-          `);
-
-        if (!dlRowsErr && downloadRows) {
-          // Aggregate counts by app name
+        if (json.data.recentDownloads) {
           const aggMap: { [key: string]: number } = {};
-          downloadRows.forEach((row: any) => {
+          json.data.recentDownloads.forEach((row: any) => {
             const appName = row.apps?.name || 'Ứng dụng không xác định';
             aggMap[appName] = (aggMap[appName] || 0) + 1;
           });
-
-          const formattedClicks = Object.keys(aggMap).map((name) => ({
-            name,
-            count: aggMap[name],
-          })).sort((a, b) => b.count - a.count).slice(0, 5); // top 5 apps
-
-          setAppClicks(formattedClicks);
+          setAppClicks(Object.keys(aggMap).map(name => ({ name, count: aggMap[name] })).sort((a, b) => b.count - a.count).slice(0, 5));
         }
 
-        // 5. Fetch daily visits (last 7 days)
-        const { data: recentVisits, error: recentVisitsErr } = await supabase
-          .from('analytics_visits')
-          .select('visited_at')
-          .order('visited_at', { ascending: true });
-
-        if (!recentVisitsErr && recentVisits) {
+        if (json.data.visitsTimeline) {
           const dailyMap: { [key: string]: number } = {};
-          // Initialize last 7 days
           for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
-            dailyMap[dateStr] = 0;
+            dailyMap[d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })] = 0;
           }
-
-          // Count visits per day
-          recentVisits.forEach((v) => {
-            const dateStr = new Date(v.visited_at).toLocaleDateString('vi-VN', {
-              day: 'numeric',
-              month: 'numeric',
-            });
-            if (dailyMap[dateStr] !== undefined) {
-              dailyMap[dateStr]++;
-            }
+          json.data.visitsTimeline.forEach((v: any) => {
+            const dateStr = new Date(v.visited_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
+            if (dailyMap[dateStr] !== undefined) dailyMap[dateStr]++;
           });
-
-          const formattedDaily = Object.keys(dailyMap).map((dateLabel) => ({
-            dateLabel,
-            count: dailyMap[dateLabel],
-          }));
-
-          setDailyVisits(formattedDaily);
+          setDailyVisits(Object.keys(dailyMap).map(dateLabel => ({ dateLabel, count: dailyMap[dateLabel] })));
         }
       } catch (err) {
         console.error('Failed to load stats:', err);

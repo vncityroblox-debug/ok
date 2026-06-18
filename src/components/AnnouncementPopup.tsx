@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { X } from 'lucide-react';
 
 const DISMISS_KEY = 'announcement_dismissed_at';
@@ -22,15 +21,11 @@ export default function AnnouncementPopup() {
     // Fetch thông báo từ site_settings
     async function loadAnnouncement() {
       try {
-        const { data } = await supabase
-          .from('site_settings')
-          .select('announcement_html')
-          .eq('id', 1)
-          .single();
+        const res = await fetch('/api/public?type=announcement');
+        const json = await res.json();
 
-        if (data?.announcement_html && data.announcement_html.trim() !== '') {
-          setHtml(data.announcement_html);
-          // Delay nhẹ để trang load xong
+        if (json.data?.announcement_html && json.data.announcement_html.trim() !== '') {
+          setHtml(json.data.announcement_html);
           setTimeout(() => setVisible(true), 800);
         }
       } catch (err) {

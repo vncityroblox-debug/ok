@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { AppWindow, Pencil, Trash2, Check, X, ShieldAlert, Lock, Unlock, Link2, Loader2 } from 'lucide-react';
 import styles from '../admin.module.css';
 
@@ -60,27 +59,15 @@ export default function AdminSourceCodes() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      // Fetch categories for select dropdown
-      const { data: cats, error: catsErr } = await supabase
-        .from('categories')
-        .select('id, name')
-        .order('name', { ascending: true });
-
-      if (catsErr) throw catsErr;
-      setCategories(cats || []);
-
-      // Fetch apps
-      const { data: appData, error: appsErr } = await supabase
-        .from('apps')
-        .select(`
-          *,
-          categories ( name )
-        `)
-        .eq('app_type', 'source_code')
-        .order('created_at', { ascending: false });
-
-      if (appsErr) throw appsErr;
-      setApps(appData as any || []);
+      const [catsRes, appsRes] = await Promise.all([
+        fetch('/api/admin/query?type=categories'),
+        fetch('/api/admin/query?type=source_codes')
+      ]);
+      const catsJson = await catsRes.json();
+      const appsJson = await appsRes.json();
+      if (!catsJson.data || !appsJson.data) throw new Error('No data');
+      setCategories(catsJson.data || []);
+      setApps(appsJson.data || []);
     } catch (err: any) {
       console.error('Fetch data error:', err);
       setErrorMsg('Lỗi khi tải dữ liệu từ database.');
@@ -149,21 +136,27 @@ export default function AdminSourceCodes() {
       .filter((url) => url !== '');
 
     try {
-      const { error } = await supabase
-        .from('apps')
-        .insert({
-          name: name.trim(),
-          slug,
-          description: description.trim(),
-          category_id: categoryId || null,
-          main_image_url: mainImageUrl.trim(),
-          detail_images: detailImages,
-          download_link: downloadLink.trim(),
-          is_locked: isLocked,
-          app_type: 'source_code',
-        });
-
-      if (error) throw error;
+      const res = await fetch('/api/admin/mutate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resource: 'source_code',
+          action: 'insert',
+          data: {
+            name: name.trim(),
+            slug,
+            description: description.trim(),
+            category_id: categoryId || null,
+            main_image_url: mainImageUrl.trim(),
+            detail_images: detailImages,
+            download_link: downloadLink.trim(),
+            is_locked: isLocked,
+            app_type: 'source_code',
+          }
+        })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
 
       setSuccessMsg('Đăng mã nguồn thành công!');
       // Reset form
@@ -207,30 +200,33 @@ export default function AdminSourceCodes() {
       .filter((url) => url !== '');
 
     try {
-      // Retrieve old app slug to keep slug intact unless name changes
       const oldApp = apps.find((a) => a.id === id);
       let newSlug = oldApp?.slug || '';
-      
-      // If name changes, regenerate slug
       if (oldApp && oldApp.name !== editName.trim()) {
         newSlug = makeSlug(editName);
       }
 
-      const { error } = await supabase
-        .from('apps')
-        .update({
-          name: editName.trim(),
-          slug: newSlug,
-          description: editDescription.trim(),
-          category_id: editCategoryId || null,
-          main_image_url: editMainImageUrl.trim(),
-          detail_images: detailImages,
-          download_link: editDownloadLink.trim(),
-          is_locked: editIsLocked,
+      const res = await fetch('/api/admin/mutate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resource: 'source_code',
+          action: 'update',
+          id,
+          data: {
+            name: editName.trim(),
+            slug: newSlug,
+            description: editDescription.trim(),
+            category_id: editCategoryId || null,
+            main_image_url: editMainImageUrl.trim(),
+            detail_images: detailImages,
+            download_link: editDownloadLink.trim(),
+            is_locked: editIsLocked,
+          }
         })
-        .eq('id', id);
-
-      if (error) throw error;
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
 
       setSuccessMsg('Cập nhật mã nguồn thành công!');
       setEditingId(null);
@@ -245,12 +241,13 @@ export default function AdminSourceCodes() {
       setErrorMsg('');
       setSuccessMsg('');
       try {
-        const { error } = await supabase
-          .from('apps')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
+        const res = await fetch('/api/admin/mutate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resource: 'source_code', action: 'delete', id })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error);
         setSuccessMsg(`Đã xóa mã nguồn "${appName}".`);
         fetchData();
       } catch (err: any) {

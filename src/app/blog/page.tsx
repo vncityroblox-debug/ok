@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 import { FileText, Calendar, ArrowRight } from 'lucide-react';
 import styles from '../home.module.css';
 
@@ -22,14 +21,9 @@ export default function BlogListPage() {
     async function loadPosts() {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (!error && data) {
-          setPosts(data);
-        }
+        const res = await fetch('/api/public?type=posts');
+        const json = await res.json();
+        if (json.data) setPosts(json.data);
       } catch (err) {
         console.error('Failed to load blog posts:', err);
       } finally {

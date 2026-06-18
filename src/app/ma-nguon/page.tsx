@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 import { Search, Lock, Unlock, Download, Terminal, ArrowRight } from 'lucide-react';
 import styles from '../home.module.css';
 
@@ -64,35 +63,17 @@ export default function SourceCodePage() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      // Fetch categories
-      const { data: cats, error: catsErr } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
+      const [catsRes, appsRes] = await Promise.all([
+        fetch('/api/public?type=categories'),
+        fetch('/api/public?type=apps&app_type=source_code'),
+      ]);
+      const catsData = await catsRes.json();
+      const appsData = await appsRes.json();
 
-      if (catsErr) throw catsErr;
-      setCategories(cats || []);
-
-      // Fetch apps
-      const { data: appData, error: appsErr } = await supabase
-        .from('apps')
-        .select(`
-          id,
-          name,
-          slug,
-          description,
-          main_image_url,
-          is_locked,
-          category_id,
-          categories ( name, slug )
-        `)
-        .eq('app_type', 'source_code')
-        .order('created_at', { ascending: false });
-
-      if (appsErr) throw appsErr;
-      setApps(appData as any || []);
+      setCategories(catsData.data || []);
+      setApps(appsData.data || []);
     } catch (err) {
-      console.error('Fetch home page data error:', err);
+      console.error('Fetch page data error:', err);
     } finally {
       setIsLoading(false);
     }
