@@ -1,36 +1,21 @@
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-function createClient(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
-  const key = supabaseServiceKey || supabaseAnonKey;
-  return {
-    supabase: createServerClient(supabaseUrl, key, {
-      cookies: {
-        getAll() { return request.cookies.getAll(); },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
-        },
-      },
-    }),
-    supabaseResponse,
-  };
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const { supabase } = createClient(request);
+    const email = request.headers.get('x-user-email');
+    if (!email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Verify admin
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', user.email).single();
+    const key = supabaseServiceKey || supabaseAnonKey;
+    const supabase = createClient(supabaseUrl, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', email).single();
     if (!admin?.role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const body = await request.json();

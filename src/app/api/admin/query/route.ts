@@ -1,35 +1,22 @@
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-function createClient(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
-  return {
-    supabase: createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() { return request.cookies.getAll(); },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
-        },
-      },
-    }),
-    supabaseResponse,
-  };
-}
 
 export async function GET(request: NextRequest) {
   try {
-    const { supabase, supabaseResponse } = createClient(request);
+    // Auth is verified by middleware — read email from headers
+    const email = request.headers.get('x-user-email');
+    if (!email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Verify admin via session cookie
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const key = supabaseServiceKey || supabaseAnonKey;
+    const supabase = createClient(supabaseUrl, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', user.email).single();
+    const { data: admin } = await supabase.from('admin_users').select('role').eq('email', email).single();
     if (!admin?.role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const url = new URL(request.url);
@@ -94,7 +81,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
 
-    return NextResponse.json({ data }, { headers: supabaseResponse.headers });
+    return NextResponse.json({ data });
   } catch (err) {
     console.error('Admin query error:', err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
