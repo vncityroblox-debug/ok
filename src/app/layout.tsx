@@ -81,8 +81,100 @@ export default async function RootLayout({
   return (
     <html lang="vi" data-theme={theme}>
       <head>
-        {/* Set up theme color and responsive viewports */}
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+/* ============================================================
+   ╔═══════════════════════════════════════════════════════════╗
+   ║            ĐẠO LÝ LÀM NGƯỜI - NHÂN QUẢ BÁO ỨNG          ║
+   ╠═══════════════════════════════════════════════════════════╣
+   ║  "Đối xử với người khác như cách bạn muốn                ║
+   ║   được đối xử"                                           ║
+   ║                                                          ║
+   ║  Người xưa dạy: "Tiên học lễ, hậu học văn".             ║
+   ║  Học làm người trước, học kiến thức sau.                 ║
+   ║  Một người có tài mà không có đức thì cũng               ║
+   ║  như con thú dữ.                                         ║
+   ║                                                          ║
+   ║  XÂM PHẠM WEB CỦA NGƯỜI KHÁC LÀ:                        ║
+   ║  • Vi phạm pháp luật                                     ║
+   ║  • Vi phạm đạo đức                                       ║
+   ║  • Tự hạ thấp giá trị bản thân                          ║
+   ║                                                          ║
+   ║  NHÂN QUẢ - KHÔNG AI THOÁT ĐƯỢC                         ║
+   ║  Mọi hành động đều có hệ quả.                            ║
+   ║  Gió bão táp không thể che được mặt trời,                ║
+   ║  tội lỗi không thể che được sự thật.                     ║
+   ║                                                          ║
+   ║  Hãy sống tốt, làm người tử tế.                          ║
+   ║  Nhân quả sẽ đến với tất cả.                             ║
+   ╚═══════════════════════════════════════════════════════════╝
+   ============================================================ */
+
+(function(){
+  try {
+    // Admin check
+    if (location.pathname.startsWith('/admin')) return;
+
+    var DAO_LY = [
+      'ĐẠO LÝ LÀM NGƯỜI',
+      '',
+      '1. Tôn trọng là nền tảng của mọi mối quan hệ.',
+      '   Web này là tài sản của người khác, xâm phạm là vi phạm đạo đức.',
+      '',
+      '2. Nhân quả không sai một ai.',
+      '   Gieo nhân nào gặt quả nấy. Làm điều xấu sẽ nhận điều xấu.',
+      '',
+      '3. Người khôn không sợ, chỉ có kẻ tiểu nhân mới lén lút.',
+      '   Hãy sống đường hoàng, chính trực, không cần gian dối.',
+      '',
+      '4. Hãy dùng thời gian và kiến thức vào việc tốt,',
+      '   đừng phí hoài cuộc đời vào những trò xâm phạm vô bổ.',
+      '',
+      '5. Một người tử tế không cần phá hoại người khác để khẳng định mình.',
+    ];
+
+    var blockEvent = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+    var events = ['contextmenu','copy','cut','paste','selectstart','dragstart'];
+
+    var bindAll = function() {
+      for (var i = 0; i < events.length; i++) {
+        document.addEventListener(events[i], blockEvent, true);
+      }
+    };
+    bindAll();
+
+    var blockKeys = function(e) {
+      if (
+        e.key === 'F12' ||
+        e.key === 'PrintScreen' || e.key === 'PrtScn' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P'))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
+    document.addEventListener('keydown', blockKeys, true);
+
+    // Re-bind every 500ms to prevent removal
+    setInterval(bindAll, 500);
+    setInterval(function() {
+      document.removeEventListener('keydown', blockKeys, true);
+      document.addEventListener('keydown', blockKeys, true);
+    }, 500);
+
+    // Moral lesson in console for anyone who opens DevTools
+    setTimeout(function() {
+      console.log('%c⚠️ XÂM PHẠM WEB LÀ CON CHÓ ⚠️', 'font-size:24px;font-weight:bold;color:#dc2626');
+      console.log('%c' + DAO_LY.join('\\n'), 'font-size:14px;color:#f0e6d0;line-height:1.8');
+      console.log('%cHãy tắt DevTools và sống tử tế. Nhân quả sẽ đến với tất cả.', 'font-size:16px;font-style:italic;color:#b8860b');
+    }, 1000);
+  } catch(e) {}
+})();
+`
+        }} />
       </head>
       <body>
         <Header siteName={siteName} siteIconUrl={siteIconUrl} />
