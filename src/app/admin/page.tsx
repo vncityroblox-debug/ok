@@ -51,19 +51,24 @@ export default function AdminDashboard() {
   const [dateTo, setDateTo] = useState('');
   const [activityByDay, setActivityByDay] = useState<{ dateLabel: string; count: number }[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [debugRaw, setDebugRaw] = useState<string>('');
 
   const formatDate = (s: string) => s ? new Date(s).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '-';
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setLoaded(false);
+    setDebugRaw('');
     try {
       const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const [s, l] = await Promise.all([
-        fetch('/api/admin/stats').then(r => r.json()).catch(() => ({})),
-        fetch('/api/admin/logs').then(r => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] })),
+      const [statsRes, logsRes] = await Promise.all([
+        fetch('/api/admin/stats'),
+        fetch('/api/admin/logs'),
       ]);
+      const s = await statsRes.json().catch(() => ({}));
+      const l = await logsRes.json().catch(() => ({ loginHistory: [], activityLogs: [] }));
+      setDebugRaw(JSON.stringify({ statsStatus: statsRes.status, logsStatus: logsRes.status, stats: s }, null, 2).slice(0, 500));
       const allLogins = l.loginHistory || [];
       const allActivities = l.activityLogs || [];
       setTotalVisits(s.totalVisits ?? 0);
@@ -153,6 +158,13 @@ export default function AdminDashboard() {
           Làm mới
         </button>
       </div>
+
+      {debugRaw && (
+        <details style={{ marginBottom: 16, background: '#f8f9fa', borderRadius: 8, padding: 12, border: '1px solid #dee2e6', fontSize: 12, fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+          <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#dc3545' }}>🔍 Debug API Response</summary>
+          {debugRaw}
+        </details>
+      )}
 
       {/* ── Section: Lưu Lượng ── */}
       <div className={styles.sectionLabel}>
