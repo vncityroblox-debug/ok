@@ -99,6 +99,91 @@
   cursor: pointer;
 }
 
+.searchBtn {
+  background: transparent;
+  border: none;
+  color: hsl(var(--text-secondary));
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.searchBtn:hover {
+  color: hsl(var(--text-primary));
+}
+
+.searchDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: hsl(var(--bg-card));
+  border-bottom: 1px solid hsl(var(--border-light));
+  padding: 0 24px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, padding 0.25s ease;
+}
+
+.searchDropdownOpen {
+  max-height: 80px;
+  padding: 16px 24px;
+}
+
+.searchForm {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: hsl(var(--bg-main));
+  border: 1px solid hsl(var(--border-glass));
+  border-radius: 8px;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.searchForm:focus-within {
+  border-color: hsl(var(--color-primary));
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.searchIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 0;
+  font-size: 0.95rem;
+  outline: none;
+  color: hsl(var(--text-primary));
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: hsl(var(--text-muted));
+}
+
+.searchClose {
+  background: transparent;
+  border: none;
+  color: hsl(var(--text-muted));
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.searchClose:hover {
+  color: hsl(var(--text-primary));
+}
+
 /* Footer Styling */
 .footer {
   background: hsl(var(--bg-card));

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Lock, Unlock, Download, ArrowRight } from 'lucide-react';
 import styles from '../home.module.css';
 
@@ -23,11 +24,12 @@ interface AppItem {
   categories: { name: string; slug: string } | null;
 }
 
-export default function UngDungPage() {
+function UngDungContent() {
+  const searchParams = useSearchParams();
   const [categories, setCategories] = useState<Category[]>([]);
   const [apps, setApps] = useState<AppItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -192,5 +194,13 @@ export default function UngDungPage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function UngDungPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '60px 0', textAlign: 'center', color: 'hsl(var(--text-secondary))' }}>Đang tải...</div>}>
+      <UngDungContent />
+    </Suspense>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import styles from './components.module.css';
@@ -14,8 +14,12 @@ interface HeaderProps {
 
 export default function Header({ siteName = 'App Store', siteIconUrl: serverIconUrl }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [localIconUrl, setLocalIconUrl] = useState('');
   const pathname = usePathname();
+  const router = useRouter();
+  const searchRef = useRef<HTMLInputElement>(null);
   const siteIconUrl = serverIconUrl || localIconUrl;
 
   useEffect(() => {
@@ -32,8 +36,31 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
     })();
   }, [serverIconUrl]);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) setShowSearch(false);
+  };
   const closeMenu = () => setIsOpen(false);
+
+  const toggleSearch = () => {
+    setShowSearch((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsOpen(false);
+        setTimeout(() => searchRef.current?.focus(), 100);
+      }
+      return next;
+    });
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    setShowSearch(false);
+    setSearchQuery('');
+    router.push(`/ung-dung?search=${encodeURIComponent(q)}`);
+  };
 
   const navItems = [
     { name: 'Trang Chủ', path: '/' },
@@ -79,12 +106,35 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
           })}
         </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Search Toggle */}
+          <button className={styles.searchBtn} onClick={toggleSearch} aria-label="Toggle search">
+            <span style={{ fontSize: '1.2rem' }}>🔎</span>
+          </button>
+
           {/* Mobile Hamburger Button */}
           <button className={styles.menuBtn} onClick={toggleMenu} aria-label="Toggle menu">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
+      </div>
+
+      {/* Search Dropdown */}
+      <div className={`${styles.searchDropdown} ${showSearch ? styles.searchDropdownOpen : ''}`}>
+        <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
+          <span className={styles.searchIcon}>🔎</span>
+          <input
+            ref={searchRef}
+            type="text"
+            className={styles.searchInput}
+            placeholder="Tìm kiếm ứng dụng..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type="button" className={styles.searchClose} onClick={() => { setShowSearch(false); setSearchQuery(''); }}>
+            ✕
+          </button>
+        </form>
       </div>
     </header>
   );
