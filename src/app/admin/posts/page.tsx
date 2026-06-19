@@ -182,12 +182,12 @@ export default function AdminPosts() {
               {editingId !== null ? 'Chỉnh Sửa Bài Viết' : 'Viết Bài Mới'}
             </h3>
             
-            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.2)', padding: '4px', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', background: 'hsl(var(--bg-subtle))', padding: '4px', borderRadius: '8px' }}>
               <button
                 type="button"
                 style={{
                   background: previewMode === 'edit' ? 'hsl(var(--color-primary))' : 'transparent',
-                  color: '#fff',
+                  color: previewMode === 'edit' ? '#fff' : 'hsl(var(--text-secondary))',
                   border: 'none',
                   padding: '6px 12px',
                   borderRadius: '6px',
@@ -206,7 +206,7 @@ export default function AdminPosts() {
                 type="button"
                 style={{
                   background: previewMode === 'preview' ? 'hsl(var(--color-primary))' : 'transparent',
-                  color: '#fff',
+                  color: previewMode === 'preview' ? '#fff' : 'hsl(var(--text-secondary))',
                   border: 'none',
                   padding: '6px 12px',
                   borderRadius: '6px',
@@ -259,7 +259,7 @@ export default function AdminPosts() {
                 <div style={{
                   minHeight: '290px',
                   background: 'rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: '1px solid hsl(var(--border-glass))',
                   padding: '20px',
                   borderRadius: '12px',
                   overflowY: 'auto',
@@ -313,7 +313,7 @@ export default function AdminPosts() {
                 <div style={{
                   minHeight: '290px',
                   background: 'rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: '1px solid hsl(var(--border-glass))',
                   padding: '20px',
                   borderRadius: '12px',
                   overflowY: 'auto',
@@ -344,7 +344,7 @@ export default function AdminPosts() {
 
         {/* Info panel */}
         <div className="glass-panel" style={{ padding: '24px', fontSize: '0.9rem' }}>
-          <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <h4 style={{ color: 'hsl(var(--text-primary))', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <FileText size={16} style={{ color: 'hsl(var(--color-secondary))' }} />
             Hướng dẫn định dạng
           </h4>
@@ -387,7 +387,7 @@ export default function AdminPosts() {
                 {posts.map((post) => (
                   <tr key={post.id}>
                     <td>
-                      <div style={{ fontWeight: 600, color: '#fff' }}>{post.title}</div>
+                      <div style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>{post.title}</div>
                     </td>
                     <td>
                       <code style={{ fontSize: '0.8rem' }}>/blog/{post.slug}</code>

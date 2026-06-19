@@ -61,7 +61,7 @@ export default function BlogListPage() {
             <p style={{ color: 'hsl(var(--text-secondary))' }}>Đang tải danh sách bài viết...</p>
           </div>
         ) : posts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+          <div style={{ textAlign: 'center', padding: '60px 0', borderRadius: '16px', border: '1px dashed hsl(var(--border-glass))' }}>
             <p style={{ color: 'hsl(var(--text-muted))', textAlign: 'center' }}>Chưa có bài viết nào được đăng tải.</p>
           </div>
         ) : (

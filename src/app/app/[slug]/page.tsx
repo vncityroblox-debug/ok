@@ -155,10 +155,6 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
         </div>
       )}
 
-      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'hsl(var(--text-secondary))', marginBottom: '30px', fontWeight: 500 }} className="hover:text-white">
-        <ArrowLeft size={16} /> Quay lại trang chủ
-      </Link>
-
       <div className={styles.appDetailLayout}>
         {/* Main Details Panel */}
         <div className={`${styles.detailCard} glass-panel`}>
@@ -168,7 +164,7 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
               <h1>{app.name}</h1>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '10px' }}>
                 <span style={{
-                  background: 'rgba(255,255,255,0.06)',
+                  background: 'hsl(var(--bg-subtle))',
                   padding: '6px 14px',
                   borderRadius: '20px',
                   fontSize: '0.85rem',
@@ -195,10 +191,10 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
             </div>
           </div>
 
-          <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '30px 0' }} />
+          <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border-glass))', margin: '30px 0' }} />
 
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '16px', color: '#fff' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '16px', color: 'hsl(var(--text-primary))' }}>
               Giới thiệu ứng dụng
             </h3>
             <p style={{ color: 'hsl(var(--text-secondary))', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
@@ -209,7 +205,7 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
           {/* Screenshots Grid (if any) */}
           {app.detail_images && app.detail_images.length > 0 && (
             <div className={styles.screenshotsSection}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '16px', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '16px', color: 'hsl(var(--text-primary))', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <ImageIcon size={18} />
                 Hình ảnh chi tiết
               </h3>

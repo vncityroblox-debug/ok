@@ -82,11 +82,19 @@ html, body {
 
 a {
   color: hsl(var(--color-primary));
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
-a:hover {
-  text-decoration: none;
+a:hover, a:active, a:focus, a:visited {
+  text-decoration: none !important;
+}
+
+button {
+  font-family: inherit;
+}
+
+img {
+  color: transparent;
 }
 
 input, textarea, select {

@@ -395,7 +395,7 @@ export default function AdminApps() {
                 checked={isLocked}
                 onChange={(e) => setIsLocked(e.target.checked)}
               />
-              <span style={{ color: '#fff', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: 'hsl(var(--text-primary))', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {isLocked ? <Lock size={16} style={{ color: 'hsl(var(--color-primary))' }} /> : <Unlock size={16} />}
                 Khóa tải về (Cần Key)
               </span>
@@ -530,7 +530,7 @@ export default function AdminApps() {
                 checked={editIsLocked}
                 onChange={(e) => setEditIsLocked(e.target.checked)}
               />
-              <span style={{ color: '#fff', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: 'hsl(var(--text-primary))', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {editIsLocked ? <Lock size={16} style={{ color: 'hsl(var(--color-primary))' }} /> : <Unlock size={16} />}
                 Khóa tải về (Cần Key)
               </span>
@@ -586,12 +586,12 @@ export default function AdminApps() {
                           height: '40px',
                           borderRadius: '10px',
                           objectFit: 'cover',
-                          border: '1px solid rgba(255,255,255,0.1)'
+                          border: '1px solid hsl(var(--border-glass))'
                         }}
                       />
                     </td>
                     <td>
-                      <div style={{ fontWeight: 600, color: '#fff' }}>{app.name}</div>
+                      <div style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>{app.name}</div>
                       <div style={{ fontSize: '0.8rem', opacity: 0.6, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {app.description}
                       </div>

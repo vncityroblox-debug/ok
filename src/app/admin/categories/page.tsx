@@ -232,7 +232,7 @@ export default function AdminCategories() {
                                 height: '36px',
                                 borderRadius: '8px',
                                 objectFit: 'cover',
-                                border: '1px solid rgba(255,255,255,0.1)',
+                                border: '1px solid hsl(var(--border-glass))',
                               }}
                             />
                           )}
@@ -247,7 +247,7 @@ export default function AdminCategories() {
                               onChange={(e) => setEditName(e.target.value)}
                             />
                           ) : (
-                            <span style={{ fontWeight: 600, color: '#fff' }}>{cat.name}</span>
+                            <span style={{ fontWeight: 600, color: 'hsl(var(--text-primary))' }}>{cat.name}</span>
                           )}
                         </td>
                         <td>

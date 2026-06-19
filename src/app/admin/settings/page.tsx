@@ -170,7 +170,7 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border-glass))', margin: '20px 0' }} />
 
         <div style={{ marginBottom: '12px' }}>
           <h4 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -209,7 +209,7 @@ export default function AdminSettings() {
           />
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border-glass))', margin: '20px 0' }} />
 
         <div className={styles.formGroup}>
           <label className={styles.formLabel} htmlFor="seoTitle">Tiêu Đề Tìm Kiếm (SEO Title)</label>
@@ -304,7 +304,7 @@ export default function AdminSettings() {
           />
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border-glass))', margin: '20px 0' }} />
 
         <div style={{ marginBottom: '12px' }}>
           <h4 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -341,7 +341,7 @@ export default function AdminSettings() {
           </div>
         )}
 
-        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '20px 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border-glass))', margin: '20px 0' }} />
 
         <div style={{ marginBottom: '12px' }}>
           <h4 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>

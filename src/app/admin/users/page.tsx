@@ -172,7 +172,7 @@ function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
                   gap: '12px',
                   padding: '16px',
                   borderRadius: '12px',
-                  border: `2px solid ${roleType === opt.value ? 'hsl(var(--color-primary))' : 'rgba(255,255,255,0.08)'}`,
+                  border: `2px solid ${roleType === opt.value ? 'hsl(var(--color-primary))' : 'hsl(var(--border-glass))'}`,
                   background: roleType === opt.value ? 'rgba(139,92,246,0.1)' : 'transparent',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
@@ -264,7 +264,7 @@ function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
               ? 'rgba(139,92,246,0.3)'
               : 'linear-gradient(135deg, hsl(var(--color-primary)), hsl(var(--color-secondary)))',
             border: 'none', borderRadius: '12px',
-            color: '#fff', fontWeight: 700, fontSize: '1rem',
+            color: 'hsl(var(--text-primary))', fontWeight: 700, fontSize: '1rem',
             cursor: loading ? 'not-allowed' : 'pointer',
             transition: 'all 0.2s ease',
           }}
@@ -299,7 +299,7 @@ function AdminTable({ users, currentEmail, onDelete }: {
       <div style={{
         textAlign: 'center', padding: '60px 20px',
         background: 'hsl(var(--bg-card))',
-        border: '1px solid rgba(255,255,255,0.06)',
+        border: '1px solid hsl(var(--border-glass))',
         borderRadius: '16px', color: 'hsl(var(--text-muted))',
       }}>
         <Users size={40} style={{ marginBottom: '12px', opacity: 0.4 }} />
