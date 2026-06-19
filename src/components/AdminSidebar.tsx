@@ -13,7 +13,7 @@ import {
   LogOut,
   Terminal,
   UserCog,
-  Activity,
+  Users,
   X,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -46,7 +46,7 @@ export default function AdminSidebar({ isOpen, onClose }: { isOpen: boolean; onC
     { name: 'Quản Lý Key', path: '/admin/keys', icon: KeyRound },
     { name: 'Viết Bài (Blog)', path: '/admin/posts', icon: FileText },
     { name: 'Quản Lý Admin', path: '/admin/users', icon: UserCog },
-    { name: 'Nhật Ký Hoạt Động', path: '/admin/activity', icon: Activity },
+    { name: 'Quản Lý Người Dùng', path: '/admin/user-management', icon: Users },
   ];
 
   const handleLogout = async () => {
