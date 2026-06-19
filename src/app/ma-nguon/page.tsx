@@ -1,17 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { Lock, Unlock, Download, Terminal, ArrowRight, Search } from 'lucide-react';
+import { Lock, Unlock, Terminal, ArrowRight } from 'lucide-react';
 import styles from '../home.module.css';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  image_url: string;
-}
 
 interface AppItem {
   id: string;
@@ -24,14 +18,16 @@ interface AppItem {
   categories: { name: string; slug: string } | null;
 }
 
-export default function SourceCodePage() {
-  const [categories, setCategories] = useState<Category[]>([]);
+function SourceCodeContent() {
+  const searchParams = useSearchParams();
   const [apps, setApps] = useState<AppItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Log visit and Fetch initial data
+  useEffect(() => {
+    setSearchQuery(searchParams.get('search') || '');
+  }, [searchParams]);
+
   useEffect(() => {
     async function initPage() {
       await logVisit();
@@ -42,15 +38,11 @@ export default function SourceCodePage() {
 
   async function logVisit() {
     try {
-      // Manage unique session ID per visitor in localStorage
       let sessionId = localStorage.getItem('visitor_session_id');
       if (!sessionId) {
-        // Generate a random UUID
         sessionId = crypto.randomUUID();
         localStorage.setItem('visitor_session_id', sessionId);
       }
-
-      // Record visit to API
       await fetch('/api/visit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,14 +56,8 @@ export default function SourceCodePage() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      const [catsRes, appsRes] = await Promise.all([
-        fetch('/api/public?type=categories'),
-        fetch('/api/public?type=apps&app_type=source_code'),
-      ]);
-      const catsData = await catsRes.json();
+      const appsRes = await fetch('/api/public?type=apps&app_type=source_code');
       const appsData = await appsRes.json();
-
-      setCategories(catsData.data || []);
       setApps(appsData.data || []);
     } catch (err) {
       console.error('Fetch page data error:', err);
@@ -80,19 +66,15 @@ export default function SourceCodePage() {
     }
   }
 
-  // Filter apps based on active category and search input
   const filteredApps = apps.filter((app) => {
-    const matchesCategory =
-      selectedCategory === 'all' || app.categories?.slug === selectedCategory;
-    const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const q = searchQuery.toLowerCase();
+    if (!q) return true;
+    return app.name.toLowerCase().includes(q) || app.description.toLowerCase().includes(q);
   });
 
   return (
     <div className="container">
       <Breadcrumbs />
-      {/* Hero Header */}
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
           Kho Mã Nguồn <span>Tuyển Chọn</span>
@@ -102,48 +84,6 @@ export default function SourceCodePage() {
         </p>
       </section>
 
-      {/* Search and filter toolbar */}
-      <section className={styles.searchSection}>
-        <div className={styles.searchBarWrapper} id="guide-search">
-          <Search size={20} style={{ width: 20, height: 20, flexShrink: 0, color: 'hsl(var(--text-secondary))' }} />
-          <input
-            type="search"
-            className={styles.searchInput}
-            placeholder="Tìm kiếm mã nguồn..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {/* Categories Bar */}
-        <div className={styles.categoriesWrapper} id="guide-categories">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`${styles.categoryPill} ${
-              selectedCategory === 'all' ? styles.categoryPillActive : ''
-            }`}
-          >
-            Tất cả
-          </button>
-          
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.slug)}
-              className={`${styles.categoryPill} ${
-                selectedCategory === cat.slug ? styles.categoryPillActive : ''
-              }`}
-            >
-              {cat.image_url && (
-                <img src={cat.image_url} alt={cat.name} className={styles.categoryIcon} />
-              )}
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Apps Showcase Grid */}
       <section style={{ marginBottom: '80px' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Terminal size={22} style={{ color: 'hsl(var(--color-primary))' }} />
@@ -162,7 +102,6 @@ export default function SourceCodePage() {
           <div className={styles.appsGrid} id="guide-apps">
             {filteredApps.map((app) => (
               <div key={app.id} className={styles.appCard}>
-                {/* Lock Badge */}
                 <div
                   className={styles.appBadge}
                   style={{
@@ -205,5 +144,13 @@ export default function SourceCodePage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function SourceCodePage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '60px 0', textAlign: 'center', color: 'hsl(var(--text-secondary))' }}>Đang tải...</div>}>
+      <SourceCodeContent />
+    </Suspense>
   );
 }

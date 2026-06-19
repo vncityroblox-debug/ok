@@ -59,7 +59,10 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
     if (!q) return;
     setShowSearch(false);
     setSearchQuery('');
-    router.push(`/ung-dung?search=${encodeURIComponent(q)}`);
+    const base = pathname?.startsWith('/ma-nguon') ? '/ma-nguon'
+      : pathname?.startsWith('/ung-dung') ? '/ung-dung'
+      : '/ung-dung';
+    router.push(`${base}?search=${encodeURIComponent(q)}`);
   };
 
   const navItems = [
