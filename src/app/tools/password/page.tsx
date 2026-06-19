@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Key, Copy, Check, RefreshCw, Shield, ShieldCheck, ShieldAlert } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { useAuth } from '@/components/AuthGuard';
 
 const CHARSETS = {
   uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -72,6 +73,7 @@ function getStrength(password: string): {
 }
 
 export default function PasswordGeneratorPage() {
+  const { user, requestAuth } = useAuth();
   const [options, setOptions] = useState<PasswordOption>({
     length: 16,
     uppercase: true,
@@ -85,6 +87,10 @@ export default function PasswordGeneratorPage() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const generate = useCallback(() => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     const result: string[] = [];
     for (let i = 0; i < options.count; i++) {
       result.push(generatePassword(options));

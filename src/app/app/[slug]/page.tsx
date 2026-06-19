@@ -5,6 +5,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import ImageLightbox from '@/components/ImageLightbox';
 import { Lock, Unlock, Download, KeyRound, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/components/AuthGuard';
 import styles from '../../home.module.css';
 
 interface AppDetails {
@@ -33,6 +34,8 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const { user, requestAuth } = useAuth();
 
   useEffect(() => {
     async function loadAppDetails() {
@@ -65,6 +68,11 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
 
   const handleDownload = async () => {
     if (!app) return;
+    if (!user) {
+      requestAuth();
+      setIsVerifying(false);
+      return;
+    }
     setIsVerifying(true);
     setErrorMessage('');
     setSuccessMessage('');

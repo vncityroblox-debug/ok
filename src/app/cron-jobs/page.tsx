@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { Clock, Plus, Trash2, Power, PowerOff, Check, X, Loader2, Globe, Timer, Activity, Zap, ExternalLink, RotateCcw } from 'lucide-react';
 import styles from './cron.module.css';
+import { useAuth } from '@/components/AuthGuard';
 
 interface CronJob {
   id: string;
@@ -35,6 +36,8 @@ export default function CronJobsPage() {
   const [interval, setInterval_] = useState(30);
   const [showForm, setShowForm] = useState(false);
 
+  const { user, requestAuth } = useAuth();
+
   useEffect(() => { fetchJobs(); }, []);
 
   async function fetchJobs() {
@@ -52,6 +55,11 @@ export default function CronJobsPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      requestAuth();
+      setIsCreating(false);
+      return;
+    }
     setErrorMsg(''); setSuccessMsg(''); setIsCreating(true);
     try {
       const res = await fetch('/api/cron-jobs', {
@@ -86,6 +94,10 @@ export default function CronJobsPage() {
   };
 
   const handleDelete = async (job: CronJob) => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     if (!confirm(`Xóa job "${job.name}"?`)) return;
     try {
       await fetch(`/api/cron-jobs?id=${job.id}`, { method: 'DELETE' });
@@ -97,6 +109,10 @@ export default function CronJobsPage() {
   };
 
   const handleExecuteNow = async () => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     setIsExecuting(true); setErrorMsg(''); setSuccessMsg('');
     try {
       const res = await fetch('/api/cron-jobs/execute', { method: 'POST' });

@@ -3,9 +3,11 @@
 import { useState, useRef, useCallback } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PasteButton from '@/components/PasteButton';
+import { useAuth } from '@/components/AuthGuard';
 import { Code, Copy, Check, Minimize2, Maximize2, Braces, FileText } from 'lucide-react';
 
 export default function JsonFormatterPage() {
+  const { user, requestAuth } = useAuth();
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
@@ -55,6 +57,10 @@ export default function JsonFormatterPage() {
   }, []);
 
   const formatJson = useCallback(() => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     try {
       setError('');
       const data = detectAndParse(input);
@@ -76,6 +82,10 @@ export default function JsonFormatterPage() {
   }, [input, tabSize, detectAndParse]);
 
   const minifyJson = useCallback(() => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     try {
       setError('');
       const data = detectAndParse(input);

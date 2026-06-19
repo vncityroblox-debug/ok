@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link2, Copy, Check, ArrowRight, ExternalLink, Clock, BarChart3 } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PasteButton from '@/components/PasteButton';
+import { useAuth } from '@/components/AuthGuard';
 
 interface HistoryItem {
   original: string;
@@ -36,6 +37,7 @@ function isValidUrl(str: string): boolean {
 }
 
 export default function ShortenPage() {
+  const { user, requestAuth } = useAuth();
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -54,6 +56,10 @@ export default function ShortenPage() {
   }).length;
 
   const handleShorten = useCallback(async () => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     setError('');
     setResult(null);
 

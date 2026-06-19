@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { useAuth } from '@/components/AuthGuard';
 import { Image, Upload, Download, Trash2, Check, ArrowRight, Maximize, Minimize } from 'lucide-react';
 
 interface CompressedImage {
@@ -26,6 +27,7 @@ function formatSize(bytes: number): string {
 }
 
 export default function ImageCompressorPage() {
+  const { user, requestAuth } = useAuth();
   const [images, setImages] = useState<CompressedImage[]>([]);
   const [quality, setQuality] = useState(80);
   const [outputFormat, setOutputFormat] = useState<'image/jpeg' | 'image/png' | 'image/webp'>('image/jpeg');
@@ -78,6 +80,10 @@ export default function ImageCompressorPage() {
 
   const handleFiles = useCallback(
     async (files: FileList) => {
+      if (!user) {
+        requestAuth();
+        return;
+      }
       const validFiles = Array.from(files).filter((f) => ACCEPTED_TYPES.includes(f.type));
       if (validFiles.length === 0) return;
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PasteButton from '@/components/PasteButton';
+import { useAuth } from '@/components/AuthGuard';
 import { Globe, Search, Server, Clock, Shield, Copy, Check, ExternalLink } from 'lucide-react';
 
 type WhoisData = {
@@ -38,6 +39,7 @@ const RECORD_TYPES: { label: string; type: number }[] = [
 ];
 
 export default function WhoisPage() {
+  const { user, requestAuth } = useAuth();
   const [domain, setDomain] = useState('');
   const [activeTab, setActiveTab] = useState<'whois' | 'dns'>('whois');
   const [whoisData, setWhoisData] = useState<WhoisData | null>(null);
@@ -126,6 +128,10 @@ export default function WhoisPage() {
   };
 
   const handleLookup = async () => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     const cleaned = cleanDomain(domain);
     if (!cleaned) {
       setError('Vui lòng nhập tên miền.');

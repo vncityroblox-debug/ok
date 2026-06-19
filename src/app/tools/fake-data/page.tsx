@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { useAuth } from '@/components/AuthGuard';
 import {
   Database,
   Copy,
@@ -239,6 +240,7 @@ function downloadFile(content: string, filename: string, type: string) {
 }
 
 export default function FakeDataPage() {
+  const { user, requestAuth } = useAuth();
   const [category, setCategory] = useState<Category>('personal');
   const [count, setCount] = useState(10);
   const [data, setData] = useState<Record<string, string>[]>([]);
@@ -246,6 +248,10 @@ export default function FakeDataPage() {
   const [viewMode, setViewMode] = useState<'table' | 'json'>('table');
 
   const handleGenerate = () => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     const generated = generateData(category, count);
     setData(generated);
     setCopied(false);

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { QrCode, Download, Copy, Check, Link, Mail, Phone, Wifi } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import PasteButton from '@/components/PasteButton';
+import { useAuth } from '@/components/AuthGuard';
 
 type TabId = 'url' | 'text' | 'email' | 'phone' | 'wifi';
 type SizeOption = '200x200' | '300x300' | '500x500' | '800x800';
@@ -59,6 +60,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 export default function QRCodePage() {
+  const { user, requestAuth } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>('url');
   const [inputs, setInputs] = useState<Record<string, string>>({
     url: '', text: '', email: '', subject: '', body: '', phone: '', ssid: '', password: '', encryption: 'WPA',
@@ -76,6 +78,10 @@ export default function QRCodePage() {
   const canGenerate = qrValue.trim().length > 0;
 
   const handleCopyLink = useCallback(async () => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     try {
       await navigator.clipboard.writeText(apiUrl);
       setCopied(true);
@@ -84,6 +90,10 @@ export default function QRCodePage() {
   }, [apiUrl]);
 
   const handleDownload = useCallback(async () => {
+    if (!user) {
+      requestAuth();
+      return;
+    }
     if (!canGenerate) return;
     setDownloading(true);
     try {
