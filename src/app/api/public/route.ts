@@ -19,7 +19,7 @@ export async function GET(request: Request) {
           supabase.from('categories').select('*').order('name', { ascending: true }),
           supabase.from('site_settings').select('home_hero_title, home_hero_subtitle').eq('id', 1).single(),
           supabase.from('apps').select('id, name, slug, description, main_image_url, is_locked, category_id, categories(name, slug), app_type')
-            .eq('app_type', appType || 'app').order('created_at', { ascending: false }).limit(limit),
+            .eq('app_type', appType || 'app').eq('is_hidden', false).order('created_at', { ascending: false }).limit(limit),
         ]);
         data = { categories: catRes.data, settings: settRes.data, apps: appsRes.data };
         break;
@@ -43,7 +43,8 @@ export async function GET(request: Request) {
       }
       case 'apps': {
         let query = supabase.from('apps')
-          .select('id, name, slug, description, main_image_url, is_locked, category_id, categories(name, slug), app_type');
+          .select('id, name, slug, description, main_image_url, is_locked, category_id, categories(name, slug), app_type')
+          .eq('is_hidden', false);
         if (appType) query = query.eq('app_type', appType);
         const res = await query.order('created_at', { ascending: false }).limit(limit);
         data = res.data;

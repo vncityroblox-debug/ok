@@ -19,6 +19,7 @@ interface AppItem {
   detail_images: string[];
   download_link: string;
   is_locked: boolean;
+  is_hidden: boolean;
   category_id: string;
   categories: { name: string } | null;
 }
@@ -170,6 +171,14 @@ export default function AdminApps() {
         const { error } = await supabase.from('apps').update({ is_locked: false }).in('id', ids);
         if (error) throw error;
         setSuccessMsg(`Đã mở khóa ${ids.length} ứng dụng.`);
+      } else if (bulkAction === 'hide') {
+        const { error } = await supabase.from('apps').update({ is_hidden: true }).in('id', ids);
+        if (error) throw error;
+        setSuccessMsg(`Đã ẩn ${ids.length} ứng dụng khỏi trang khách.`);
+      } else if (bulkAction === 'show') {
+        const { error } = await supabase.from('apps').update({ is_hidden: false }).in('id', ids);
+        if (error) throw error;
+        setSuccessMsg(`Đã hiện ${ids.length} ứng dụng trên trang khách.`);
       } else if (bulkAction === 'attach_key') {
         if (!bulkKeyId) { setErrorMsg('Vui lòng chọn Key để gắn.'); setIsBulkProcessing(false); return; }
         // Delete existing app_keys for these apps first, then insert
@@ -332,6 +341,8 @@ export default function AdminApps() {
               <option value="">-- Chọn hành động --</option>
               <option value="lock">🔐 Khóa hàng loạt</option>
               <option value="unlock">🔓 Mở khóa hàng loạt</option>
+              <option value="hide">👁️‍🗨️ Ẩn hàng loạt</option>
+              <option value="show">👁️ Hiện hàng loạt</option>
               <option value="attach_key">🔑 Gắn Key hàng loạt</option>
               <option value="detach_key">🗑️ Tháo Key hàng loạt</option>
             </select>
@@ -367,6 +378,7 @@ export default function AdminApps() {
                   <th>Tên App</th>
                   <th>Danh mục</th>
                   <th>Trạng thái</th>
+                  <th>Hiện</th>
                   <th>Slug Link</th>
                   <th style={{ width: '100px' }}>Hành động</th>
                 </tr>
@@ -391,6 +403,18 @@ export default function AdminApps() {
                       ) : (
                         <span className={`${styles.badge} ${styles.badgeSuccess}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Unlock size={12} /> Mở</span>
                       )}
+                    </td>
+                    <td>
+                      <button
+                        onClick={async () => {
+                          await supabase.from('apps').update({ is_hidden: !app.is_hidden }).eq('id', app.id);
+                          fetchData();
+                        }}
+                        title={app.is_hidden ? 'Đang ẩn - Bấm để hiện' : 'Đang hiện - Bấm để ẩn'}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: app.is_hidden ? 'hsl(var(--text-muted))' : 'hsl(var(--color-primary))', padding: '4px' }}
+                      >
+                        {app.is_hidden ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
                     </td>
                     <td><code style={{ fontSize: '0.8rem' }}>/app/{app.slug}</code></td>
                     <td>
