@@ -12,6 +12,7 @@ const nameMap: Record<string, string> = {
   '2fa': 'Lấy 2FA',
   'blog': 'Bài Viết',
   'app': 'Chi Tiết',
+  'phim-hay': 'Phim Hay',
 };
 
 export default function Breadcrumbs() {

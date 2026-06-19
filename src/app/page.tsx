@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText } from 'lucide-react';
+import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText, Film } from 'lucide-react';
 import styles from './home.module.css';
 
 interface Post {
@@ -76,6 +76,7 @@ export default function HomePage() {
   const sections = [
     { label: 'Ứng Dụng', href: '/ung-dung', icon: AppWindow, color: 'var(--color-primary)' },
     { label: 'Mã Nguồn', href: '/ma-nguon', icon: Terminal, color: 'var(--color-success)' },
+    { label: 'Phim Hay', href: '/phim-hay', icon: Film, color: 'var(--color-accent, #8b5cf6)' },
     { label: 'Tiện Ích', href: '/tien-ich', icon: ShieldCheck, color: 'var(--color-warning)' },
   ];
 
