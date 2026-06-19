@@ -59,19 +59,14 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
     if (!q) return;
     setShowSearch(false);
     setSearchQuery('');
-    if (pathname?.startsWith('/phim-hay') || pathname?.startsWith('/phim-')) {
-      router.push(`/phim-hay?keyword=${encodeURIComponent(q)}`);
-    } else {
-      const base = pathname?.startsWith('/ma-nguon') ? '/ma-nguon'
-        : pathname?.startsWith('/ung-dung') ? '/ung-dung'
-        : '/ung-dung';
-      router.push(`${base}?search=${encodeURIComponent(q)}`);
-    }
+    const base = pathname?.startsWith('/ma-nguon') ? '/ma-nguon'
+      : pathname?.startsWith('/ung-dung') ? '/ung-dung'
+      : '/ung-dung';
+    router.push(`${base}?search=${encodeURIComponent(q)}`);
   };
 
   const navItems = [
     { name: 'Trang Chủ', path: '/' },
-    { name: 'Phim Hay', path: '/phim-hay' },
     { name: 'Mã Nguồn', path: '/ma-nguon' },
     { name: 'Tiện Ích', path: '/tien-ich' },
     { name: 'Bài Viết', path: '/blog' },
