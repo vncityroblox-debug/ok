@@ -80,7 +80,7 @@ export default function AdminDashboard() {
       if (Array.isArray(s.visitsTimeline)) {
         const m: Record<string, number> = {};
         for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); m[d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })] = 0; }
-        s.visitsTimeline.forEach((v: any) => { const k = new Date(v.created_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' }); if (m[k] !== undefined) m[k]++; });
+        s.visitsTimeline.forEach((v: any) => { const k = new Date(v.visited_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' }); if (m[k] !== undefined) m[k]++; });
         setDailyVisits(Object.keys(m).map(k => ({ dateLabel: k, count: m[k] })));
       }
       const acts = (allActivities || []).map((a: any) => ({ ...a, username: a.user_profiles?.username || a.user_email || 'N/A' }));
