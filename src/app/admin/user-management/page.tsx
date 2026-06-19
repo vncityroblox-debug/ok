@@ -134,20 +134,11 @@ function UserDetailModal({ user, onClose }: {
   useEffect(() => {
     (async () => {
       try {
-        const results = await Promise.allSettled([
-          supabase.from('purchases').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-          supabase.from('login_history').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        ]);
+        const logsRes = await fetch(`/api/admin/logs?user_id=${user.id}`).then((r) => r.json()).catch(() => ({ activityLogs: [], loginHistory: [] }));
+        const userActivityRes = await fetch(`/api/admin/user-activity?user_id=${user.id}`).then((r) => r.json()).catch(() => ({ purchases: [], activityLogs: [] }));
 
-        const getData = (r: PromiseSettledResult<any>): any[] => {
-          if (r.status === 'rejected') return [];
-          const res = r.value;
-          if (res.error) { console.error('Query error:', res.error.message); return []; }
-          return res.data ?? [];
-        };
-
-        setPurchases(getData(results[0]));
-        setLoginHistory(getData(results[1]));
+        setPurchases(userActivityRes.purchases ?? []);
+        setLoginHistory(logsRes.loginHistory ?? []);
       } catch {
         // silently fail
       } finally {
@@ -518,42 +509,15 @@ export default function UserManagementPage() {
     setLoading(true);
     setError('');
     try {
-      const results = await Promise.allSettled([
-        supabase.from('user_profiles').select('*').order('created_at', { ascending: false }),
-        supabase.from('purchases').select('id, user_id'),
-        supabase.from('login_history').select('user_id, created_at').order('created_at', { ascending: false }),
-      ]);
+      const res = await fetch('/api/admin/users');
+      const json = await res.json();
 
-      const getData = (r: PromiseSettledResult<any>): any[] => {
-        if (r.status === 'rejected') return [];
-        const res = r.value;
-        if (res.error) { console.error('Query error:', res.error.message); return []; }
-        return res.data ?? [];
-      };
+      if (!res.ok) {
+        setError(json.error || 'Không lấy được danh sách người dùng.');
+        return;
+      }
 
-      const profiles = getData(results[0]);
-      const purchases = getData(results[1]);
-      const loginHistory = getData(results[2]);
-
-      const purchaseCountMap = new Map<string, number>();
-      purchases.forEach((p: any) => {
-        purchaseCountMap.set(p.user_id, (purchaseCountMap.get(p.user_id) ?? 0) + 1);
-      });
-
-      const lastLoginMap = new Map<string, string>();
-      loginHistory.forEach((l: any) => {
-        if (!lastLoginMap.has(l.user_id)) {
-          lastLoginMap.set(l.user_id, l.created_at);
-        }
-      });
-
-      const users = profiles.map((p: any) => ({
-        ...p,
-        total_purchases: purchaseCountMap.get(p.id) ?? 0,
-        last_login: lastLoginMap.get(p.id) ?? null,
-      }));
-
-      setAllUsers(users);
+      setAllUsers(json.users ?? []);
       setDisplayCount(PAGE_SIZE);
     } catch {
       setError('Không kết nối được server.');

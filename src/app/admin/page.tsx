@@ -89,56 +89,29 @@ export default function AdminDashboard() {
     try {
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      const todayISO = todayStart.toISOString();
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-      const results = await Promise.allSettled([
-        supabase.from('analytics_visits').select('*', { count: 'exact', head: true }),
-        supabase.from('analytics_visits').select('*', { count: 'exact', head: true }).gte('created_at', todayISO),
-        supabase.from('analytics_downloads').select('*', { count: 'exact', head: true }),
-        supabase.from('analytics_downloads').select('app_id, apps(name)'),
-        supabase.from('analytics_visits').select('created_at').order('created_at', { ascending: true }),
-        supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(500),
-        supabase.from('login_history').select('*').order('created_at', { ascending: false }).limit(500),
+      const [statsRes, logsRes] = await Promise.all([
+        fetch('/api/admin/stats').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/admin/logs').then((r) => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] })),
       ]);
 
-      const getCount = (r: PromiseSettledResult<any>): number => {
-        if (r.status === 'rejected') return 0;
-        const res = r.value;
-        if (res.error) { console.error('Query error:', res.error.message); return 0; }
-        return res.count ?? 0;
-      };
+      const allLogins = logsRes.loginHistory || [];
+      const allActivities = logsRes.activityLogs || [];
 
-      const getData = (r: PromiseSettledResult<any>): any[] => {
-        if (r.status === 'rejected') return [];
-        const res = r.value;
-        if (res.error) { console.error('Query error:', res.error.message); return []; }
-        return res.data ?? [];
-      };
-
-      const tVisits = getCount(results[0]);
-      const tTodayVisits = getCount(results[1]);
-      const tDownloads = getCount(results[2]);
-      const recentDownloads = getData(results[3]);
-      const visitsTimeline = getData(results[4]);
-      const tUsers = getCount(results[5]);
-      const allActivities = getData(results[6]);
-      const allLogins = getData(results[7]);
-
-      setTotalVisits(tVisits);
-      setTodayVisits(tTodayVisits);
-      setTotalDownloads(tDownloads);
-      setTotalUsers(tUsers);
+      setTotalVisits(statsRes.totalVisits ?? 0);
+      setTodayVisits(statsRes.recentVisits ?? 0);
+      setTotalDownloads(statsRes.totalDownloads ?? 0);
+      setTotalUsers(statsRes.totalUsers ?? 0);
 
       const todayLoginsCount = allLogins.filter((l: any) => new Date(l.created_at) >= todayStart).length;
       const unique7dUsers = new Set(allLogins.filter((l: any) => new Date(l.created_at) >= new Date(sevenDaysAgo)).map((l: any) => l.user_id));
       setTodayLogins(todayLoginsCount);
       setActiveUsers7d(unique7dUsers.size);
 
-      if (Array.isArray(recentDownloads)) {
+      if (Array.isArray(statsRes.recentDownloads)) {
         const aggMap: { [key: string]: number } = {};
-        recentDownloads.forEach((row: any) => {
+        statsRes.recentDownloads.forEach((row: any) => {
           const appName = row.apps?.name || 'Ứng dụng không xác định';
           aggMap[appName] = (aggMap[appName] || 0) + 1;
         });
@@ -150,14 +123,14 @@ export default function AdminDashboard() {
         );
       }
 
-      if (Array.isArray(visitsTimeline)) {
+      if (Array.isArray(statsRes.visitsTimeline)) {
         const dailyMap: { [key: string]: number } = {};
         for (let i = 6; i >= 0; i--) {
           const d = new Date();
           d.setDate(d.getDate() - i);
           dailyMap[d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })] = 0;
         }
-        visitsTimeline.forEach((v: any) => {
+        statsRes.visitsTimeline.forEach((v: any) => {
           const dateStr = new Date(v.created_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
           if (dailyMap[dateStr] !== undefined) dailyMap[dateStr]++;
         });
@@ -183,7 +156,7 @@ export default function AdminDashboard() {
         const key = d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
         dailyActivityMap[key] = 0;
       }
-      acts.forEach((a: ActivityLog) => {
+      acts.forEach((a: any) => {
         const dateStr = new Date(a.created_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
         if (dailyActivityMap[dateStr] !== undefined) dailyActivityMap[dateStr]++;
       });

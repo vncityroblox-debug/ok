@@ -58,26 +58,13 @@ export default function ActivityPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const results = await Promise.allSettled([
-        supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(500),
-        supabase.from('login_history').select('*').order('created_at', { ascending: false }).limit(500),
-      ])
+      const logsRes = await fetch('/api/admin/logs').then((r) => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] }))
 
-      const getData = (r: PromiseSettledResult<any>): any[] => {
-        if (r.status === 'rejected') return []
-        const res = r.value
-        if (res.error) { console.error('Query error:', res.error.message); return [] }
-        return res.data ?? []
-      }
-
-      const allActivities = getData(results[0])
-      const allLogins = getData(results[1])
-
-      const acts = allActivities.map((a: any) => ({
+      const acts = (logsRes.activityLogs || []).map((a: any) => ({
         ...a,
         username: a.user_profiles?.username || a.user_email || 'N/A',
       }))
-      const logins = allLogins.map((l: any) => ({
+      const logins = (logsRes.loginHistory || []).map((l: any) => ({
         ...l,
         username: l.user_profiles?.username || l.user_email || 'N/A',
       }))
