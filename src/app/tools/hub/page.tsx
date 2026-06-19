@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { QrCode, Link2, Key, Code, Database, Globe, Image, ArrowRight } from 'lucide-react';
+import { QrCode, Link2, Key, Code, Database, Globe, Image, ShieldCheck, ArrowRight } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 const tools = [
@@ -53,6 +53,13 @@ const tools = [
     href: '/tools/image-compressor',
     icon: Image,
     color: '#10b981',
+  },
+  {
+    name: 'Lấy Mã 2FA',
+    description: 'Tạo mã xác thực 2 bước (TOTP) từ secret key. Tự động làm mới mỗi 30 giây.',
+    href: '/tien-ich/2fa',
+    icon: ShieldCheck,
+    color: '#8b5cf6',
   },
 ];
 

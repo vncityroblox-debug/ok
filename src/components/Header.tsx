@@ -69,7 +69,6 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
     { name: 'Trang Chủ', path: '/' },
     { name: 'Công Cụ', path: '/tools/hub' },
     { name: 'CronJobs', path: '/cron-jobs' },
-    { name: 'Tiện Ích', path: '/tien-ich' },
     { name: 'Mã Nguồn', path: '/ma-nguon' },
     { name: 'Bài Viết', path: '/blog' },
   ];

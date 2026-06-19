@@ -37,6 +37,7 @@ const nameMap: Record<string, string> = {
 const redirectMap: Record<string, string> = {
   '/tools': '/tools/hub',
   '/app': '/ung-dung',
+  '/tien-ich': '/tools/hub',
 };
 
 export default function Breadcrumbs() {
