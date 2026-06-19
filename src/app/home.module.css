@@ -85,7 +85,7 @@
 
 .searchInput {
   flex: 1;
-  padding: 16px 20px 16px 0;
+  padding: 16px 20px 16px 10px;
   font-size: 1.05rem;
   background: transparent !important;
   border: none !important;
@@ -96,7 +96,7 @@
 
 @media (max-width: 480px) {
   .searchInput {
-    padding: 12px 14px 12px 0;
+    padding: 12px 14px 12px 8px;
     font-size: 0.95rem;
   }
 }
