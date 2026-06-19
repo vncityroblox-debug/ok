@@ -134,26 +134,20 @@ function UserDetailModal({ user, onClose }: {
   useEffect(() => {
     (async () => {
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData?.session?.access_token;
-        const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-
-        // Both APIs use service role on backend to bypass RLS
-        const [usersRes, logsRes] = await Promise.all([
-          fetch('/api/admin/users', { headers }).then((r) => r.json()).catch(() => ({ users: [] })),
-          fetch(`/api/admin/logs?user_id=${user.id}`, { headers }).then((r) => r.json()).catch(() => ({ loginHistory: [] })),
+        const results = await Promise.allSettled([
+          supabase.from('purchases').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+          supabase.from('login_history').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         ]);
 
-        // Extract purchases for this specific user from purchases count
-        // Use dedicated user-specific purchase fetch via logs API's purchases field
-        const { data: sessionData2 } = await supabase.auth.getSession();
-        const token2 = sessionData2?.session?.access_token;
-        const purchasesRes = await fetch(`/api/admin/user-activity?user_id=${user.id}`, {
-          headers: token2 ? { Authorization: `Bearer ${token2}` } : {},
-        }).then((r) => r.json()).catch(() => ({ purchases: [] }));
+        const getData = (r: PromiseSettledResult<any>): any[] => {
+          if (r.status === 'rejected') return [];
+          const res = r.value;
+          if (res.error) { console.error('Query error:', res.error.message); return []; }
+          return res.data ?? [];
+        };
 
-        setPurchases(purchasesRes.purchases ?? []);
-        setLoginHistory(logsRes.loginHistory ?? []);
+        setPurchases(getData(results[0]));
+        setLoginHistory(getData(results[1]));
       } catch {
         // silently fail
       } finally {
@@ -524,20 +518,42 @@ export default function UserManagementPage() {
     setLoading(true);
     setError('');
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+      const results = await Promise.allSettled([
+        supabase.from('user_profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('purchases').select('id, user_id'),
+        supabase.from('login_history').select('user_id, created_at').order('created_at', { ascending: false }),
+      ]);
 
-      // Use backend API (service role) to bypass RLS on user_profiles and purchases
-      const res = await fetch('/api/admin/users', { headers });
-      const json = await res.json();
+      const getData = (r: PromiseSettledResult<any>): any[] => {
+        if (r.status === 'rejected') return [];
+        const res = r.value;
+        if (res.error) { console.error('Query error:', res.error.message); return []; }
+        return res.data ?? [];
+      };
 
-      if (!res.ok) {
-        setError(json.error || 'Không lấy được danh sách người dùng.');
-        return;
-      }
+      const profiles = getData(results[0]);
+      const purchases = getData(results[1]);
+      const loginHistory = getData(results[2]);
 
-      setAllUsers(json.users ?? []);
+      const purchaseCountMap = new Map<string, number>();
+      purchases.forEach((p: any) => {
+        purchaseCountMap.set(p.user_id, (purchaseCountMap.get(p.user_id) ?? 0) + 1);
+      });
+
+      const lastLoginMap = new Map<string, string>();
+      loginHistory.forEach((l: any) => {
+        if (!lastLoginMap.has(l.user_id)) {
+          lastLoginMap.set(l.user_id, l.created_at);
+        }
+      });
+
+      const users = profiles.map((p: any) => ({
+        ...p,
+        total_purchases: purchaseCountMap.get(p.id) ?? 0,
+        last_login: lastLoginMap.get(p.id) ?? null,
+      }));
+
+      setAllUsers(users);
       setDisplayCount(PAGE_SIZE);
     } catch {
       setError('Không kết nối được server.');

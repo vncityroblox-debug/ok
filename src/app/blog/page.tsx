@@ -22,9 +22,9 @@ export default function BlogListPage() {
     async function loadPosts() {
       setIsLoading(true);
       try {
-        const res = await fetch('/api/public?type=posts');
-        const json = await res.json();
-        if (json.data) setPosts(json.data);
+        const { fetchPublicPosts } = await import('@/lib/public-fetch');
+        const postsData = await fetchPublicPosts();
+        setPosts(postsData);
       } catch (err) {
         console.error('Failed to load blog posts:', err);
       } finally {

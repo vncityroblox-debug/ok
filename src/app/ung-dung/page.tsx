@@ -56,9 +56,9 @@ function UngDungContent() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      const appsRes = await fetch('/api/public?type=apps&app_type=app');
-      const appsData = await appsRes.json();
-      setApps(appsData.data || []);
+      const { fetchPublicApps } = await import('@/lib/public-fetch');
+      const appsData = await fetchPublicApps('app');
+      setApps(appsData as AppItem[]);
     } catch (err) {
       console.error('Fetch page data error:', err);
     } finally {

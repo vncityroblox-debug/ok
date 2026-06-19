@@ -49,19 +49,18 @@ export default function HomePage() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      const [settRes, postsRes] = await Promise.all([
-        fetch('/api/public?type=home&app_type=app'),
-        fetch('/api/public?type=posts&limit=4'),
+      const { fetchPublicSettings, fetchPublicPosts } = await import('@/lib/public-fetch');
+      const [settings, posts] = await Promise.all([
+        fetchPublicSettings(),
+        fetchPublicPosts(4),
       ]);
-      const homeData = await settRes.json();
-      const postsData = await postsRes.json();
 
-      if (homeData.data?.settings) {
-        if (homeData.data.settings.home_hero_title) setHeroTitle(homeData.data.settings.home_hero_title);
-        if (homeData.data.settings.home_hero_subtitle) setHeroSubtitle(homeData.data.settings.home_hero_subtitle);
+      if (settings) {
+        if (settings.home_hero_title) setHeroTitle(settings.home_hero_title);
+        if (settings.home_hero_subtitle) setHeroSubtitle(settings.home_hero_subtitle);
       }
 
-      setRecentPosts(postsData.data || []);
+      setRecentPosts(posts || []);
     } catch (err) {
       console.error('Fetch home page data error:', err);
     } finally {

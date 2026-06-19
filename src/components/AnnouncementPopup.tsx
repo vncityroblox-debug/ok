@@ -21,11 +21,11 @@ export default function AnnouncementPopup() {
     // Fetch thông báo từ site_settings
     async function loadAnnouncement() {
       try {
-        const res = await fetch('/api/public?type=announcement');
-        const json = await res.json();
+        const { fetchAnnouncement } = await import('@/lib/public-fetch');
+        const data = await fetchAnnouncement();
 
-        if (json.data?.announcement_html && json.data.announcement_html.trim() !== '') {
-          setHtml(json.data.announcement_html);
+        if (data?.announcement_html && data.announcement_html.trim() !== '') {
+          setHtml(data.announcement_html);
           setTimeout(() => setVisible(true), 800);
         }
       } catch (err) {

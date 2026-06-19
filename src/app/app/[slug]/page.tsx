@@ -44,17 +44,17 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
     async function loadAppDetails() {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/public?type=app&slug=${encodeURIComponent(slug)}`);
-        const json = await res.json();
+        const { fetchPublicAppBySlug } = await import('@/lib/public-fetch');
+        const { app: appData, settings } = await fetchPublicAppBySlug(slug);
 
-        if (!json.data?.app) {
+        if (!appData) {
           setErrorMessage('Không tìm thấy ứng dụng yêu cầu.');
         } else {
-          setApp(json.data.app);
+          setApp(appData);
         }
 
-        if (json.data?.settings?.terms_content) {
-          setTermsContent(json.data.settings.terms_content);
+        if (settings?.terms_content) {
+          setTermsContent(settings.terms_content);
         } else {
           setTermsAccepted(true);
         }

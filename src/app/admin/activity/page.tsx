@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Activity, Users, RefreshCw, Filter, Search, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { Activity, Users, RefreshCw, Filter, Search, Clock, ChevronDown } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import styles from '../admin.module.css'
 
@@ -58,17 +58,26 @@ export default function ActivityPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const { data: sessionData } = await supabase.auth.getSession()
-      const token = sessionData?.session?.access_token
-      const logsRes = await fetch('/api/admin/logs', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      }).then((r) => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] }))
+      const results = await Promise.allSettled([
+        supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(500),
+        supabase.from('login_history').select('*').order('created_at', { ascending: false }).limit(500),
+      ])
 
-      const acts = (logsRes.activityLogs || []).map((a: any) => ({
+      const getData = (r: PromiseSettledResult<any>): any[] => {
+        if (r.status === 'rejected') return []
+        const res = r.value
+        if (res.error) { console.error('Query error:', res.error.message); return [] }
+        return res.data ?? []
+      }
+
+      const allActivities = getData(results[0])
+      const allLogins = getData(results[1])
+
+      const acts = allActivities.map((a: any) => ({
         ...a,
         username: a.user_profiles?.username || a.user_email || 'N/A',
       }))
-      const logins = (logsRes.loginHistory || []).map((l: any) => ({
+      const logins = allLogins.map((l: any) => ({
         ...l,
         username: l.user_profiles?.username || l.user_email || 'N/A',
       }))

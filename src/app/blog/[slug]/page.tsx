@@ -25,13 +25,13 @@ export default function BlogPostDetailPage({ params }: { params: Promise<{ slug:
     async function loadPostDetails() {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/public?type=post&slug=${encodeURIComponent(slug)}`);
-        const json = await res.json();
+        const { fetchPublicPostBySlug } = await import('@/lib/public-fetch');
+        const postData = await fetchPublicPostBySlug(slug);
 
-        if (!json.data) {
+        if (!postData) {
           setErrorMessage('Không tìm thấy bài viết yêu cầu.');
         } else {
-          setPost(json.data);
+          setPost(postData);
         }
       } catch (err) {
         console.error('Blog load error:', err);
