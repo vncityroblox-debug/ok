@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Search, User, LogOut, Shield, ChevronDown } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/components/AuthGuard';
 import styles from './components.module.css';
 
 interface HeaderProps {
@@ -17,9 +18,9 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [localIconUrl, setLocalIconUrl] = useState('');
-  const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const { user, loading: authLoading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const searchRef = useRef<HTMLInputElement>(null);
@@ -41,19 +42,19 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
   }, [serverIconUrl]);
 
   useEffect(() => {
+    if (!user?.email) {
+      setIsAdmin(false);
+      return;
+    }
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        const { data } = await supabase
-          .from('admin_users')
-          .select('id')
-          .eq('email', session.user.email)
-          .single();
-        setIsAdmin(!!data);
-      }
+      const { data } = await supabase
+        .from('admin_users')
+        .select('id')
+        .eq('email', user.email)
+        .single();
+      setIsAdmin(!!data);
     })();
-  }, []);
+  }, [user?.email]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -103,12 +104,9 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
   ];
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setIsAdmin(false);
     setShowUserMenu(false);
+    await supabase.auth.signOut();
     router.push('/');
-    router.refresh();
   };
 
   const isAdminRoute = pathname?.startsWith('/admin');
