@@ -12,7 +12,7 @@
 .sidebar {
   width: 250px;
   background: hsl(var(--bg-card));
-  border-right: 1px solid hsl(var(--border-light));
+  border-right: 1px solid hsl(var(--border-glass));
   padding: 0 0 16px 0;
   display: flex;
   flex-direction: column;
@@ -44,7 +44,7 @@
   justify-content: space-between;
   height: 3.5rem;
   padding: 0 1rem;
-  border-bottom: 1px solid hsl(var(--border-light));
+  border-bottom: 1px solid hsl(var(--border-glass));
   background: hsl(var(--bg-subtle));
 }
 
@@ -96,7 +96,7 @@
 
 .hamburgerBtn {
   background: hsl(var(--bg-card));
-  border: 1px solid hsl(var(--border-light));
+  border: 1px solid hsl(var(--border-glass));
   border-radius: 10px;
   padding: 8px;
   cursor: pointer;
@@ -280,7 +280,7 @@
 .statCard {
   padding: 24px;
   background: hsl(var(--bg-card));
-  border: 1px solid hsl(var(--border-light));
+  border: 1px solid hsl(var(--border-glass));
   border-radius: 0.5rem;
   box-shadow: var(--shadow-card);
   transition: var(--transition-smooth);
@@ -310,7 +310,7 @@
 /* Analytics Graph */
 .graphSection {
   background: hsl(var(--bg-card));
-  border: 1px solid hsl(var(--border-light));
+  border: 1px solid hsl(var(--border-glass));
   border-radius: 0.5rem;
   padding: 24px;
   box-shadow: var(--shadow-card);
@@ -329,7 +329,7 @@
   height: 220px;
   gap: 12px;
   padding-top: 20px;
-  border-bottom: 1px solid hsl(var(--border-light));
+  border-bottom: 1px solid hsl(var(--border-glass));
 }
 
 .barCol {
@@ -398,7 +398,7 @@
 .formInput {
   width: 100%;
   background: hsl(var(--bg-card));
-  border: 1px solid hsl(var(--border-light));
+  border: 1px solid hsl(var(--border-glass));
   padding: 10px 14px;
   border-radius: 0.375rem;
   color: hsl(var(--text-primary));
@@ -421,7 +421,7 @@
   background: hsl(var(--bg-subtle));
   padding: 14px;
   border-radius: 0.5rem;
-  border: 1px solid hsl(var(--border-light));
+  border: 1px solid hsl(var(--border-glass));
 }
 
 /* ── Custom Checkbox (admin) ── */
@@ -444,7 +444,7 @@
   width: 18px;
   height: 18px;
   border-radius: 4px;
-  border: 2px solid hsl(var(--border-light));
+  border: 2px solid hsl(var(--border-glass));
   background: hsl(var(--bg-card));
   display: flex;
   align-items: center;
@@ -506,17 +506,17 @@
   font-size: 0.9rem;
   color: hsl(var(--text-primary));
   border: none;
-  border-top: 1px solid hsl(var(--border-light));
-  border-bottom: 1px solid hsl(var(--border-light));
+  border-top: 1px solid hsl(var(--border-glass));
+  border-bottom: 1px solid hsl(var(--border-glass));
 }
 
 .adminTable tbody td:first-child {
-  border-left: 1px solid hsl(var(--border-light));
+  border-left: 1px solid hsl(var(--border-glass));
   border-radius: 12px 0 0 12px;
 }
 
 .adminTable tbody td:last-child {
-  border-right: 1px solid hsl(var(--border-light));
+  border-right: 1px solid hsl(var(--border-glass));
   border-radius: 0 12px 12px 0;
 }
 
@@ -589,7 +589,7 @@
   max-width: 420px;
   padding: 36px;
   background: hsl(var(--bg-card));
-  border: 1px solid hsl(var(--border-light));
+  border: 1px solid hsl(var(--border-glass));
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
 }

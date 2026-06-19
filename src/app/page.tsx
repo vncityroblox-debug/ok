@@ -151,7 +151,7 @@ export default function HomePage() {
             <p style={{ color: 'hsl(var(--text-secondary))' }}>Đang tải dữ liệu...</p>
           </div>
         ) : filteredCategories.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', borderRadius: '16px', border: '1px dashed hsl(var(--border-light))' }}>
+          <div style={{ textAlign: 'center', padding: '60px 0', borderRadius: '16px', border: '1px dashed hsl(var(--border-glass))' }}>
             <p style={{ color: 'hsl(var(--text-muted))' }}>Không tìm thấy danh mục phù hợp.</p>
           </div>
         ) : (

@@ -1,18 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* AdminLTE v4 / Bootstrap Theme */
+  /* White theme — higher contrast borders & text */
   --bg-main: 210 16% 95%;
   --bg-card: 0 0% 100%;
-  --bg-subtle: 210 16% 93%;
-  --bg-hover: 210 14% 90%;
-  --bg-glass: 0 0% 100% / 0.92;
-  --border-glass: 210 10% 85%;
-  --border-light: 210 10% 88%;
+  --bg-subtle: 210 16% 90%;
+  --bg-hover: 210 14% 85%;
+  --bg-glass: 0 0% 100% / 0.95;
+  --border-glass: 210 10% 78%;
+  --border-light: 210 10% 82%;
 
-  --text-primary: 210 10% 14%;
-  --text-secondary: 210 8% 40%;
-  --text-muted: 210 6% 58%;
+  --text-primary: 210 10% 10%;
+  --text-secondary: 210 8% 32%;
+  --text-muted: 210 6% 50%;
 
   /* Bootstrap Blue primary */
   --color-primary: 213 93% 52%;
@@ -26,10 +26,10 @@
   /* Fonts */
   --font-main: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
-  /* Box Shadows */
-  --shadow-neon: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-neon-strong: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.08);
+  /* Box Shadows — stronger for white theme */
+  --shadow-neon: 0 1px 4px rgba(0, 0, 0, 0.1);
+  --shadow-neon-strong: 0 6px 16px rgba(0, 0, 0, 0.13);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 5px rgba(0, 0, 0, 0.1);
 
   /* Transitions */
   --transition-smooth: all 0.2s ease;
@@ -86,13 +86,27 @@ a {
 }
 
 a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 input, textarea, select {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
+}
+
+textarea, input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="url"], select {
+  border: 1.5px solid hsl(var(--border-glass));
+  background: hsl(var(--bg-card));
+  border-radius: 8px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="url"]:focus, select:focus {
+  border-color: hsl(var(--color-primary));
+  box-shadow: 0 0 0 3px hsla(var(--color-primary) / 0.12);
 }
 
 /* ── Custom Checkbox (modern toggle style) ── */
@@ -186,7 +200,7 @@ input, textarea, select {
 /* Reusable UI Utilities */
 .glass-panel {
   background: hsl(var(--bg-card));
-  border: 1px solid hsl(var(--border-light));
+  border: 1px solid hsl(var(--border-glass));
   border-radius: 12px;
   box-shadow: var(--shadow-card);
   transition: var(--transition-smooth);
@@ -194,6 +208,7 @@ input, textarea, select {
 
 .glass-panel:hover {
   box-shadow: var(--shadow-neon-strong);
+  border-color: hsl(var(--border-light));
 }
 
 .neon-btn {
