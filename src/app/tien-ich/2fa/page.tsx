@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ShieldCheck, Copy, Trash2, Plus, Check } from 'lucide-react';
+import BackButton from '@/components/BackButton';
 import {
   generateTOTP,
   getRemainingSeconds,
@@ -207,6 +208,7 @@ export default function TwoFAPage() {
 
   return (
     <div className="container">
+      <BackButton />
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
           Tiện Ích <span>Lấy 2FA</span>

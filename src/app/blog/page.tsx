@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { FileText, Calendar, ArrowRight } from 'lucide-react';
 import styles from '../home.module.css';
 
@@ -42,6 +43,7 @@ export default function BlogListPage() {
 
   return (
     <div className="container" id="guide-blog">
+      <BackButton />
       {/* Header Banner */}
       <section className={styles.hero} style={{ padding: '60px 0 40px 0' }}>
         <h1 className={styles.heroTitle} style={{ fontSize: '3rem' }}>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
+import BackButton from '@/components/BackButton';
 import { Calendar, ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';
 import styles from '../../home.module.css';
@@ -66,9 +67,7 @@ export default function BlogPostDetailPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="container" style={{ padding: '20px 24px' }}>
-      <Link href="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'hsl(var(--text-secondary))', marginBottom: '30px', fontWeight: 500 }} className="hover:text-white">
-        <ArrowLeft size={16} /> Quay lại danh sách
-      </Link>
+      <BackButton />
 
       <article className={`${styles.articleLayout} glass-panel`}>
         <h1 className={styles.articleTitle}>{post.title}</h1>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { Lock, Unlock, Download, Terminal, ArrowRight } from 'lucide-react';
 import styles from '../home.module.css';
 
@@ -90,6 +91,7 @@ export default function SourceCodePage() {
 
   return (
     <div className="container">
+      <BackButton />
       {/* Hero Header */}
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
