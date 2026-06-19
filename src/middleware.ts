@@ -19,7 +19,14 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data: { user: u } } = await supabase.auth.getUser();
+    user = u;
+  } catch (e) {
+    console.error('Middleware getUser error:', e);
+  }
+
   const path = request.nextUrl.pathname;
 
   // Admin page routes: redirect to login if not authenticated
@@ -32,14 +39,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/admin', request.url));
   }
 
-  // Admin API routes: return 401 if not authenticated
-  if (path.startsWith('/api/admin') && !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/admin/:path*'],
 };
