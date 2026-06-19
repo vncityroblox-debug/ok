@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import PasteButton from '@/components/PasteButton';
 import { Code, Copy, Check, Minimize2, Maximize2, Braces, FileText } from 'lucide-react';
 
 export default function JsonFormatterPage() {
@@ -286,6 +287,7 @@ export default function JsonFormatterPage() {
             >
               Input
             </span>
+            <PasteButton onPaste={setInput} style={{ marginLeft: 'auto', marginRight: 8 }} />
             <span
               style={{
                 marginLeft: 'auto',

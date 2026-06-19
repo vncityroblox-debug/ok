@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link2, Copy, Check, ArrowRight, ExternalLink, Clock, BarChart3 } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import PasteButton from '@/components/PasteButton';
 
 interface HistoryItem {
   original: string;
@@ -248,6 +249,7 @@ export default function ShortenPage() {
         style={{ maxWidth: 640, margin: '0 auto 40px', padding: 32 }}
       >
         <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <PasteButton onPaste={(text) => { setUrl(text); setError(''); }} style={{ marginTop: 1 }} />
           <input
             type="url"
             value={url}

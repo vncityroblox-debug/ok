@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import PasteButton from '@/components/PasteButton';
 import { Globe, Search, Server, Clock, Shield, Copy, Check, ExternalLink } from 'lucide-react';
 
 type WhoisData = {
@@ -279,6 +280,7 @@ export default function WhoisPage() {
                 color: 'hsl(var(--text-primary))',
               }}
             />
+            <PasteButton onPaste={(text) => setDomain(text.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, ''))} />
           </div>
           <button
             onClick={handleLookup}

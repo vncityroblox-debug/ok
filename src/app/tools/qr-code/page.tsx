@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { QrCode, Download, Copy, Check, Link, Mail, Phone, Wifi, User } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import PasteButton from '@/components/PasteButton';
 
 type TabId = 'url' | 'text' | 'email' | 'phone' | 'wifi';
 type SizeOption = '200x200' | '300x300' | '500x500' | '800x800';
@@ -199,7 +200,10 @@ export default function QRCodePage() {
             <div style={{ padding: 20 }}>
               {activeTab === 'url' && (
                 <div>
-                  <label style={labelStyle}>URL</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <label style={labelStyle}>URL</label>
+                    <PasteButton onPaste={(text) => updateInput('url', text.trim())} style={{ width: 28, height: 28 }} />
+                  </div>
                   <input
                     type="url"
                     placeholder="https://example.com"
@@ -212,7 +216,10 @@ export default function QRCodePage() {
 
               {activeTab === 'text' && (
                 <div>
-                  <label style={labelStyle}>Text</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <label style={labelStyle}>Text</label>
+                    <PasteButton onPaste={(text) => updateInput('text', text)} style={{ width: 28, height: 28 }} />
+                  </div>
                   <textarea
                     placeholder="Nhập nội dung văn bản..."
                     value={inputs.text}
