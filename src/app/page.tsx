@@ -2,15 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText, Grid3X3, Search } from 'lucide-react';
+import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText } from 'lucide-react';
 import styles from './home.module.css';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  image_url: string;
-}
 
 interface Post {
   id: string;
@@ -21,9 +14,7 @@ interface Post {
 }
 
 export default function HomePage() {
-  const [categories, setCategories] = useState<Category[]>([]);
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [heroTitle, setHeroTitle] = useState('Kho Tài Nguyên|Tuyển Chọn');
   const [heroSubtitle, setHeroSubtitle] = useState(
@@ -58,16 +49,12 @@ export default function HomePage() {
   async function fetchData() {
     setIsLoading(true);
     try {
-      const [catsRes, settRes, postsRes] = await Promise.all([
-        fetch('/api/public?type=categories'),
+      const [settRes, postsRes] = await Promise.all([
         fetch('/api/public?type=home&app_type=app'),
         fetch('/api/public?type=posts&limit=4'),
       ]);
-      const catsData = await catsRes.json();
       const homeData = await settRes.json();
       const postsData = await postsRes.json();
-
-      setCategories(catsData.data || []);
 
       if (homeData.data?.settings) {
         if (homeData.data.settings.home_hero_title) setHeroTitle(homeData.data.settings.home_hero_title);
@@ -81,10 +68,6 @@ export default function HomePage() {
       setIsLoading(false);
     }
   }
-
-  const filteredCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const [heroMain, heroHighlight] = heroTitle.includes('|')
     ? heroTitle.split('|', 2).map((part) => part.trim())
@@ -107,20 +90,6 @@ export default function HomePage() {
         <p className={styles.heroSubtitle}>{heroSubtitle}</p>
       </section>
 
-      {/* Search */}
-      <section className={styles.searchSection}>
-        <div className={styles.searchBarWrapper}>
-          <Search size={20} style={{ width: 20, height: 20, flexShrink: 0, color: 'hsl(var(--text-secondary))' }} />
-          <input
-            type="search"
-            className={styles.searchInput}
-            placeholder="Tìm danh mục..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </section>
-
       {/* Quick Sections */}
       <section className={styles.sectionsRow}>
         {sections.map((sec) => {
@@ -137,45 +106,6 @@ export default function HomePage() {
             </Link>
           );
         })}
-      </section>
-
-      {/* Category Grid */}
-      <section style={{ marginBottom: '60px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-          <Grid3X3 size={22} style={{ color: 'hsl(var(--color-primary))' }} />
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Danh Mục</h2>
-        </div>
-
-        {isLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
-            <p style={{ color: 'hsl(var(--text-secondary))' }}>Đang tải dữ liệu...</p>
-          </div>
-        ) : filteredCategories.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', borderRadius: '16px', border: '1px dashed hsl(var(--border-glass))' }}>
-            <p style={{ color: 'hsl(var(--text-muted))' }}>Không tìm thấy danh mục phù hợp.</p>
-          </div>
-        ) : (
-          <div className={styles.catGrid}>
-            {filteredCategories.map((cat) => (
-              <div key={cat.id} className={styles.catCard}>
-                <img
-                  src={cat.image_url || '/placeholder-icon.png'}
-                  alt={cat.name}
-                  className={styles.catImage}
-                />
-                <h3 className={styles.catName}>{cat.name}</h3>
-                <div className={styles.catActions}>
-                  <Link href={`/tien-ich?cat=${cat.slug}`} className={styles.catBtn}>
-                    <AppWindow size={14} /> Apps
-                  </Link>
-                  <Link href={`/ma-nguon?cat=${cat.slug}`} className={styles.catBtn}>
-                    <Terminal size={14} /> Mã Nguồn
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </section>
 
       {/* Recent Posts */}
