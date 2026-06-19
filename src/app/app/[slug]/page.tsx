@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
+import { useRouter } from 'next/navigation';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ImageLightbox from '@/components/ImageLightbox';
+import { supabase } from '@/lib/supabase';
 import { Lock, Unlock, Download, KeyRound, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthGuard';
@@ -36,6 +38,7 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const { user, requestAuth } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     async function loadAppDetails() {
@@ -78,9 +81,15 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
     setSuccessMessage('');
 
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
       const response = await fetch('/api/download', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           appId: app.id,
           key: app.is_locked ? keyInput : undefined,
@@ -95,11 +104,11 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
         return;
       }
 
-      setSuccessMessage('Xác thực thành công! File đang được tải về...');
+      setSuccessMessage('Tải xuống thành công! Đang chuyển đến lịch sử đơn hàng...');
       setKeyInput('');
       
-      // Redirect or open in new tab
       window.open(result.downloadLink, '_blank');
+      router.push('/profile');
     } catch (err) {
       setErrorMessage('Lỗi kết nối server. Vui lòng thử lại.');
     } finally {

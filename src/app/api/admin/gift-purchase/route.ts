@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden: Chỉ Full Admin mới tặng được.' }, { status: 403 });
     }
 
-    const { user_id, user_email, item_type, item_id, key_code, notes } = await req.json();
+    const { user_id, user_email, item_type, item_id, key_code } = await req.json();
     if (!user_id || !item_type || !item_id) {
       return NextResponse.json({ error: 'Thiếu dữ liệu bắt buộc (user_id, item_type, item_id).' }, { status: 400 });
     }
@@ -61,7 +61,6 @@ export async function POST(req: NextRequest) {
         item_name,
         key_code: key_code ?? null,
         status: 'gifted',
-        notes: notes ?? null,
         created_at: new Date().toISOString(),
       })
       .select()

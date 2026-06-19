@@ -104,11 +104,39 @@ export async function POST(request: Request) {
 
     if (clickLogError) {
       console.error('Failed to log click analytics:', clickLogError);
-      // We do not block the download if analytics log fails
     }
 
-    // 4. Return the download link
-    return NextResponse.json({ downloadLink: app.download_link });
+    // 4. Log purchase record (get user from auth header)
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.split(' ')[1];
+        const anonSupabase = getSupabaseServer(false);
+        const { data: { user } } = await anonSupabase.auth.getUser(token);
+        if (user) {
+          const { data: appInfo } = await supabase
+            .from('apps')
+            .select('name')
+            .eq('id', appId)
+            .single();
+          await supabase.from('purchases').insert({
+            user_id: user.id,
+            user_email: user.email,
+            item_type: 'app',
+            item_id: appId,
+            item_name: appInfo?.name ?? '',
+            key_code: key?.trim() || null,
+            status: key ? 'key_verified' : 'downloaded',
+            created_at: new Date().toISOString(),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to log purchase:', e);
+      }
+    }
+
+    // 5. Return the download link
+    return Response.json({ downloadLink: app.download_link });
   } catch (error) {
     console.error('Download API error:', error);
     return NextResponse.json({ error: 'Lỗi hệ thống' }, { status: 500 });

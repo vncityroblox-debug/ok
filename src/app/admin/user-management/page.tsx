@@ -28,7 +28,6 @@ interface Purchase {
   item_type: string;
   item_name: string;
   key_code: string;
-  notes: string;
   created_at: string;
 }
 
@@ -319,7 +318,6 @@ function GiftKeyModal({ user, onClose, onSaved }: {
   const [items, setItems] = useState<{ id: string; name: string }[]>([]);
   const [selectedItemId, setSelectedItemId] = useState('');
   const [keyCode, setKeyCode] = useState('');
-  const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -369,7 +367,6 @@ function GiftKeyModal({ user, onClose, onSaved }: {
           item_type: itemType,
           item_id: selectedItemId,
           key_code: keyCode || undefined,
-          notes,
         }),
       });
       const json = await res.json();
@@ -378,7 +375,6 @@ function GiftKeyModal({ user, onClose, onSaved }: {
       } else {
         setMsg({ type: 'success', text: 'Tặng key thành công!' });
         setKeyCode('');
-        setNotes('');
         setSelectedItemId('');
         onSaved();
       }
@@ -468,16 +464,6 @@ function GiftKeyModal({ user, onClose, onSaved }: {
                 Tạo Key
               </button>
             </div>
-          </div>
-
-          <div>
-            <label style={labelStyle}>Ghi Chú</label>
-            <textarea
-              style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ghi chú thêm..."
-            />
           </div>
 
           {msg && (
