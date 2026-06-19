@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       const { error } = await supabaseAdmin
         .from('user_profiles')
         .update(profileFields)
-        .eq('user_id', user_id);
+        .eq('id', user_id);
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Link2, Megaphone, LayoutTemplate } from 'lucide-react';
+import { Save, Link2, Megaphone, LayoutTemplate, Mail, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 
@@ -21,6 +21,15 @@ export default function AdminSettings() {
   const [homeHeroTitle, setHomeHeroTitle] = useState('');
   const [homeHeroSubtitle, setHomeHeroSubtitle] = useState('');
   
+  const [smtpHost, setSmtpHost] = useState('');
+  const [smtpPort, setSmtpPort] = useState('587');
+  const [smtpUser, setSmtpUser] = useState('');
+  const [smtpPass, setSmtpPass] = useState('');
+  const [smtpFrom, setSmtpFrom] = useState('');
+  const [testEmailTo, setTestEmailTo] = useState('');
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [testEmailMsg, setTestEmailMsg] = useState({ text: '', type: '' as '' | 'success' | 'error' });
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
@@ -48,6 +57,11 @@ export default function AdminSettings() {
           data.home_hero_subtitle ||
             'Khám phá và tải xuống hàng loạt ứng dụng, mã nguồn, công cụ tiện ích và tài nguyên công nghệ tốt nhất hoàn toàn miễn phí.'
         );
+        setSmtpHost(data.smtp_host || '');
+        setSmtpPort(data.smtp_port || '587');
+        setSmtpUser(data.smtp_user || '');
+        setSmtpPass(data.smtp_pass || '');
+        setSmtpFrom(data.smtp_from || '');
       } catch (err) {
         console.error('Settings load error:', err);
       } finally {
@@ -86,6 +100,11 @@ export default function AdminSettings() {
         announcement_html: announcementHtml,
         home_hero_title: homeHeroTitle.trim(),
         home_hero_subtitle: homeHeroSubtitle.trim(),
+        smtp_host: smtpHost.trim(),
+        smtp_port: smtpPort.trim(),
+        smtp_user: smtpUser.trim(),
+        smtp_pass: smtpPass.trim(),
+        smtp_from: smtpFrom.trim(),
       });
       if (error) throw new Error(error.message);
       
@@ -375,6 +394,152 @@ export default function AdminSettings() {
             onChange={(e) => setLink4mToken(e.target.value)}
             placeholder="Ví dụ: 66628893d41d933b781a2c50"
           />
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border-glass))', margin: '20px 0' }} />
+
+        <div style={{ marginBottom: '12px' }}>
+          <h4 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <Mail size={18} style={{ color: 'hsl(var(--color-primary))' }} />
+            Cấu Hình Email (SMTP)
+          </h4>
+          <p style={{ color: 'hsl(var(--text-muted))', fontSize: '0.85rem' }}>
+            Cấu hình SMTP để hệ thống gửi email đặt lại mật khẩu và thông báo. Nên dùng Gmail App Password hoặc dịch vụ email chuyên dụng.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="smtpHost">SMTP Host</label>
+            <input
+              id="smtpHost"
+              type="text"
+              className={styles.formInput}
+              value={smtpHost}
+              onChange={(e) => setSmtpHost(e.target.value)}
+              placeholder="smtp.gmail.com"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="smtpPort">SMTP Port</label>
+            <input
+              id="smtpPort"
+              type="text"
+              className={styles.formInput}
+              value={smtpPort}
+              onChange={(e) => setSmtpPort(e.target.value)}
+              placeholder="587"
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="smtpUser">SMTP Username / Email</label>
+            <input
+              id="smtpUser"
+              type="text"
+              className={styles.formInput}
+              value={smtpUser}
+              onChange={(e) => setSmtpUser(e.target.value)}
+              placeholder="your-email@gmail.com"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="smtpPass">SMTP Password / App Password</label>
+            <input
+              id="smtpPass"
+              type="password"
+              className={styles.formInput}
+              value={smtpPass}
+              onChange={(e) => setSmtpPass(e.target.value)}
+              placeholder="••••••••"
+            />
+          </div>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel} htmlFor="smtpFrom">SMTP From Name / Email</label>
+          <input
+            id="smtpFrom"
+            type="text"
+            className={styles.formInput}
+            value={smtpFrom}
+            onChange={(e) => setSmtpFrom(e.target.value)}
+            placeholder="your-email@gmail.com hoặc Tên Website <email@gmail.com>"
+          />
+        </div>
+
+        {/* Test email section */}
+        <div style={{
+          background: 'hsl(var(--bg-card))',
+          border: '1px solid hsl(var(--border-glass))',
+          borderRadius: '12px',
+          padding: '16px',
+          marginTop: '12px',
+        }}>
+          <p style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Send size={14} />
+            Thử Gửi Email
+          </p>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div className={styles.formGroup} style={{ flex: 1, minWidth: '200px', marginBottom: 0 }}>
+              <input
+                type="email"
+                className={styles.formInput}
+                value={testEmailTo}
+                onChange={(e) => setTestEmailTo(e.target.value)}
+                placeholder="Địa chỉ email nhận thử"
+                style={{ fontSize: '0.9rem' }}
+              />
+            </div>
+            <button
+              type="button"
+              className="neon-btn"
+              style={{ fontSize: '0.85rem', padding: '8px 16px', marginBottom: 0, whiteSpace: 'nowrap' }}
+              disabled={isSendingTest || !testEmailTo.trim()}
+              onClick={async () => {
+                setIsSendingTest(true);
+                setTestEmailMsg({ text: '', type: '' });
+                try {
+                  const { data: sessionData } = await supabase.auth.getSession();
+                  const token = sessionData?.session?.access_token;
+                  const res = await fetch('/api/admin/test-email', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ to: testEmailTo.trim() }),
+                  });
+                  const json = await res.json();
+                  if (!res.ok) throw new Error(json.error || 'Lỗi gửi email');
+                  setTestEmailMsg({ text: json.message || 'Gửi thành công!', type: 'success' });
+                } catch (err: any) {
+                  setTestEmailMsg({ text: err.message || 'Lỗi gửi email.', type: 'error' });
+                } finally {
+                  setIsSendingTest(false);
+                }
+              }}
+            >
+              {isSendingTest ? 'Đang gửi...' : 'Gửi Thử'}
+            </button>
+          </div>
+          {testEmailMsg.text && (
+            <p style={{
+              marginTop: '8px',
+              fontSize: '0.85rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              color: testEmailMsg.type === 'success' ? '#10b981' : '#ef4444',
+            }}>
+              {testEmailMsg.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
+              {testEmailMsg.text}
+            </p>
+          )}
         </div>
 
         <button

@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data, error: queryErr } = await supabase
+    const supabaseAdmin = getSupabaseServer(true);
+    const { data, error: queryErr } = await supabaseAdmin
       .from('purchases')
       .select('*')
       .eq('user_id', user.id)

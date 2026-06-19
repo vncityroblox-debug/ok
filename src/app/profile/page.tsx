@@ -63,10 +63,12 @@ export default function ProfilePage() {
   const [expandedPurchase, setExpandedPurchase] = useState<string | null>(null);
 
   useEffect(() => {
+    if (user) {
+      setEmail(user.email || '');
+    }
     if (profile) {
       setFullName(profile.full_name || '');
       setPhone(profile.phone || '');
-      setEmail(user?.email || '');
     }
   }, [profile, user]);
 

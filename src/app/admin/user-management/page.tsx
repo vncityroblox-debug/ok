@@ -136,17 +136,23 @@ function UserDetailModal({ user, onClose }: {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
         const token = sessionData?.session?.access_token;
-        const [purchasesRes, logsRes] = await Promise.all([
-          supabase
-            .from('purchases')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false }),
-          fetch(`/api/admin/logs?user_id=${user.id}`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          }).then((r) => r.json()).catch(() => ({ loginHistory: [] })),
+        const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
+        // Both APIs use service role on backend to bypass RLS
+        const [usersRes, logsRes] = await Promise.all([
+          fetch('/api/admin/users', { headers }).then((r) => r.json()).catch(() => ({ users: [] })),
+          fetch(`/api/admin/logs?user_id=${user.id}`, { headers }).then((r) => r.json()).catch(() => ({ loginHistory: [] })),
         ]);
-        setPurchases(purchasesRes.data ?? []);
+
+        // Extract purchases for this specific user from purchases count
+        // Use dedicated user-specific purchase fetch via logs API's purchases field
+        const { data: sessionData2 } = await supabase.auth.getSession();
+        const token2 = sessionData2?.session?.access_token;
+        const purchasesRes = await fetch(`/api/admin/user-activity?user_id=${user.id}`, {
+          headers: token2 ? { Authorization: `Bearer ${token2}` } : {},
+        }).then((r) => r.json()).catch(() => ({ purchases: [] }));
+
+        setPurchases(purchasesRes.purchases ?? []);
         setLoginHistory(logsRes.loginHistory ?? []);
       } catch {
         // silently fail
@@ -520,43 +526,18 @@ export default function UserManagementPage() {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
-      const [profilesRes, purchasesRes, logsRes] = await Promise.all([
-        supabase
-          .from('user_profiles')
-          .select('*')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('purchases')
-          .select('id, user_id'),
-        fetch('/api/admin/logs', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }).then((r) => r.json()).catch(() => ({ loginHistory: [] })),
-      ]);
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
-      if (profilesRes.error) {
-        setError(profilesRes.error.message);
+      // Use backend API (service role) to bypass RLS on user_profiles and purchases
+      const res = await fetch('/api/admin/users', { headers });
+      const json = await res.json();
+
+      if (!res.ok) {
+        setError(json.error || 'Không lấy được danh sách người dùng.');
         return;
       }
 
-      const purchaseCountMap = new Map<string, number>();
-      (purchasesRes.data ?? []).forEach((p: any) => {
-        purchaseCountMap.set(p.user_id, (purchaseCountMap.get(p.user_id) ?? 0) + 1);
-      });
-
-      const lastLoginMap = new Map<string, string>();
-      (logsRes.loginHistory ?? []).forEach((l: any) => {
-        if (!lastLoginMap.has(l.user_id)) {
-          lastLoginMap.set(l.user_id, l.created_at);
-        }
-      });
-
-      const merged: UserProfile[] = (profilesRes.data ?? []).map((p: any) => ({
-        ...p,
-        total_purchases: purchaseCountMap.get(p.id) ?? 0,
-        last_login: lastLoginMap.get(p.id) ?? null,
-      }));
-
-      setAllUsers(merged);
+      setAllUsers(json.users ?? []);
       setDisplayCount(PAGE_SIZE);
     } catch {
       setError('Không kết nối được server.');

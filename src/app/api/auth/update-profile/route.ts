@@ -20,22 +20,42 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseServer(true);
 
-    const { error: profileErr } = await supabaseAdmin
-      .from('user_profiles')
-      .update({ full_name, phone, email, updated_at: new Date().toISOString() })
-      .eq('id', user.id);
-
-    if (profileErr) {
-      console.error('Update profile error', profileErr);
-      return NextResponse.json({ error: profileErr.message }, { status: 400 });
-    }
-
+    // 1. If email changes, update auth email first
     if (email && email !== user.email) {
       const { error: emailErr } = await supabaseAdmin.auth.admin.updateUserById(user.id, { email });
       if (emailErr) {
         console.error('Update email error', emailErr);
-        return NextResponse.json({ error: emailErr.message }, { status: 400 });
+        const errMsg = emailErr.message && emailErr.message !== '{}'
+          ? emailErr.message
+          : 'Lỗi cập nhật email (email đã được sử dụng bởi tài khoản khác hoặc không hợp lệ).';
+        return NextResponse.json({ error: errMsg }, { status: 400 });
       }
+    }
+
+    // 2. Fetch existing username or generate default
+    const { data: existingProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('username')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const username = existingProfile?.username || user.user_metadata?.username || user.email?.split('@')[0] || `user_${user.id.slice(0, 8)}`;
+
+    // 3. Upsert into user_profiles
+    const { error: profileErr } = await supabaseAdmin
+      .from('user_profiles')
+      .upsert({
+        id: user.id,
+        username,
+        full_name,
+        phone,
+        email: email || user.email,
+        updated_at: new Date().toISOString()
+      });
+
+    if (profileErr) {
+      console.error('Update profile error', profileErr);
+      return NextResponse.json({ error: profileErr.message }, { status: 400 });
     }
 
     await supabaseAdmin.from('activity_logs').insert({

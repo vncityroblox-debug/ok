@@ -87,33 +87,19 @@ export default function AdminDashboard() {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-
-      const [
-        totalVisitsRes,
-        recentVisitsRes,
-        totalDownloadsRes,
-        recentDownloadsRes,
-        visitsTimelineRes,
-        totalUsersRes,
-      ] = await Promise.allSettled([
-        supabase.from('analytics_visits').select('*', { count: 'exact', head: true }),
-        supabase.from('analytics_visits').select('*', { count: 'exact', head: true }).gte('visited_at', thirtyDaysAgo),
-        supabase.from('analytics_downloads').select('*', { count: 'exact', head: true }),
-        supabase.from('analytics_downloads').select('app_id, apps(name)'),
-        supabase.from('analytics_visits').select('visited_at').order('visited_at', { ascending: true }),
-        supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
-      ]).then((results) => results.map((r) => r.status === 'fulfilled' ? r.value : { data: null, error: null, count: 0 }));
-
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
-      const logsRes = await fetch('/api/admin/logs', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      }).then((r) => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] }));
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
+      // Fetch stats and logs in parallel (both use service role on backend)
+      const [statsRes, logsRes] = await Promise.all([
+        fetch('/api/admin/stats', { headers }).then((r) => r.json()).catch(() => ({})),
+        fetch('/api/admin/logs', { headers }).then((r) => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] })),
+      ]);
 
       const allLogins = logsRes.loginHistory || [];
       const allActivities = logsRes.activityLogs || [];
@@ -121,16 +107,17 @@ export default function AdminDashboard() {
       const todayLogins = allLogins.filter((l: any) => new Date(l.created_at) >= todayStart).length;
       const unique7dUsers = new Set(allLogins.filter((l: any) => new Date(l.created_at) >= new Date(sevenDaysAgo)).map((l: any) => l.user_id));
 
-      setTotalVisits(totalVisitsRes.count || 0);
-      setTodayVisits(recentVisitsRes.count || 0);
-      setTotalDownloads(totalDownloadsRes.count || 0);
-      setTotalUsers(totalUsersRes.count || 0);
+      setTotalVisits(statsRes.totalVisits ?? 0);
+      setTodayVisits(statsRes.recentVisits ?? 0);
+      setTotalDownloads(statsRes.totalDownloads ?? 0);
+      setTotalUsers(statsRes.totalUsers ?? 0);
       setTodayLogins(todayLogins);
       setActiveUsers7d(unique7dUsers.size);
 
-      if (Array.isArray(recentDownloadsRes.data)) {
+      // Build app click stats from API response
+      if (Array.isArray(statsRes.recentDownloads)) {
         const aggMap: { [key: string]: number } = {};
-        recentDownloadsRes.data.forEach((row: any) => {
+        statsRes.recentDownloads.forEach((row: any) => {
           const appName = row.apps?.name || 'Ứng dụng không xác định';
           aggMap[appName] = (aggMap[appName] || 0) + 1;
         });
@@ -142,14 +129,15 @@ export default function AdminDashboard() {
         );
       }
 
-      if (Array.isArray(visitsTimelineRes.data)) {
+      // Build 7-day visits chart from API timeline data
+      if (Array.isArray(statsRes.visitsTimeline)) {
         const dailyMap: { [key: string]: number } = {};
         for (let i = 6; i >= 0; i--) {
           const d = new Date();
           d.setDate(d.getDate() - i);
           dailyMap[d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })] = 0;
         }
-        visitsTimelineRes.data.forEach((v: any) => {
+        statsRes.visitsTimeline.forEach((v: any) => {
           const dateStr = new Date(v.visited_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
           if (dailyMap[dateStr] !== undefined) dailyMap[dateStr]++;
         });

@@ -57,7 +57,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: loginErr.message }, { status: 500 });
     }
 
-    return NextResponse.json({ activities: activities || [], logins: logins || [] });
+    const { data: purchases, error: purchaseErr } = await supabaseAdmin
+      .from('purchases')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    return NextResponse.json({
+      activities: activities || [],
+      logins: logins || [],
+      purchases: purchases || [],
+    });
   } catch (e: any) {
     console.error('User activity error', e);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
