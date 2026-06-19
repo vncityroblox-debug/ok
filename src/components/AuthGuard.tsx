@@ -210,6 +210,15 @@ export function AuthGuardModal() {
         document.cookie = `remember_me=${encodeURIComponent(loginUsername.trim())}; expires=${expires}; path=/; SameSite=Lax`;
       }
 
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (token) {
+        fetch('/api/auth/log-login', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      }
+
       await refreshProfile();
       setLoginSuccess('Đăng nhập thành công!');
       setTimeout(() => handleClose(), 600);

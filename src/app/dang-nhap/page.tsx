@@ -61,6 +61,15 @@ function DangNhapContent() {
       } = await supabase.auth.getUser();
 
       if (user) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+        if (token) {
+          fetch('/api/auth/log-login', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch(() => {});
+        }
+
         const { data: adminData } = await supabase
           .from('admin_users')
           .select('id')

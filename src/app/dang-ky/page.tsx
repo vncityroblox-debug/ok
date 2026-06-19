@@ -65,6 +65,15 @@ export default function DangKyPage() {
         return;
       }
 
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (token) {
+        fetch('/api/auth/log-login', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      }
+
       router.push('/');
       router.refresh();
     } catch {
