@@ -55,34 +55,50 @@ export default function WhoisPage() {
 
   const fetchWhois = async (domainName: string) => {
     try {
-      const res = await fetch(
-        `https://api.whoisxmlapi.com/v1?apiKey=at_demo&domainName=${domainName}`
-      );
-      if (!res.ok) throw new Error('WHOIS request failed');
+      const res = await fetch(`https://rdap.org/domain/${domainName}`);
+      if (!res.ok) {
+        const alt = await fetch(`https://rdap.verisign.com/com/v1/domain/${domainName}`);
+        if (!alt.ok) throw new Error('WHOIS request failed');
+        const data = await alt.json();
+        parseRdap(data, domainName);
+        return;
+      }
       const data = await res.json();
-
-      const record = data.records?.[0] || {};
-      const parsed: WhoisData = {
-        domainName: record.domainName || domainName,
-        registrar: record.registrarName || record.registrarWhoisServer || 'N/A',
-        creationDate: record.createdDate || record.registryData?.createdDate || 'N/A',
-        expiryDate: record.expiresDate || record.registryData?.expiresDate || 'N/A',
-        updatedDate: record.updatedDate || record.registryData?.updatedDate || 'N/A',
-        nameServers: record.nameServers
-          ? (typeof record.nameServers === 'string'
-              ? record.nameServers.split(',').map((s: string) => s.trim())
-              : record.nameServers)
-          : [],
-        status: record.status
-          ? (Array.isArray(record.status) ? record.status : [record.status])
-          : [],
-        registrant: record.registrant?.organization || record.registrant?.name || 'N/A',
-      };
-
-      setWhoisData(parsed);
+      parseRdap(data, domainName);
     } catch {
-      throw new Error('Không thể lấy thông tin WHOIS. Vui lòng thử lại.');
+      throw new Error('Không thể lấy thông tin WHOIS. Tên miền có thể không tồn tại hoặc không hỗ trợ.');
     }
+  };
+
+  const parseRdap = (data: any, domainName: string) => {
+    const findEvent = (events: any[], label: string) => {
+      const ev = events?.find((e: any) => e.eventActions?.includes(label));
+      return ev ? new Date(ev.eventDate).toLocaleDateString('vi-VN') : 'N/A';
+    };
+
+    const statuses: string[] = data.status || [];
+    const nameservers: string[] = (data.nameservers || []).map((ns: any) => ns.ldhName || ns.handle || '').filter(Boolean);
+    const registrar = data.ldhName || data.handle || 'N/A';
+
+    let registrant = 'N/A';
+    const entity = data.entities?.find((e: any) => e.vcardArray?.[1]?.some((v: any) => v[0] === 'fn'));
+    if (entity) {
+      const fn = entity.vcardArray[1].find((v: any) => v[0] === 'fn');
+      if (fn) registrant = fn[3];
+    }
+
+    const parsed: WhoisData = {
+      domainName: data.ldhName || domainName,
+      registrar,
+      creationDate: findEvent(data.events, 'registration'),
+      expiryDate: findEvent(data.events, 'expiration'),
+      updatedDate: findEvent(data.events, 'last changed'),
+      nameServers: nameservers,
+      status: statuses,
+      registrant,
+    };
+
+    setWhoisData(parsed);
   };
 
   const fetchDns = async (domainName: string) => {
@@ -127,7 +143,11 @@ export default function WhoisPage() {
     setDnsRecords({});
 
     try {
-      await Promise.all([fetchWhois(cleaned), fetchDns(cleaned)]);
+      const results = await Promise.allSettled([fetchWhois(cleaned), fetchDns(cleaned)]);
+      const whoisResult = results[0];
+      if (whoisResult.status === 'rejected') {
+        setError(whoisResult.reason?.message || 'Không thể lấy thông tin WHOIS.');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi không mong muốn.');
     } finally {

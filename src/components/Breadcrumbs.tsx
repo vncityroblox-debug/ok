@@ -34,6 +34,10 @@ const nameMap: Record<string, string> = {
   'login': 'Đăng Nhập',
 };
 
+const redirectMap: Record<string, string> = {
+  '/tools': '/tools/hub',
+};
+
 export default function Breadcrumbs() {
   const pathname = usePathname();
   const segments = pathname.split('/').filter(Boolean);
@@ -70,12 +74,13 @@ export default function Breadcrumbs() {
       </Link>
 
       {segments.map((seg, i) => {
-        const href = '/' + segments.slice(0, i + 1).join('/');
+        const rawHref = '/' + segments.slice(0, i + 1).join('/');
+        const href = redirectMap[rawHref] || rawHref;
         const name = nameMap[seg] || seg;
         const isLast = i === segments.length - 1;
 
         return (
-          <span key={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <span key={rawHref} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ color: 'hsl(var(--border-light))' }}>/</span>
             {isLast ? (
               <span style={{ color: 'hsl(var(--text-primary))', fontWeight: 600 }}>{name}</span>
