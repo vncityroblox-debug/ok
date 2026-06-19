@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServer } from '@/lib/supabase';
-import { checkAdminAuth, unauthorized } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  if (!await checkAdminAuth(req)) return unauthorized();
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('user_id');

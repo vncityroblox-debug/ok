@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServer } from '@/lib/supabase';
-import { checkAdminAuth, unauthorized } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest) {
-  if (!await checkAdminAuth(req)) return unauthorized();
+export async function GET(_req: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseServer(true);
 
