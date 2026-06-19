@@ -290,11 +290,31 @@
   font-size: 0.85rem;
 }
 
+.navMobileLogo {
+  display: none;
+}
+
+.navMobileLogoImg {
+  height: 36px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .menuBtn {
     display: block;
     z-index: 100;
+  }
+
+  .navMobileLogo {
+    display: flex;
+    align-items: center;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid hsl(var(--border-light));
+    width: 100%;
   }
 
   .nav {

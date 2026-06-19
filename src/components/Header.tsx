@@ -93,6 +93,13 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
 
         {/* Desktop Navigation */}
         <nav className={`${styles.nav} ${isOpen ? styles.navOpen : ''}`}>
+          <div className={styles.navMobileLogo}>
+            {siteIconUrl ? (
+              <img src={siteIconUrl} alt={siteName} className={styles.navMobileLogoImg} />
+            ) : (
+              <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'hsl(var(--text-primary))' }}>{siteName}</span>
+            )}
+          </div>
           {navItems.map((item) => {
             const isActive =
               item.path === '/'
