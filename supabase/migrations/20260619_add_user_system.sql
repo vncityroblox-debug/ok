@@ -36,6 +36,7 @@ CREATE INDEX idx_activity_logs_created_at ON activity_logs(created_at DESC);
 CREATE TABLE IF NOT EXISTS purchases (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
+  user_email TEXT DEFAULT '',
   item_type TEXT NOT NULL DEFAULT 'app',
   item_id UUID,
   item_name TEXT DEFAULT '',
@@ -55,9 +56,9 @@ CREATE INDEX idx_purchases_user_id ON purchases(user_id);
 CREATE TABLE IF NOT EXISTS login_history (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL,
-  email TEXT DEFAULT '',
+  user_email TEXT DEFAULT '',
   ip_address TEXT DEFAULT '',
-  user_agent TEXT DEFAULT '',
+  device TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
