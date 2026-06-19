@@ -3,17 +3,17 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Phone, Clock, ShoppingCart, Download, Edit3, Save, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { User, Mail, Phone, Clock, ShoppingCart, Download, Edit3, Save, X, ChevronDown, ChevronUp, Key } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { useAuth } from '@/components/AuthGuard';
 import { supabase } from '@/lib/supabase';
 
-type Tab = 'profile' | 'history' | 'purchases';
+type Tab = 'profile' | 'history' | 'purchases' | 'keys';
 
 interface LoginHistory {
   id: string;
-  ip: string;
-  user_agent: string;
+  ip_address: string;
+  device: string;
   created_at: string;
 }
 
@@ -52,6 +52,7 @@ export default function ProfilePage() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [loadingPurchases, setLoadingPurchases] = useState(false);
+  const [loadingKeys, setLoadingKeys] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -88,6 +89,8 @@ export default function ProfilePage() {
       .catch(() => setPurchases([]))
       .finally(() => setLoadingPurchases(false));
   }, [user, activeTab]);
+
+  const giftedKeys = purchases.filter((p) => p.key_code && (p.status === 'gifted' || p.status === 'key_verified'));
 
   const handleSave = async () => {
     setSaving(true);
@@ -154,6 +157,7 @@ export default function ProfilePage() {
     { key: 'profile', label: 'Thông Tin Cá Nhân', icon: <User size={16} /> },
     { key: 'history', label: 'Lịch Sử Đăng Nhập', icon: <Clock size={16} /> },
     { key: 'purchases', label: 'Lịch Sử Mua Hàng', icon: <ShoppingCart size={16} /> },
+    { key: 'keys', label: 'Key Đã Tặng', icon: <Key size={16} /> },
   ];
 
   const labelStyle: React.CSSProperties = {
@@ -365,10 +369,10 @@ export default function ProfilePage() {
                             {new Date(item.created_at).toLocaleString('vi-VN')}
                           </td>
                           <td style={{ padding: '14px 16px', fontSize: '0.9rem', borderTop: '1px solid hsl(var(--border-glass))', borderBottom: '1px solid hsl(var(--border-glass))', fontFamily: 'monospace' }}>
-                            {item.ip || 'N/A'}
+                            {item.ip_address || 'N/A'}
                           </td>
                           <td style={{ padding: '14px 16px', fontSize: '0.9rem', borderTop: '1px solid hsl(var(--border-glass))', borderBottom: '1px solid hsl(var(--border-glass))', borderRight: '1px solid hsl(var(--border-glass))', borderRadius: '0 12px 12px 0' }}>
-                            {parseDevice(item.user_agent)}
+                            {parseDevice(item.device || '')}
                           </td>
                         </tr>
                       ))}
@@ -498,6 +502,103 @@ export default function ProfilePage() {
                       </div>
                     );
                   })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tab 4: Gifted Keys */}
+          {activeTab === 'keys' && (
+            <div>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Key size={18} style={{ color: 'hsl(var(--color-primary))' }} />
+                Key Đã Được Tặng
+              </h2>
+
+              {loadingPurchases ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'hsl(var(--text-muted))' }}>
+                  <p>Đang tải dữ liệu...</p>
+                </div>
+              ) : giftedKeys.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'hsl(var(--text-muted))' }}>
+                  <Key size={36} style={{ marginBottom: '12px', opacity: 0.4 }} />
+                  <p>Bạn chưa có key nào được tặng.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {giftedKeys.map((item) => (
+                    <div
+                      key={item.id}
+                      style={{
+                        border: '1px solid hsl(var(--border-glass))',
+                        borderRadius: '12px',
+                        padding: '18px 20px',
+                        background: 'hsl(var(--bg-card))',
+                        transition: 'box-shadow 0.2s',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-neon-strong)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{
+                            width: '36px', height: '36px', borderRadius: '8px',
+                            background: item.item_type === 'app' ? 'rgba(59,130,246,0.1)' : 'rgba(139,92,246,0.1)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            {item.item_type === 'app' ? <ShoppingCart size={16} style={{ color: '#3b82f6' }} /> : <Download size={16} style={{ color: '#8b5cf6' }} />}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{item.item_name}</div>
+                            <div style={{ fontSize: '0.78rem', color: 'hsl(var(--text-muted))', marginTop: '2px' }}>
+                              {new Date(item.created_at).toLocaleDateString('vi-VN')}
+                            </div>
+                          </div>
+                        </div>
+                        <span style={{
+                          padding: '3px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600,
+                          background: item.item_type === 'app' ? 'rgba(59,130,246,0.1)' : 'rgba(139,92,246,0.1)',
+                          color: item.item_type === 'app' ? '#3b82f6' : '#8b5cf6',
+                        }}>
+                          {item.item_type === 'app' ? 'Ứng Dụng' : 'Mã Nguồn'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'hsl(var(--text-secondary))', marginBottom: '6px' }}>Mã Key</div>
+                        <div style={{
+                          fontFamily: "'Courier New', monospace",
+                          fontSize: '1rem',
+                          fontWeight: 700,
+                          padding: '12px 16px',
+                          background: 'hsla(var(--color-primary) / 0.06)',
+                          border: '1.5px dashed hsla(var(--color-primary) / 0.3)',
+                          borderRadius: '10px',
+                          letterSpacing: '2px',
+                          wordBreak: 'break-all',
+                          color: 'hsl(var(--color-primary))',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '12px',
+                        }}>
+                          <span>{item.key_code}</span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(item.key_code || '');
+                            }}
+                            style={{
+                              padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600,
+                              background: 'hsl(var(--color-primary))', color: '#fff', border: 'none',
+                              cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                            }}
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

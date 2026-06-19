@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: queryErr.message }, { status: 500 });
     }
 
-    return NextResponse.json({ data: data || [] });
+    return NextResponse.json({ history: data || [] });
   } catch (e: any) {
     console.error('Login history error', e);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
