@@ -138,7 +138,7 @@ export default function AdminDashboard() {
           dailyMap[d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })] = 0;
         }
         statsRes.visitsTimeline.forEach((v: any) => {
-          const dateStr = new Date(v.visited_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
+          const dateStr = new Date(v.created_at).toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
           if (dailyMap[dateStr] !== undefined) dailyMap[dateStr]++;
         });
         setDailyVisits(Object.keys(dailyMap).map((dateLabel) => ({ dateLabel, count: dailyMap[dateLabel] })));

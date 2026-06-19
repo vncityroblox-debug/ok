@@ -29,30 +29,49 @@ export async function GET(req: NextRequest) {
 
     const supabaseAdmin = getSupabaseServer(true);
 
-    const [
-      totalVisitsRes,
-      recentVisitsRes,
-      totalDownloadsRes,
-      recentDownloadsRes,
-      visitsTimelineRes,
-      totalUsersRes,
-    ] = await Promise.all([
+    const results = await Promise.allSettled([
+      // 0: total visits count
       supabaseAdmin.from('analytics_visits').select('*', { count: 'exact', head: true }),
+      // 1: recent 30-day visits count (use created_at which is the auto-generated timestamp)
       supabaseAdmin.from('analytics_visits').select('*', { count: 'exact', head: true })
-        .gte('visited_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+        .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+      // 2: total downloads count
       supabaseAdmin.from('analytics_downloads').select('*', { count: 'exact', head: true }),
+      // 3: recent downloads with app name
       supabaseAdmin.from('analytics_downloads').select('app_id, apps(name)'),
-      supabaseAdmin.from('analytics_visits').select('visited_at').order('visited_at', { ascending: true }),
+      // 4: visits timeline (all created_at for chart)
+      supabaseAdmin.from('analytics_visits').select('created_at').order('created_at', { ascending: true }),
+      // 5: total users count
       supabaseAdmin.from('user_profiles').select('*', { count: 'exact', head: true }),
     ]);
 
+    const getCount = (r: PromiseSettledResult<any>): number => {
+      if (r.status === 'rejected') return 0;
+      const res = r.value;
+      if (res.error) {
+        console.error('Stats query error:', res.error.message);
+        return 0;
+      }
+      return res.count ?? 0;
+    };
+
+    const getData = (r: PromiseSettledResult<any>): any[] => {
+      if (r.status === 'rejected') return [];
+      const res = r.value;
+      if (res.error) {
+        console.error('Stats query error:', res.error.message);
+        return [];
+      }
+      return res.data ?? [];
+    };
+
     return NextResponse.json({
-      totalVisits: totalVisitsRes.count ?? 0,
-      recentVisits: recentVisitsRes.count ?? 0,
-      totalDownloads: totalDownloadsRes.count ?? 0,
-      recentDownloads: recentDownloadsRes.data ?? [],
-      visitsTimeline: visitsTimelineRes.data ?? [],
-      totalUsers: totalUsersRes.count ?? 0,
+      totalVisits: getCount(results[0]),
+      recentVisits: getCount(results[1]),
+      totalDownloads: getCount(results[2]),
+      recentDownloads: getData(results[3]),
+      visitsTimeline: getData(results[4]),
+      totalUsers: getCount(results[5]),
     });
   } catch (e: any) {
     console.error('Admin stats error', e);
