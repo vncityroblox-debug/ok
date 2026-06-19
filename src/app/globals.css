@@ -103,7 +103,7 @@ input, textarea, select {
   color: inherit;
 }
 
-textarea, input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="url"], select {
+textarea, input[type="text"], input[type="email"], input[type="password"], input[type="url"], select {
   border: 1.5px solid hsl(var(--border-glass));
   background: hsl(var(--bg-card));
   border-radius: 8px;
@@ -112,9 +112,15 @@ textarea, input[type="text"], input[type="email"], input[type="password"], input
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="url"]:focus, select:focus {
+textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="url"]:focus, select:focus {
   border-color: hsl(var(--color-primary));
   box-shadow: 0 0 0 3px hsla(var(--color-primary) / 0.12);
+}
+
+input[type="search"] {
+  border: none;
+  background: transparent;
+  outline: none;
 }
 
 /* ── Custom Checkbox (modern toggle style) ── */
@@ -182,7 +188,7 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type=
   width: 100%;
   padding: 12px 14px 12px 40px;
   background: hsl(var(--bg-card));
-  border: 2px solid hsl(var(--border-light));
+  border: 2px solid hsl(var(--border-glass));
   border-radius: 10px;
   color: hsl(var(--text-primary));
   font-size: 1rem;

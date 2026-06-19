@@ -87,8 +87,9 @@
   flex: 1;
   padding: 16px 20px 16px 0;
   font-size: 1.05rem;
-  background: transparent;
-  border: none;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
   color: hsl(var(--text-primary));
   outline: none;
 }
@@ -101,14 +102,14 @@
 }
 
 .searchInput:focus {
-  border-color: transparent;
-  box-shadow: none;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .searchIcon {
   padding: 0 0 0 18px;
   flex-shrink: 0;
-  color: hsl(var(--text-muted));
+  color: hsl(var(--text-secondary));
 }
 
 @media (max-width: 480px) {
