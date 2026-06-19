@@ -32,6 +32,10 @@ const nameMap: Record<string, string> = {
   'apps': 'Ứng Dụng',
   'source-codes': 'Mã Nguồn',
   'login': 'Đăng Nhập',
+  'dang-nhap': 'Đăng Nhập',
+  'dang-ky': 'Đăng Ký',
+  'quen-mat-khau': 'Quên Mật Khẩu',
+  'profile': 'Hồ Sơ',
 };
 
 const redirectMap: Record<string, string> = {

@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import ProtectionProvider from '@/components/ProtectionProvider';
+import { AuthProvider, AuthGuardModal } from '@/components/AuthGuard';
 
 export async function generateMetadata() {
   try {
@@ -167,13 +168,16 @@ export default async function RootLayout({
         }} />
       </head>
       <body>
-        <Header siteName={siteName} siteIconUrl={siteIconUrl} />
-        <ProtectionProvider />
-        <main style={{ minHeight: 'calc(100vh - 250px)' }}>
-          {children}
-        </main>
-        <Footer siteName={siteName} siteIconUrl={siteIconUrl} siteDescription={siteDescription} footerText={footerText} />
-        <AnnouncementPopup />
+        <AuthProvider>
+          <Header siteName={siteName} siteIconUrl={siteIconUrl} />
+          <ProtectionProvider />
+          <main style={{ minHeight: 'calc(100vh - 250px)' }}>
+            {children}
+          </main>
+          <Footer siteName={siteName} siteIconUrl={siteIconUrl} siteDescription={siteDescription} footerText={footerText} />
+          <AnnouncementPopup />
+          <AuthGuardModal />
+        </AuthProvider>
       </body>
     </html>
   );

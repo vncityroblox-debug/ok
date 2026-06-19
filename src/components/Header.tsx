@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X, Search, User, LogOut, Shield, ChevronDown } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import styles from './components.module.css';
 
@@ -17,9 +17,13 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [localIconUrl, setLocalIconUrl] = useState('');
+  const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const searchRef = useRef<HTMLInputElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const siteIconUrl = serverIconUrl || localIconUrl;
 
   useEffect(() => {
@@ -35,6 +39,31 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
       } catch {}
     })();
   }, [serverIconUrl]);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        const { data } = await supabase
+          .from('admin_users')
+          .select('id')
+          .eq('email', session.user.email)
+          .single();
+        setIsAdmin(!!data);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -72,6 +101,15 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
     { name: 'Mã Nguồn', path: '/ma-nguon' },
     { name: 'Bài Viết', path: '/blog' },
   ];
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setIsAdmin(false);
+    setShowUserMenu(false);
+    router.push('/');
+    router.refresh();
+  };
 
   const isAdminRoute = pathname?.startsWith('/admin');
 
@@ -122,6 +160,100 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
           <button className={styles.searchBtn} onClick={toggleSearch} aria-label="Toggle search">
             <Search size={22} className={styles.searchSvg} />
           </button>
+
+          {/* User Menu */}
+          <div ref={userMenuRef} style={{ position: 'relative' }}>
+            {user ? (
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 12px', borderRadius: '8px',
+                  background: showUserMenu ? 'hsla(var(--color-primary) / 0.1)' : 'transparent',
+                  border: '1px solid hsl(var(--border-glass))',
+                  cursor: 'pointer', fontSize: '0.85rem',
+                  color: 'hsl(var(--text-primary))', fontWeight: 500,
+                }}
+              >
+                <User size={16} />
+                <span className={styles.userMenuName}>
+                  {user.email?.split('@')[0]}
+                </span>
+                <ChevronDown size={14} style={{
+                  transform: showUserMenu ? 'rotate(180deg)' : 'rotate(0)',
+                  transition: 'transform 0.2s',
+                }} />
+              </button>
+            ) : (
+              <Link
+                href="/dang-nhap"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 14px', borderRadius: '8px',
+                  background: 'hsl(var(--color-primary))',
+                  color: '#fff', fontSize: '0.85rem', fontWeight: 600,
+                  textDecoration: 'none',
+                }}
+              >
+                Đăng Nhập
+              </Link>
+            )}
+            {showUserMenu && user && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                minWidth: '200px', background: 'hsl(var(--bg-card))',
+                border: '1px solid hsl(var(--border-glass))',
+                borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                padding: '8px', zIndex: 100,
+              }}>
+                <div style={{
+                  padding: '10px 14px', borderBottom: '1px solid hsl(var(--border-glass))',
+                  marginBottom: '4px',
+                }}>
+                  <div style={{ fontSize: '0.8rem', color: 'hsl(var(--text-muted))' }}>Tài khoản</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 600, wordBreak: 'break-all' }}>{user.email}</div>
+                </div>
+                <Link href="/profile" onClick={() => setShowUserMenu(false)} style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '10px 14px', borderRadius: '8px',
+                  fontSize: '0.9rem', color: 'hsl(var(--text-primary))',
+                  textDecoration: 'none',
+                }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'hsla(var(--color-primary) / 0.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <User size={16} />
+                  Hồ Sơ
+                </Link>
+                {isAdmin && (
+                  <Link href="/admin" onClick={() => setShowUserMenu(false)} style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '10px 14px', borderRadius: '8px',
+                    fontSize: '0.9rem', color: 'hsl(var(--text-primary))',
+                    textDecoration: 'none',
+                  }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'hsla(var(--color-primary) / 0.08)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <Shield size={16} />
+                    Quản Trị
+                  </Link>
+                )}
+                <button onClick={handleLogout} style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '10px 14px', borderRadius: '8px',
+                  fontSize: '0.9rem', color: '#ef4444', width: '100%',
+                  background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+                }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <LogOut size={16} />
+                  Đăng Xuất
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Mobile Hamburger Button */}
           <button className={`${styles.menuBtn} ${isOpen ? styles.menuBtnOpen : ''}`} onClick={toggleMenu} aria-label="Toggle menu">

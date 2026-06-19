@@ -372,4 +372,7 @@
     max-width: 120px;
     height: 32px;
   }
+  .userMenuName {
+    display: none;
+  }
 }
