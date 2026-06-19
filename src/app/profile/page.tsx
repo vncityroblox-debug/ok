@@ -73,32 +73,48 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user || activeTab !== 'history') return;
     setLoadingHistory(true);
-    fetch('/api/auth/login-history')
-      .then((r) => r.json())
-      .then((data) => setLoginHistory(data.history || []))
-      .catch(() => setLoginHistory([]))
-      .finally(() => setLoadingHistory(false));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const token = session?.access_token;
+      fetch('/api/auth/login-history', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+        .then((r) => r.json())
+        .then((data) => setLoginHistory(data.history || []))
+        .catch(() => setLoginHistory([]))
+        .finally(() => setLoadingHistory(false));
+    });
   }, [user, activeTab]);
 
   useEffect(() => {
-    if (!user || activeTab !== 'purchases') return;
+    if (!user || activeTab !== 'purchases' && activeTab !== 'keys') return;
     setLoadingPurchases(true);
-    fetch('/api/auth/purchases')
-      .then((r) => r.json())
-      .then((data) => setPurchases(data.purchases || []))
-      .catch(() => setPurchases([]))
-      .finally(() => setLoadingPurchases(false));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const token = session?.access_token;
+      fetch('/api/auth/purchases', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+        .then((r) => r.json())
+        .then((data) => setPurchases(data.purchases || []))
+        .catch(() => setPurchases([]))
+        .finally(() => setLoadingPurchases(false));
+    });
   }, [user, activeTab]);
 
-  const giftedKeys = purchases.filter((p) => p.key_code && (p.status === 'gifted' || p.status === 'key_verified'));
+  const giftedKeys = purchases.filter((p) => p.key_code && p.key_code.trim() !== '');
+  const downloadHistory = purchases.filter((p) => !p.key_code || p.key_code.trim() === '');
 
   const handleSave = async () => {
     setSaving(true);
     setSaveMsg(null);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
       const res = await fetch('/api/auth/update-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ full_name: fullName, phone, email }),
       });
       const data = await res.json();
@@ -395,14 +411,14 @@ export default function ProfilePage() {
                 <div style={{ textAlign: 'center', padding: '40px', color: 'hsl(var(--text-muted))' }}>
                   <p>Đang tải dữ liệu...</p>
                 </div>
-              ) : purchases.length === 0 ? (
+              ) : downloadHistory.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'hsl(var(--text-muted))' }}>
                   <ShoppingCart size={36} style={{ marginBottom: '12px', opacity: 0.4 }} />
                   <p>Chưa có lịch sử mua hàng.</p>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {purchases.map((item) => {
+                  {downloadHistory.map((item) => {
                     const isExpanded = expandedPurchase === item.id;
                     return (
                       <div
