@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import ImageLightbox from '@/components/ImageLightbox';
 import { Lock, Unlock, Download, KeyRound, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import Link from 'next/link';
 import styles from '../../home.module.css';
@@ -31,6 +32,7 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
   const [termsContent, setTermsContent] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     async function loadAppDetails() {
@@ -159,7 +161,13 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
         {/* Main Details Panel */}
         <div className={`${styles.detailCard} glass-panel`}>
           <div className={styles.detailHeader}>
-            <img src={app.main_image_url} alt={app.name} className={styles.detailIcon} />
+            <img
+              src={app.main_image_url}
+              alt={app.name}
+              className={styles.detailIcon}
+              onClick={() => setLightboxIndex(0)}
+              style={{ cursor: 'zoom-in' }}
+            />
             <div className={styles.detailInfo}>
               <h1>{app.name}</h1>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '10px' }}>
@@ -216,10 +224,23 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
                     src={imgUrl}
                     alt={`${app.name} screenshot ${index + 1}`}
                     className={styles.screenshotImg}
+                    onClick={() => setLightboxIndex(index + 1)}
+                    style={{ cursor: 'zoom-in' }}
                   />
                 ))}
               </div>
             </div>
+          )}
+
+          {lightboxIndex !== null && (
+            <ImageLightbox
+              images={app.detail_images && app.detail_images.length > 0
+                ? [app.main_image_url, ...app.detail_images]
+                : [app.main_image_url]}
+              initialIndex={lightboxIndex}
+              alt={app.name}
+              onClose={() => setLightboxIndex(null)}
+            />
           )}
         </div>
 

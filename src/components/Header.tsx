@@ -118,8 +118,10 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
           </button>
 
           {/* Mobile Hamburger Button */}
-          <button className={styles.menuBtn} onClick={toggleMenu} aria-label="Toggle menu">
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          <button className={`${styles.menuBtn} ${isOpen ? styles.menuBtnOpen : ''}`} onClick={toggleMenu} aria-label="Toggle menu">
+            <span className={`${styles.menuBtnIcon} ${isOpen ? styles.menuBtnIconSpin : ''}`}>
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </span>
           </button>
         </div>
       </div>

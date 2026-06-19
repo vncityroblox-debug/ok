@@ -97,6 +97,26 @@
   border: none;
   color: hsl(var(--text-primary));
   cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menuBtnOpen {
+  transform: rotate(360deg);
+}
+
+.menuBtnIcon {
+  transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+}
+
+.menuBtnIconSpin {
+  animation: menuIconSpin 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes menuIconSpin {
+  0% { transform: rotate(0deg) scale(1); opacity: 1; }
+  50% { transform: rotate(180deg) scale(0.5); opacity: 0; }
+  100% { transform: rotate(360deg) scale(1); opacity: 1; }
 }
 
 .searchBtn {
