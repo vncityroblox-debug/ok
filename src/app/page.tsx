@@ -87,7 +87,7 @@ export default function HomePage() {
           {heroMain}
           {heroHighlight ? <> <span>{heroHighlight}</span></> : null}
         </h1>
-        <p className={styles.heroSubtitle}>{heroSubtitle}</p>
+        <p className={styles.heroSubtitle} dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
       </section>
 
       {/* Quick Sections */}

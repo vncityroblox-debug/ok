@@ -178,7 +178,7 @@ export default function AdminSettings() {
             Hero Trang Chủ
           </h4>
           <p style={{ color: 'hsl(var(--text-muted))', fontSize: '0.85rem' }}>
-            Tiêu đề và mô tả hiển thị ở đầu trang chủ. Dùng dấu <strong>|</strong> trong tiêu đề để tách phần chữ gradient, ví dụ: <code>Kho Tài Nguyên|Tuyển Chọn</code>
+            Tiêu đề và mô tả hiển thị ở đầu trang chủ. Tiêu đề dùng dấu <strong>|</strong> để tách phần chữ gradient, ví dụ: <code>Kho Tài Nguyên|Tuyển Chọn</code>. Mô tả hỗ trợ nhúng HTML đầy đủ (thẻ &lt;b&gt;, &lt;a&gt;, &lt;br&gt;, &lt;span&gt;...).
           </p>
         </div>
 
@@ -196,18 +196,31 @@ export default function AdminSettings() {
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.formLabel} htmlFor="homeHeroSubtitle">Mô Tả Trang Chủ</label>
+          <label className={styles.formLabel} htmlFor="homeHeroSubtitle">Mô Tả Trang Chủ (Hỗ trợ HTML)</label>
           <textarea
             id="homeHeroSubtitle"
             rows={3}
             required
             className={styles.formInput}
-            style={{ resize: 'vertical' }}
+            style={{ resize: 'vertical', fontFamily: 'monospace', fontSize: '0.88rem' }}
             value={homeHeroSubtitle}
             onChange={(e) => setHomeHeroSubtitle(e.target.value)}
             placeholder="Khám phá và tải xuống hàng loạt ứng dụng..."
           />
         </div>
+        {homeHeroSubtitle.trim() && (
+          <div style={{ marginBottom: '20px' }}>
+            <label className={styles.formLabel}>Xem Trước Mô Tả</label>
+            <div style={{
+              padding: '16px',
+              borderRadius: '12px',
+              background: 'rgba(13, 110, 253, 0.05)',
+              border: '1px solid rgba(13, 110, 253, 0.2)',
+              lineHeight: 1.7,
+              color: 'hsl(var(--text-primary))',
+            }} dangerouslySetInnerHTML={{ __html: homeHeroSubtitle }} />
+          </div>
+        )}
 
         <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border-glass))', margin: '20px 0' }} />
 
