@@ -21,7 +21,12 @@ async function runCronJobs() {
       .eq('is_active', true)
       .lte('next_run', now);
 
-    if (fetchError) throw fetchError;
+    if (fetchError) {
+      if (fetchError.message?.includes('does not exist') || fetchError.code === '42P01') {
+        return Response.json({ message: 'cron_jobs table not found', executed: 0 });
+      }
+      throw fetchError;
+    }
     if (!jobs || jobs.length === 0) {
       return Response.json({ message: 'No jobs to run', executed: 0 });
     }

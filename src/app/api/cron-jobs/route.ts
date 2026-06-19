@@ -9,10 +9,15 @@ export async function GET() {
       .from('cron_jobs')
       .select('*')
       .order('created_at', { ascending: false });
-    if (error) throw error;
+    if (error) {
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        return Response.json({ data: [], error: 'Bảng cron_jobs chưa tồn tại. Vui lòng chạy migration.' });
+      }
+      throw error;
+    }
     return Response.json({ data });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return Response.json({ data: [], error: err.message }, { status: 500 });
   }
 }
 
@@ -46,7 +51,12 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        return Response.json({ error: 'Bảng cron_jobs chưa tồn tại. Vui lòng chạy migration trong Supabase SQL Editor.' }, { status: 400 });
+      }
+      throw error;
+    }
     return Response.json({ data });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });
@@ -67,7 +77,12 @@ export async function PATCH(request: Request) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        return Response.json({ error: 'Bảng cron_jobs chưa tồn tại.' }, { status: 400 });
+      }
+      throw error;
+    }
     return Response.json({ data });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });
@@ -82,7 +97,12 @@ export async function DELETE(request: Request) {
 
     const supabase = getSupabaseServer(true);
     const { error } = await supabase.from('cron_jobs').delete().eq('id', id);
-    if (error) throw error;
+    if (error) {
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        return Response.json({ error: 'Bảng cron_jobs chưa tồn tại.' }, { status: 400 });
+      }
+      throw error;
+    }
     return Response.json({ success: true });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });

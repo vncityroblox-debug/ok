@@ -1,12 +1,27 @@
 import { getSupabaseServer } from '@/lib/supabase';
 
+async function fetchApps(supabase: ReturnType<typeof getSupabaseServer>, appType: string, limit: number) {
+  const selectCols = 'id, name, slug, description, main_image_url, is_locked, category_id, categories(name, slug), app_type';
+
+  let query = supabase.from('apps').select(selectCols).eq('is_hidden', false);
+  if (appType) query = query.eq('app_type', appType);
+  const res = await query.order('created_at', { ascending: false }).limit(limit);
+
+  if (res.error && (res.error.message?.includes('is_hidden') || res.error.code === '42703')) {
+    let fallback = supabase.from('apps').select(selectCols);
+    if (appType) fallback = fallback.eq('app_type', appType);
+    const fallbackRes = await fallback.order('created_at', { ascending: false }).limit(limit);
+    return fallbackRes.data || [];
+  }
+  return res.data || [];
+}
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const type = url.searchParams.get('type') || '';
     const slug = url.searchParams.get('slug') || '';
     const limit = parseInt(url.searchParams.get('limit') || '100');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
     const appType = url.searchParams.get('app_type') || '';
 
     const supabase = getSupabaseServer();
@@ -15,13 +30,12 @@ export async function GET(request: Request) {
 
     switch (type) {
       case 'home': {
-        const [catRes, settRes, appsRes] = await Promise.all([
+        const [catRes, settRes] = await Promise.all([
           supabase.from('categories').select('*').order('name', { ascending: true }),
           supabase.from('site_settings').select('home_hero_title, home_hero_subtitle').eq('id', 1).single(),
-          supabase.from('apps').select('id, name, slug, description, main_image_url, is_locked, category_id, categories(name, slug), app_type')
-            .eq('app_type', appType || 'app').eq('is_hidden', false).order('created_at', { ascending: false }).limit(limit),
         ]);
-        data = { categories: catRes.data, settings: settRes.data, apps: appsRes.data };
+        const apps = await fetchApps(supabase, appType || 'app', limit);
+        data = { categories: catRes.data, settings: settRes.data, apps };
         break;
       }
       case 'categories': {
@@ -42,12 +56,8 @@ export async function GET(request: Request) {
         break;
       }
       case 'apps': {
-        let query = supabase.from('apps')
-          .select('id, name, slug, description, main_image_url, is_locked, category_id, categories(name, slug), app_type')
-          .eq('is_hidden', false);
-        if (appType) query = query.eq('app_type', appType);
-        const res = await query.order('created_at', { ascending: false }).limit(limit);
-        data = res.data;
+        const apps = await fetchApps(supabase, appType, limit);
+        data = apps;
         break;
       }
       case 'app': {
