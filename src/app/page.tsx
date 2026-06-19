@@ -110,7 +110,7 @@ export default function HomePage() {
       {/* Search */}
       <section className={styles.searchSection}>
         <div className={styles.searchBarWrapper}>
-          <Search size={18} className={styles.searchIcon} />
+          <Search size={20} className={styles.searchIcon} />
           <input
             type="search"
             className={styles.searchInput}

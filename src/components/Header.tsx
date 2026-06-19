@@ -122,7 +122,7 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
       {/* Search Dropdown */}
       <div className={`${styles.searchDropdown} ${showSearch ? styles.searchDropdownOpen : ''}`}>
         <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
-          <Search size={18} className={styles.searchIcon} />
+          <Search size={20} className={styles.searchIcon} />
           <input
             ref={searchRef}
             type="search"

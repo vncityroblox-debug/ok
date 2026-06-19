@@ -105,7 +105,7 @@ export default function SourceCodePage() {
       {/* Search and filter toolbar */}
       <section className={styles.searchSection}>
         <div className={styles.searchBarWrapper} id="guide-search">
-          <Search size={18} className={styles.searchIcon} />
+          <Search size={20} className={styles.searchIcon} />
           <input
             type="search"
             className={styles.searchInput}
