@@ -91,7 +91,7 @@ export default function HomePage() {
     : [heroTitle.trim(), ''];
 
   const sections = [
-    { label: 'Ứng Dụng', href: '/tien-ich', icon: AppWindow, color: 'var(--color-primary)' },
+    { label: 'Ứng Dụng', href: '/ung-dung', icon: AppWindow, color: 'var(--color-primary)' },
     { label: 'Mã Nguồn', href: '/ma-nguon', icon: Terminal, color: 'var(--color-success)' },
     { label: 'Tiện Ích', href: '/tien-ich', icon: ShieldCheck, color: 'var(--color-warning)' },
   ];
