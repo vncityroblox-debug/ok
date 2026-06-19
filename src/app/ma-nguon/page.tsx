@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
-import { Lock, Unlock, Download, Terminal, ArrowRight } from 'lucide-react';
+import { Lock, Unlock, Download, Terminal, ArrowRight, Search } from 'lucide-react';
 import styles from '../home.module.css';
 
 interface Category {
@@ -105,7 +105,7 @@ export default function SourceCodePage() {
       {/* Search and filter toolbar */}
       <section className={styles.searchSection}>
         <div className={styles.searchBarWrapper} id="guide-search">
-          <span className={styles.searchIcon}>🔎</span>
+          <Search size={18} className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}

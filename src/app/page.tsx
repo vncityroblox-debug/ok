@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText, Grid3X3 } from 'lucide-react';
+import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText, Grid3X3, Search } from 'lucide-react';
 import styles from './home.module.css';
 
 interface Category {
@@ -110,7 +110,7 @@ export default function HomePage() {
       {/* Search */}
       <section className={styles.searchSection}>
         <div className={styles.searchBarWrapper}>
-          <span className={styles.searchIcon}>🔎</span>
+          <Search size={18} className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}

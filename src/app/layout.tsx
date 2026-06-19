@@ -172,7 +172,7 @@ export default async function RootLayout({
         <main style={{ minHeight: 'calc(100vh - 250px)' }}>
           {children}
         </main>
-        <Footer siteName={siteName} siteDescription={siteDescription} footerText={footerText} />
+        <Footer siteName={siteName} siteIconUrl={siteIconUrl} siteDescription={siteDescription} footerText={footerText} />
         <AnnouncementPopup />
       </body>
     </html>

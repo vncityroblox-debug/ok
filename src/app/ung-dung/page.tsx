@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import BackButton from '@/components/BackButton';
-import { Lock, Unlock, Download, ArrowRight } from 'lucide-react';
+import { Lock, Unlock, Download, ArrowRight, Search } from 'lucide-react';
 import styles from '../home.module.css';
 
 interface Category {
@@ -99,7 +99,7 @@ function UngDungContent() {
 
       <section className={styles.searchSection}>
         <div className={styles.searchBarWrapper} id="guide-search">
-          <span className={styles.searchIcon}>🔎</span>
+          <Search size={18} className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}
