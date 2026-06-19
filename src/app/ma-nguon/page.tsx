@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import BackButton from '@/components/BackButton';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { Lock, Unlock, Download, Terminal, ArrowRight, Search } from 'lucide-react';
 import styles from '../home.module.css';
 
@@ -91,7 +91,7 @@ export default function SourceCodePage() {
 
   return (
     <div className="container">
-      <BackButton />
+      <Breadcrumbs />
       {/* Hero Header */}
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>

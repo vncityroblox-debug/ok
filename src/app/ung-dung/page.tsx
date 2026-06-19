@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import BackButton from '@/components/BackButton';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { Lock, Unlock, Download, ArrowRight, Search } from 'lucide-react';
 import styles from '../home.module.css';
 
@@ -87,7 +87,7 @@ function UngDungContent() {
 
   return (
     <div className="container">
-      <BackButton />
+      <Breadcrumbs />
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
           Kho Ứng Dụng <span>Tuyển Chọn</span>

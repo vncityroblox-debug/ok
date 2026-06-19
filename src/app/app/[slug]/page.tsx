@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import BackButton from '@/components/BackButton';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { Lock, Unlock, Download, KeyRound, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import Link from 'next/link';
 import styles from '../../home.module.css';
@@ -120,7 +120,7 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
 
   return (
     <div className="container" style={{ padding: '20px 24px', position: 'relative' }}>
-      <BackButton />
+      <Breadcrumbs />
       {/* Terms Popup */}
       {showTermsPopup && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>

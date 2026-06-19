@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import BackButton from '@/components/BackButton';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { Calendar, ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';
 import styles from '../../home.module.css';
@@ -67,7 +67,7 @@ export default function BlogPostDetailPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="container" style={{ padding: '20px 24px' }}>
-      <BackButton />
+      <Breadcrumbs />
 
       <article className={`${styles.articleLayout} glass-panel`}>
         <h1 className={styles.articleTitle}>{post.title}</h1>

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import BackButton from '@/components/BackButton';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
 import styles from './tienich.module.css';
 
@@ -15,7 +15,7 @@ const utilities = [
 export default function TienIchPage() {
   return (
     <div className="container">
-      <BackButton />
+      <Breadcrumbs />
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
           Kho <span>Tiện Ích</span>
