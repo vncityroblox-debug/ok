@@ -30,7 +30,9 @@ export async function GET(request: Request) {
         break;
       }
       case 'posts': {
-        const res = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+        let query = supabase.from('posts').select('*').order('created_at', { ascending: false });
+        if (limit > 0) query = query.limit(limit);
+        const res = await query;
         data = res.data;
         break;
       }
