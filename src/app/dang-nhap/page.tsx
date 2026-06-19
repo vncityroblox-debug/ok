@@ -56,12 +56,6 @@ function DangNhapContent() {
         return;
       }
 
-      if (rememberMe) {
-        const maxAge = 60 * 60 * 24 * 30;
-        document.cookie = `sb-access-token=; path=/; max-age=${maxAge}`;
-        document.cookie = `sb-refresh-token=; path=/; max-age=${maxAge}`;
-      }
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
