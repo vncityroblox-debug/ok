@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText } from 'lucide-react';
+import { AppWindow, Terminal, ShieldCheck, ArrowRight, FileText, Clock } from 'lucide-react';
 import styles from './home.module.css';
 
 interface Post {
@@ -76,6 +76,7 @@ export default function HomePage() {
   const sections = [
     { label: 'Ứng Dụng', href: '/ung-dung', icon: AppWindow, color: 'var(--color-primary)' },
     { label: 'Mã Nguồn', href: '/ma-nguon', icon: Terminal, color: 'var(--color-success)' },
+    { label: 'CronJobs', href: '/cron-jobs', icon: Clock, color: '#10b981' },
     { label: 'Tiện Ích', href: '/tien-ich', icon: ShieldCheck, color: 'var(--color-warning)' },
   ];
 

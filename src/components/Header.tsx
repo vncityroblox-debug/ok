@@ -67,8 +67,9 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
 
   const navItems = [
     { name: 'Trang Chủ', path: '/' },
-    { name: 'Mã Nguồn', path: '/ma-nguon' },
     { name: 'Tiện Ích', path: '/tien-ich' },
+    { name: 'CronJobs', path: '/cron-jobs' },
+    { name: 'Mã Nguồn', path: '/ma-nguon' },
     { name: 'Bài Viết', path: '/blog' },
   ];
 
