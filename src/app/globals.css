@@ -253,6 +253,31 @@ input, textarea, select {
   padding: 0 24px;
 }
 
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+/* Ensure everything stays within viewport */
+img, svg, video, canvas, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+code, pre {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Better tap targets on mobile */
+@media (max-width: 768px) {
+  button, a, [role="button"], input, select, textarea {
+    font-size: 16px; /* prevent iOS zoom */
+  }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

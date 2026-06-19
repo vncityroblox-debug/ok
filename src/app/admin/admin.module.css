@@ -135,6 +135,7 @@
     left: 0;
     z-index: 50;
     width: 280px;
+    max-width: 85vw;
     height: 100vh;
     border-right: none;
     border-bottom: none;
@@ -165,6 +166,34 @@
     margin-left: 0.5rem;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 16px 12px;
+    padding-top: 64px;
+  }
+  .sidebar {
+    width: 260px;
+  }
+  .pageTitle {
+    font-size: 1.3rem;
+  }
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .statValue {
+    font-size: 1.5rem;
+  }
+  .adminTable tbody td {
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+  .checkboxGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    padding: 10px;
   }
 }
 

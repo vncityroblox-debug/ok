@@ -31,13 +31,26 @@
 
 @media (max-width: 768px) {
   .hero {
-    padding: 50px 0 40px 0;
+    padding: 40px 0 30px 0;
   }
   .heroTitle {
     font-size: 2.25rem;
   }
   .heroSubtitle {
     font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 28px 0 20px 0;
+  }
+  .heroTitle {
+    font-size: 1.65rem;
+    letter-spacing: -0.5px;
+  }
+  .heroSubtitle {
+    font-size: 0.95rem;
   }
 }
 
@@ -58,6 +71,13 @@
   box-shadow: var(--shadow-card);
 }
 
+@media (max-width: 480px) {
+  .searchBarWrapper {
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+}
+
 .searchBarWrapper:focus-within {
   border-color: hsl(var(--color-primary));
   box-shadow: 0 0 0 4px hsla(var(--color-primary) / 0.1);
@@ -73,6 +93,13 @@
   outline: none;
 }
 
+@media (max-width: 480px) {
+  .searchInput {
+    padding: 12px 14px 12px 0;
+    font-size: 0.95rem;
+  }
+}
+
 .searchInput:focus {
   border-color: transparent;
   box-shadow: none;
@@ -86,6 +113,13 @@
   align-items: center;
 }
 
+@media (max-width: 480px) {
+  .searchIcon {
+    padding: 0 0 0 12px;
+    font-size: 1rem;
+  }
+}
+
 /* Quick Section Cards */
 .sectionsRow {
   display: grid;
@@ -97,6 +131,21 @@
 @media (max-width: 768px) {
   .sectionsRow {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionCard {
+    padding: 16px;
+    gap: 12px;
+  }
+  .sectionIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+  .sectionLabel {
+    font-size: 0.95rem;
   }
 }
 
@@ -147,7 +196,7 @@
 /* Category Grid */
 .catGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
 }
 
@@ -155,6 +204,20 @@
   .catGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+  }
+  .catCard {
+    padding: 16px 12px;
+  }
+  .catImage {
+    width: 48px;
+    height: 48px;
+  }
+  .catName {
+    font-size: 0.85rem;
+  }
+  .catBtn {
+    font-size: 0.72rem;
+    padding: 5px 8px;
   }
 }
 
@@ -229,6 +292,13 @@
   gap: 30px;
 }
 
+@media (max-width: 480px) {
+  .appsGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
 .appCard {
   padding: 24px;
   background: hsl(var(--bg-card));
@@ -248,6 +318,13 @@
   border-color: hsla(var(--color-primary) / 0.15);
 }
 
+@media (max-width: 480px) {
+  .appCard {
+    padding: 18px;
+    border-radius: 16px;
+  }
+}
+
 .appCardHeader {
   display: flex;
   gap: 16px;
@@ -262,6 +339,17 @@
   object-fit: cover;
   border: 1px solid hsl(var(--border-light));
   box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 480px) {
+  .appIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+  .appTitle {
+    font-size: 1rem;
+  }
 }
 
 .appTitle {
@@ -336,6 +424,18 @@
   transition: var(--transition-bounce);
 }
 
+@media (max-width: 480px) {
+  .categoryPill {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    gap: 5px;
+  }
+  .categoryIcon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .categoryPill:hover {
   transform: scale(1.05);
   border-color: hsla(var(--color-primary) / 0.3);
@@ -378,12 +478,34 @@
   border-radius: 24px;
 }
 
+@media (max-width: 768px) {
+  .detailCard {
+    padding: 24px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .detailCard {
+    padding: 16px;
+    border-radius: 14px;
+  }
+}
+
 .detailHeader {
   display: flex;
   gap: 30px;
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 40px;
+}
+
+@media (max-width: 480px) {
+  .detailHeader {
+    gap: 16px;
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 .detailIcon {
@@ -395,11 +517,31 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
+@media (max-width: 480px) {
+  .detailIcon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+  }
+}
+
 .detailInfo h1 {
   font-size: 2.5rem;
   font-weight: 800;
   color: hsl(var(--text-primary));
   margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .detailInfo h1 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .detailInfo h1 {
+    font-size: 1.4rem;
+  }
 }
 
 .screenshotsSection {
@@ -408,9 +550,16 @@
 
 .screenshotsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
   margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+  .screenshotsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
 }
 
 .screenshotImg {
@@ -436,6 +585,18 @@
   position: sticky;
   top: 90px;
   text-align: center;
+}
+
+@media (max-width: 992px) {
+  .downloadBox {
+    position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .downloadBox {
+    padding: 20px;
+  }
 }
 
 .downloadTitle {
@@ -474,8 +635,15 @@
 /* Blog List and Article Styling */
 .blogGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 480px) {
+  .blogGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 .blogCard {
@@ -488,6 +656,13 @@
   height: 100%;
   transition: var(--transition-bounce);
   text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .blogCard {
+    padding: 20px;
+    border-radius: 14px;
+  }
 }
 
 .blogCard:hover {
@@ -541,6 +716,13 @@
   border-radius: 24px;
 }
 
+@media (max-width: 480px) {
+  .articleLayout {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+}
+
 .articleTitle {
   font-size: 2.8rem;
   font-weight: 800;
@@ -549,10 +731,29 @@
   color: hsl(var(--text-primary));
 }
 
+@media (max-width: 768px) {
+  .articleTitle {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .articleTitle {
+    font-size: 1.35rem;
+  }
+}
+
 .articleContent {
   font-size: 1.1rem;
   line-height: 1.8;
   color: hsl(var(--text-secondary));
+}
+
+@media (max-width: 480px) {
+  .articleContent {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
 }
 
 .articleContent p {
