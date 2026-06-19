@@ -88,7 +88,6 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
 
@@ -99,14 +98,16 @@ export default function AdminDashboard() {
         recentDownloadsRes,
         visitsTimelineRes,
         totalUsersRes,
-      ] = await Promise.all([
+      ] = await Promise.allSettled([
         supabase.from('analytics_visits').select('*', { count: 'exact', head: true }),
         supabase.from('analytics_visits').select('*', { count: 'exact', head: true }).gte('visited_at', thirtyDaysAgo),
         supabase.from('analytics_downloads').select('*', { count: 'exact', head: true }),
         supabase.from('analytics_downloads').select('app_id, apps(name)'),
         supabase.from('analytics_visits').select('visited_at').order('visited_at', { ascending: true }),
         supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
-      ]);
+      ]).then((results) => results.map((r) => r.status === 'fulfilled' ? r.value : { data: null, error: null, count: 0 }));
+
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
@@ -119,7 +120,6 @@ export default function AdminDashboard() {
 
       const todayLogins = allLogins.filter((l: any) => new Date(l.created_at) >= todayStart).length;
       const unique7dUsers = new Set(allLogins.filter((l: any) => new Date(l.created_at) >= new Date(sevenDaysAgo)).map((l: any) => l.user_id));
-      const todayActivityCount = allActivities.filter((a: any) => new Date(a.created_at) >= todayStart).length;
 
       setTotalVisits(totalVisitsRes.count || 0);
       setTodayVisits(recentVisitsRes.count || 0);
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       setTodayLogins(todayLogins);
       setActiveUsers7d(unique7dUsers.size);
 
-      if (recentDownloadsRes.data) {
+      if (Array.isArray(recentDownloadsRes.data)) {
         const aggMap: { [key: string]: number } = {};
         recentDownloadsRes.data.forEach((row: any) => {
           const appName = row.apps?.name || 'Ứng dụng không xác định';
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
         );
       }
 
-      if (visitsTimelineRes.data) {
+      if (Array.isArray(visitsTimelineRes.data)) {
         const dailyMap: { [key: string]: number } = {};
         for (let i = 6; i >= 0; i--) {
           const d = new Date();
@@ -156,11 +156,11 @@ export default function AdminDashboard() {
         setDailyVisits(Object.keys(dailyMap).map((dateLabel) => ({ dateLabel, count: dailyMap[dateLabel] })));
       }
 
-      const acts = allActivities.map((a: any) => ({
+      const acts = (Array.isArray(allActivities) ? allActivities : []).map((a: any) => ({
         ...a,
         username: a.user_profiles?.username || a.user_email || 'N/A',
       }));
-      const logins = allLogins.map((l: any) => ({
+      const logins = (Array.isArray(allLogins) ? allLogins : []).map((l: any) => ({
         ...l,
         username: l.user_profiles?.username || l.user_email || 'N/A',
       }));
