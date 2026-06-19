@@ -186,9 +186,9 @@ input[type="search"] {
 
 .keyInput {
   width: 100%;
-  padding: 12px 14px 12px 40px;
+  padding: 12px 14px 12px 40px !important;
   background: hsl(var(--bg-card));
-  border: 2px solid hsl(var(--border-glass));
+  border: 2px solid hsl(var(--border-glass)) !important;
   border-radius: 10px;
   color: hsl(var(--text-primary));
   font-size: 1rem;
