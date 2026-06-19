@@ -10,6 +10,8 @@ const nameMap: Record<string, string> = {
   'ma-nguon': 'Mã Nguồn',
   'tien-ich': 'Tiện Ích',
   '2fa': 'Lấy 2FA',
+  'tools': 'Công Cụ',
+  'whois': 'WHOIS & DNS',
   'blog': 'Bài Viết',
   'app': 'Chi Tiết',
   'phim-hay': 'Phim Hay',

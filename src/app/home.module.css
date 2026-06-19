@@ -778,3 +778,82 @@
   border-radius: 12px;
   margin: 30px 0;
 }
+
+/* Tools Hub Grid */
+.toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 80px;
+}
+
+@media (max-width: 992px) {
+  .toolsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .toolsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.toolCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 28px 24px;
+  background: hsl(var(--bg-card));
+  border: 1px solid hsl(var(--border-glass));
+  border-radius: 20px;
+  text-decoration: none;
+  transition: var(--transition-bounce);
+  box-shadow: var(--shadow-card);
+}
+
+.toolCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-neon-strong);
+  border-color: hsla(var(--color-primary) / 0.15);
+  text-decoration: none;
+}
+
+.toolIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toolInfo {
+  flex: 1;
+}
+
+.toolName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: hsl(var(--text-primary));
+  margin-bottom: 6px;
+}
+
+.toolDescription {
+  font-size: 0.88rem;
+  color: hsl(var(--text-secondary));
+  line-height: 1.5;
+}
+
+.toolArrow {
+  color: hsl(var(--text-muted));
+  transition: var(--transition-smooth);
+  align-self: flex-end;
+}
+
+.toolCard:hover .toolArrow {
+  color: hsl(var(--color-primary));
+  transform: translateX(4px);
+}
