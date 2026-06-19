@@ -107,7 +107,7 @@ export default function SourceCodePage() {
         <div className={styles.searchBarWrapper} id="guide-search">
           <Search size={18} className={styles.searchIcon} />
           <input
-            type="text"
+            type="search"
             className={styles.searchInput}
             placeholder="Tìm kiếm mã nguồn..."
             value={searchQuery}

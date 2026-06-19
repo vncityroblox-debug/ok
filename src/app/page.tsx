@@ -112,7 +112,7 @@ export default function HomePage() {
         <div className={styles.searchBarWrapper}>
           <Search size={18} className={styles.searchIcon} />
           <input
-            type="text"
+            type="search"
             className={styles.searchInput}
             placeholder="Tìm danh mục..."
             value={searchQuery}

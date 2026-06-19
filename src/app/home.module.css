@@ -108,6 +108,8 @@
 
 .searchIcon {
   padding: 0 0 0 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   color: hsl(var(--text-secondary));
 }

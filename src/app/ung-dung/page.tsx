@@ -101,7 +101,7 @@ function UngDungContent() {
         <div className={styles.searchBarWrapper} id="guide-search">
           <Search size={18} className={styles.searchIcon} />
           <input
-            type="text"
+            type="search"
             className={styles.searchInput}
             placeholder="Tìm kiếm ứng dụng..."
             value={searchQuery}

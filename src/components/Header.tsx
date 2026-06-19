@@ -125,7 +125,7 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
           <Search size={18} className={styles.searchIcon} />
           <input
             ref={searchRef}
-            type="text"
+            type="search"
             className={styles.searchInput}
             placeholder="Tìm kiếm ứng dụng..."
             value={searchQuery}
