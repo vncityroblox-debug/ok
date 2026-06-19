@@ -21,7 +21,7 @@ const nameMap: Record<string, string> = {
   'image-compressor': 'Nén Ảnh',
   'cron-jobs': 'CronJobs',
   'blog': 'Bài Viết',
-  'app': 'Chi Tiết',
+  'app': 'Ứng Dụng',
   'phim-hay': 'Phim Hay',
   'admin': 'Quản Trị',
   'settings': 'Cài Đặt',
@@ -36,6 +36,7 @@ const nameMap: Record<string, string> = {
 
 const redirectMap: Record<string, string> = {
   '/tools': '/tools/hub',
+  '/app': '/ung-dung',
 };
 
 export default function Breadcrumbs() {
