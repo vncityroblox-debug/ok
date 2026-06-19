@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import styles from './components.module.css';
 
@@ -109,7 +109,7 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {/* Search Toggle */}
           <button className={styles.searchBtn} onClick={toggleSearch} aria-label="Toggle search">
-            <span style={{ fontSize: '1.2rem' }}>🔎</span>
+            <Search size={22} className={styles.searchSvg} />
           </button>
 
           {/* Mobile Hamburger Button */}
@@ -122,7 +122,7 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
       {/* Search Dropdown */}
       <div className={`${styles.searchDropdown} ${showSearch ? styles.searchDropdownOpen : ''}`}>
         <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
-          <span className={styles.searchIcon}>🔎</span>
+          <Search size={18} className={styles.searchIcon} />
           <input
             ref={searchRef}
             type="text"

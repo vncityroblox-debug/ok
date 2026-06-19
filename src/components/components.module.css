@@ -114,6 +114,24 @@
   color: hsl(var(--text-primary));
 }
 
+.searchSvg {
+  transition: transform 0.3s ease, color 0.2s;
+}
+
+.searchBtn:hover .searchSvg {
+  transform: scale(1.15) rotate(-5deg);
+  animation: searchPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes searchPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.searchBtn:active .searchSvg {
+  transform: scale(0.9);
+}
+
 .searchDropdown {
   position: absolute;
   top: 100%;
@@ -150,8 +168,8 @@
 }
 
 .searchIcon {
-  font-size: 1rem;
   flex-shrink: 0;
+  color: hsl(var(--text-muted));
 }
 
 .searchInput {
