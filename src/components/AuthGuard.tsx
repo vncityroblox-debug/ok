@@ -17,9 +17,19 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const defaultAuth: AuthContextType = {
+  user: null,
+  profile: null,
+  loading: true,
+  showAuth: false,
+  requestAuth: () => {},
+  hideAuth: () => {},
+  refreshProfile: async () => {},
+};
+
 export function useAuth(): AuthContextType {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) return defaultAuth;
   return ctx;
 }
 
