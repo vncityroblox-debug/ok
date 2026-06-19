@@ -99,7 +99,7 @@ function UngDungContent() {
 
       <section className={styles.searchSection}>
         <div className={styles.searchBarWrapper} id="guide-search">
-          <Search size={20} className={styles.searchIcon} />
+          <Search size={20} style={{ width: 20, height: 20, flexShrink: 0, color: 'hsl(var(--text-secondary))' }} />
           <input
             type="search"
             className={styles.searchInput}
