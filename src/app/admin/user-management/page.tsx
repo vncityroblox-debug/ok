@@ -134,21 +134,20 @@ function UserDetailModal({ user, onClose }: {
   useEffect(() => {
     (async () => {
       try {
-        const [purchasesRes, loginRes] = await Promise.all([
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+        const [purchasesRes, logsRes] = await Promise.all([
           supabase
             .from('purchases')
             .select('*')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false }),
-          supabase
-            .from('login_history')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(10),
+          fetch(`/api/admin/logs?user_id=${user.id}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }).then((r) => r.json()).catch(() => ({ loginHistory: [] })),
         ]);
         setPurchases(purchasesRes.data ?? []);
-        setLoginHistory(loginRes.data ?? []);
+        setLoginHistory(logsRes.loginHistory ?? []);
       } catch {
         // silently fail
       } finally {
@@ -519,7 +518,9 @@ export default function UserManagementPage() {
     setLoading(true);
     setError('');
     try {
-      const [profilesRes, purchasesRes, loginRes] = await Promise.all([
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      const [profilesRes, purchasesRes, logsRes] = await Promise.all([
         supabase
           .from('user_profiles')
           .select('*')
@@ -527,10 +528,9 @@ export default function UserManagementPage() {
         supabase
           .from('purchases')
           .select('id, user_id'),
-        supabase
-          .from('login_history')
-          .select('id, user_id, created_at')
-          .order('created_at', { ascending: false }),
+        fetch('/api/admin/logs', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }).then((r) => r.json()).catch(() => ({ loginHistory: [] })),
       ]);
 
       if (profilesRes.error) {
@@ -544,7 +544,7 @@ export default function UserManagementPage() {
       });
 
       const lastLoginMap = new Map<string, string>();
-      (loginRes.data ?? []).forEach((l: any) => {
+      (logsRes.loginHistory ?? []).forEach((l: any) => {
         if (!lastLoginMap.has(l.user_id)) {
           lastLoginMap.set(l.user_id, l.created_at);
         }

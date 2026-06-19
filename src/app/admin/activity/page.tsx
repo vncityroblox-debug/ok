@@ -58,24 +58,19 @@ export default function ActivityPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [activityRes, loginRes] = await Promise.all([
-        supabase
-          .from('activity_logs')
-          .select('*, user_profiles(username)')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('login_history')
-          .select('*, user_profiles(username)')
-          .order('created_at', { ascending: false }),
-      ])
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+      const logsRes = await fetch('/api/admin/logs', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }).then((r) => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] }))
 
-      const acts = (activityRes.data || []).map((a: any) => ({
+      const acts = (logsRes.activityLogs || []).map((a: any) => ({
         ...a,
-        username: a.user_profiles?.username || 'N/A',
+        username: a.user_profiles?.username || a.user_email || 'N/A',
       }))
-      const logins = (loginRes.data || []).map((l: any) => ({
+      const logins = (logsRes.loginHistory || []).map((l: any) => ({
         ...l,
-        username: l.user_profiles?.username || 'N/A',
+        username: l.user_profiles?.username || l.user_email || 'N/A',
       }))
 
       setActivities(acts)

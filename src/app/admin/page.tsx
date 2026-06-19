@@ -91,7 +91,6 @@ export default function AdminDashboard() {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      const todayIso = todayStart.toISOString();
 
       const [
         totalVisitsRes,
@@ -100,11 +99,6 @@ export default function AdminDashboard() {
         recentDownloadsRes,
         visitsTimelineRes,
         totalUsersRes,
-        todayLoginsRes,
-        activeUsers7dRes,
-        activityRes,
-        loginRes,
-        todayActivityCountRes,
       ] = await Promise.all([
         supabase.from('analytics_visits').select('*', { count: 'exact', head: true }),
         supabase.from('analytics_visits').select('*', { count: 'exact', head: true }).gte('visited_at', thirtyDaysAgo),
@@ -112,28 +106,26 @@ export default function AdminDashboard() {
         supabase.from('analytics_downloads').select('app_id, apps(name)'),
         supabase.from('analytics_visits').select('visited_at').order('visited_at', { ascending: true }),
         supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('login_history').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
-        supabase.from('login_history').select('user_id').gte('created_at', sevenDaysAgo),
-        supabase
-          .from('activity_logs')
-          .select('*, user_profiles(username)')
-          .order('created_at', { ascending: false })
-          .limit(200),
-        supabase
-          .from('login_history')
-          .select('*, user_profiles(username)')
-          .order('created_at', { ascending: false })
-          .limit(200),
-        supabase.from('activity_logs').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
       ]);
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      const logsRes = await fetch('/api/admin/logs', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }).then((r) => r.json()).catch(() => ({ loginHistory: [], activityLogs: [] }));
+
+      const allLogins = logsRes.loginHistory || [];
+      const allActivities = logsRes.activityLogs || [];
+
+      const todayLogins = allLogins.filter((l: any) => new Date(l.created_at) >= todayStart).length;
+      const unique7dUsers = new Set(allLogins.filter((l: any) => new Date(l.created_at) >= new Date(sevenDaysAgo)).map((l: any) => l.user_id));
+      const todayActivityCount = allActivities.filter((a: any) => new Date(a.created_at) >= todayStart).length;
 
       setTotalVisits(totalVisitsRes.count || 0);
       setTodayVisits(recentVisitsRes.count || 0);
       setTotalDownloads(totalDownloadsRes.count || 0);
       setTotalUsers(totalUsersRes.count || 0);
-      setTodayLogins(todayLoginsRes.count || 0);
-
-      const unique7dUsers = new Set((activeUsers7dRes.data || []).map((r: any) => r.user_id));
+      setTodayLogins(todayLogins);
       setActiveUsers7d(unique7dUsers.size);
 
       if (recentDownloadsRes.data) {
@@ -164,13 +156,13 @@ export default function AdminDashboard() {
         setDailyVisits(Object.keys(dailyMap).map((dateLabel) => ({ dateLabel, count: dailyMap[dateLabel] })));
       }
 
-      const acts = (activityRes.data || []).map((a: any) => ({
+      const acts = allActivities.map((a: any) => ({
         ...a,
-        username: a.user_profiles?.username || 'N/A',
+        username: a.user_profiles?.username || a.user_email || 'N/A',
       }));
-      const logins = (loginRes.data || []).map((l: any) => ({
+      const logins = allLogins.map((l: any) => ({
         ...l,
-        username: l.user_profiles?.username || 'N/A',
+        username: l.user_profiles?.username || l.user_email || 'N/A',
       }));
 
       setActivities(acts);
