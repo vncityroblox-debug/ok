@@ -35,21 +35,12 @@ export async function POST(req: NextRequest) {
     const supabaseAdmin = getSupabaseServer(true);
 
     let item_name = '';
-    if (item_type === 'app') {
-      const { data: item } = await supabaseAdmin
-        .from('apps')
-        .select('name')
-        .eq('id', item_id)
-        .single();
-      item_name = item?.name ?? '';
-    } else if (item_type === 'source_code') {
-      const { data: item } = await supabaseAdmin
-        .from('source_codes')
-        .select('name')
-        .eq('id', item_id)
-        .single();
-      item_name = item?.name ?? '';
-    }
+    const { data: item } = await supabaseAdmin
+      .from('apps')
+      .select('name')
+      .eq('id', item_id)
+      .single();
+    item_name = item?.name ?? '';
 
     const { data: purchase, error: insertErr } = await supabaseAdmin
       .from('purchases')

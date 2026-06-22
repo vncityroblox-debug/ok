@@ -76,27 +76,30 @@ function SourceCodeContent() {
     <div className="container">
       <Breadcrumbs />
       <section className={styles.hero}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'hsl(var(--color-secondary))', border: '1px solid hsla(var(--color-secondary) / 0.2)', padding: '4px 12px', borderRadius: '50px', background: 'hsla(var(--color-secondary) / 0.05)', marginBottom: '16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <Terminal size={12} style={{ animation: 'pulse 1.5s infinite' }} /> Phân Hệ Firmware
+        </div>
         <h1 className={styles.heroTitle}>
-          Kho Mã Nguồn <span>Tuyển Chọn</span>
+          Mã Nguồn & <span>Firmware Thiết Bị</span>
         </h1>
         <p className={styles.heroSubtitle}>
-          Khám phá và tải xuống hàng loạt mã nguồn, mẫu website, và tài nguyên lập trình tốt nhất hoàn toàn miễn phí.
+          Khám phá hệ thống mã nguồn, firmware nạp vi điều khiển, và các tập lệnh tích hợp hệ thống tối tân.
         </p>
       </section>
 
       <section style={{ marginBottom: '80px' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Terminal size={22} style={{ color: 'hsl(var(--color-primary))' }} />
-          Mã Nguồn Cho Bạn
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <Terminal size={22} style={{ color: 'hsl(var(--color-secondary))' }} />
+          Firmware & Mã Nguồn Tuyển Chọn
         </h2>
 
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
-            <p style={{ color: 'hsl(var(--text-secondary))' }}>Đang tải danh sách mã nguồn...</p>
+            <p style={{ color: 'hsl(var(--text-secondary))' }}>Đang kết nối kho dữ liệu firmware...</p>
           </div>
         ) : filteredApps.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', borderRadius: '16px', border: '1px dashed hsl(var(--border-glass))' }}>
-            <p style={{ color: 'hsl(var(--text-muted))', textAlign: 'center' }}>Không tìm thấy mã nguồn phù hợp.</p>
+            <p style={{ color: 'hsl(var(--text-muted))', textAlign: 'center' }}>Không tìm thấy firmware hoặc mã nguồn phù hợp.</p>
           </div>
         ) : (
           <div className={styles.appsGrid} id="guide-apps">

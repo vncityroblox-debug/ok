@@ -857,3 +857,296 @@
   color: hsl(var(--color-primary));
   transform: translateX(4px);
 }
+
+/* ============================================================
+   LANDING PAGE & HIGH-TECH CYBERNETIC EFFECT CLASSES
+   ============================================================ */
+
+.landingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: hsl(var(--bg-main));
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: var(--font-main);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fadeOutLanding {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Sci-fi tech grid background */
+.gridBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(hsla(var(--color-primary) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(var(--color-primary) / 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gridBg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 20%, hsl(var(--bg-main)) 80%);
+}
+
+/* Radar & HUD Animations */
+.hudContainer {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.radarRing1 {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 2px dashed hsl(var(--color-primary));
+  border-radius: 50%;
+  animation: spin 60s linear infinite;
+}
+
+.radarRing2 {
+  position: absolute;
+  top: 50px; left: 50px; right: 50px; bottom: 50px;
+  border: 1px solid hsla(var(--color-accent) / 0.4);
+  border-radius: 50%;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  animation: spin 30s linear infinite reverse;
+}
+
+.radarRing3 {
+  position: absolute;
+  top: 120px; left: 120px; right: 120px; bottom: 120px;
+  border: 1px dashed hsla(var(--color-secondary) / 0.4);
+  border-radius: 50%;
+  animation: spin 15s linear infinite;
+}
+
+/* Landing Content Container */
+.landingContent {
+  position: relative;
+  z-index: 10;
+  max-width: 1000px;
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.landingTitle {
+  font-size: 3.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  color: hsl(var(--text-primary));
+  text-shadow: 0 0 30px hsla(var(--color-primary) / 0.2);
+}
+
+.landingTitle span {
+  background: linear-gradient(135deg, hsl(var(--color-primary)), hsl(var(--color-secondary)), hsl(var(--color-accent)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landingSubtitle {
+  font-size: 1.35rem;
+  color: hsl(var(--text-secondary));
+  max-width: 700px;
+  margin: 0 auto 40px auto;
+  line-height: 1.6;
+}
+
+/* Stats */
+.landingStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 700px;
+  width: 100%;
+  margin-bottom: 48px;
+}
+
+.landingStatItem {
+  background: hsla(var(--bg-card) / 0.4);
+  border: 1px solid hsla(var(--color-primary) / 0.15);
+  padding: 16px 20px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.landingStatVal {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: hsl(var(--color-primary));
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.landingStatLabel {
+  font-size: 0.88rem;
+  color: hsl(var(--text-secondary));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Feature grid */
+.landingCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 54px;
+}
+
+.landingCard {
+  background: hsla(var(--bg-card) / 0.5);
+  border: 1px solid hsla(var(--border-glass));
+  border-radius: 18px;
+  padding: 24px;
+  text-align: left;
+  backdrop-filter: blur(8px);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.landingCard:hover {
+  transform: translateY(-5px);
+  border-color: hsla(var(--color-primary) / 0.4);
+  box-shadow: 0 10px 30px hsla(var(--color-primary) / 0.15);
+}
+
+.landingCardIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.landingCardTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: hsl(var(--text-primary));
+  margin-bottom: 8px;
+}
+
+.landingCardDesc {
+  font-size: 0.85rem;
+  color: hsl(var(--text-secondary));
+  line-height: 1.5;
+}
+
+/* Enter Button */
+.landingCtaBtn {
+  background: linear-gradient(135deg, hsl(var(--color-primary)), hsl(var(--color-primary-hover)));
+  color: #fff;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 50px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 0 25px hsla(var(--color-primary) / 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landingCtaBtn:hover {
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: 0 0 35px hsla(var(--color-primary) / 0.6);
+}
+
+.landingCtaBtn:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* Control Panel elements for dashboard */
+.controlGrid {
+  background-image: 
+    linear-gradient(hsla(var(--color-primary) / 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(var(--color-primary) / 0.02) 1px, transparent 1px);
+  background-size: 30px 30px;
+  border-radius: 24px;
+  border: 1px solid hsla(var(--color-primary) / 0.08);
+  padding: 30px;
+  background-color: hsla(var(--bg-card) / 0.2);
+}
+
+/* Animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 992px) {
+  .landingCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .landingTitle {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .landingCards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .landingStats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .landingTitle {
+    font-size: 2rem;
+  }
+  .landingSubtitle {
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+  }
+  .landingCtaBtn {
+    padding: 12px 28px;
+    font-size: 1rem;
+  }
+}

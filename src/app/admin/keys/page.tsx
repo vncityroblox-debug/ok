@@ -27,7 +27,13 @@ export default function AdminKeys() {
   const [keyType, setKeyType] = useState<'random' | 'custom'>('random');
   const [customKeyValue, setCustomKeyValue] = useState('');
   const [selectedAppIds, setSelectedAppIds] = useState<string[]>([]);
-  const [expirationDate, setExpirationDate] = useState('');
+  const [expirationDate, setExpirationDate] = useState(() => {
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    nextWeek.setHours(23, 59, 0, 0);
+    const tzoffset = nextWeek.getTimezoneOffset() * 60000;
+    return new Date(nextWeek.getTime() - tzoffset).toISOString().slice(0, 16);
+  });
   const [usageLimit, setUsageLimit] = useState(1);
 
   // Edit states
@@ -43,14 +49,6 @@ export default function AdminKeys() {
 
   useEffect(() => {
     fetchData();
-    // Default expiration date: 7 days from now
-    const nextWeek = new Date();
-    nextWeek.setDate(nextWeek.getDate() + 7);
-    nextWeek.setHours(23, 59, 0, 0);
-    // Format for datetime-local: YYYY-MM-DDTHH:mm
-    const tzoffset = nextWeek.getTimezoneOffset() * 60000;
-    const localISOTime = new Date(nextWeek.getTime() - tzoffset).toISOString().slice(0, 16);
-    setExpirationDate(localISOTime);
   }, []);
 
   async function fetchData() {

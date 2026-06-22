@@ -40,8 +40,7 @@ export default function ActivityPage() {
   const [activeTab, setActiveTab] = useState<'activity' | 'login'>('activity')
   const [activities, setActivities] = useState<ActivityLog[]>([])
   const [loginHistory, setLoginHistory] = useState<LoginRecord[]>([])
-  const [filteredActivities, setFilteredActivities] = useState<ActivityLog[]>([])
-  const [filteredLogins, setFilteredLogins] = useState<LoginRecord[]>([])
+
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
 
@@ -92,58 +91,36 @@ export default function ActivityPage() {
   }, [fetchData])
 
   useEffect(() => {
-    let result = [...activities]
+    setVisibleCount(PAGE_SIZE);
+  }, [search, actionFilter, dateFrom, dateTo]);
 
+  const filteredActivities = activities.filter(a => {
     if (search) {
-      const q = search.toLowerCase()
-      result = result.filter(
-        (a) =>
-          a.username?.toLowerCase().includes(q) ||
-          a.action?.toLowerCase().includes(q)
-      )
+      const q = search.toLowerCase();
+      const u = (a.username || '').toLowerCase();
+      const act = (a.action || '').toLowerCase();
+      if (!u.includes(q) && !act.includes(q)) return false;
     }
+    if (actionFilter !== 'all' && a.action !== actionFilter) return false;
+    if (dateFrom && a.created_at?.slice(0, 10) < dateFrom) return false;
+    if (dateTo && a.created_at?.slice(0, 10) > dateTo) return false;
+    return true;
+  });
 
-    if (actionFilter !== 'all') {
-      result = result.filter((a) => a.action === actionFilter)
-    }
-
-    if (dateFrom) {
-      result = result.filter((a) => a.created_at?.slice(0, 10) >= dateFrom)
-    }
-
-    if (dateTo) {
-      result = result.filter((a) => a.created_at?.slice(0, 10) <= dateTo)
-    }
-
-    setFilteredActivities(result)
-    setVisibleCount(PAGE_SIZE)
-  }, [activities, search, actionFilter, dateFrom, dateTo])
-
-  useEffect(() => {
-    let result = [...loginHistory]
-
+  const filteredLogins = loginHistory.filter(l => {
     if (search) {
-      const q = search.toLowerCase()
-      result = result.filter(
-        (l) =>
-          l.username?.toLowerCase().includes(q) ||
-          l.ip_address?.toLowerCase().includes(q)
-      )
+      const q = search.toLowerCase();
+      const u = (l.username || '').toLowerCase();
+      const ip = (l.ip_address || '').toLowerCase();
+      if (!u.includes(q) && !ip.includes(q)) return false;
     }
+    if (dateFrom && l.created_at?.slice(0, 10) < dateFrom) return false;
+    if (dateTo && l.created_at?.slice(0, 10) > dateTo) return false;
+    return true;
+  });
 
-    if (dateFrom) {
-      result = result.filter((l) => l.created_at?.slice(0, 10) >= dateFrom)
-    }
-
-    if (dateTo) {
-      result = result.filter((l) => l.created_at?.slice(0, 10) <= dateTo)
-    }
-
-    setFilteredLogins(result)
-  }, [loginHistory, search, dateFrom, dateTo])
-
-  const currentList = activeTab === 'activity' ? filteredActivities : filteredLogins
-  const visibleList = currentList.slice(0, visibleCount)
+  const currentList = activeTab === 'activity' ? filteredActivities : filteredLogins;
+  const visibleList = currentList.slice(0, visibleCount);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '-'

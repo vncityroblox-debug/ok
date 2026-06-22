@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { Lock, Unlock, Download, ArrowRight } from 'lucide-react';
+import { Lock, Unlock, Download, ArrowRight, Cpu } from 'lucide-react';
 import styles from '../home.module.css';
 
 interface AppItem {
@@ -76,27 +76,30 @@ function UngDungContent() {
     <div className="container">
       <Breadcrumbs />
       <section className={styles.hero}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'hsl(var(--color-primary))', border: '1px solid hsla(var(--color-primary) / 0.2)', padding: '4px 12px', borderRadius: '50px', background: 'hsla(var(--color-primary) / 0.05)', marginBottom: '16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <Cpu size={12} style={{ animation: 'pulse 1.5s infinite' }} /> Phân Hệ Thiết Bị & Giải Pháp
+        </div>
         <h1 className={styles.heroTitle}>
-          Kho Ứng Dụng <span>Tuyển Chọn</span>
+          Thiết Bị & <span>Giải Pháp Phần Mềm</span>
         </h1>
         <p className={styles.heroSubtitle}>
-          Khám phá và tải xuống hàng loạt ứng dụng, phần mềm, và công cụ hữu ích hoàn toàn miễn phí.
+          Khám phá cấu hình chi tiết và tải xuống các giải pháp điều khiển, phần mềm hệ thống tốt nhất.
         </p>
       </section>
 
       <section style={{ marginBottom: '80px' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Download size={22} style={{ color: 'hsl(var(--color-primary))' }} />
-          Ứng Dụng Cho Bạn
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <Cpu size={22} style={{ color: 'hsl(var(--color-primary))' }} />
+          Danh Sách Thiết Bị & Giải Pháp
         </h2>
 
         {isLoading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
-            <p style={{ color: 'hsl(var(--text-secondary))' }}>Đang tải danh sách ứng dụng...</p>
+            <p style={{ color: 'hsl(var(--text-secondary))' }}>Đang kết nối cơ sở dữ liệu thiết bị...</p>
           </div>
         ) : filteredApps.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', borderRadius: '16px', border: '1px dashed hsl(var(--border-glass))' }}>
-            <p style={{ color: 'hsl(var(--text-muted))', textAlign: 'center' }}>Không tìm thấy ứng dụng phù hợp.</p>
+            <p style={{ color: 'hsl(var(--text-muted))', textAlign: 'center' }}>Không tìm thấy thiết bị hoặc giải pháp phù hợp.</p>
           </div>
         ) : (
           <div className={styles.appsGrid} id="guide-apps">

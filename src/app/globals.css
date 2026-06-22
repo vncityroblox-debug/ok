@@ -1,62 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* White theme — higher contrast borders & text */
-  --bg-main: 210 16% 95%;
+  /* Light Theme - Clean metallic silver & cyan accents */
+  --bg-main: 220 20% 97%;
   --bg-card: 0 0% 100%;
-  --bg-subtle: 210 16% 90%;
-  --bg-hover: 210 14% 85%;
-  --bg-glass: 0 0% 100% / 0.95;
-  --border-glass: 210 10% 78%;
-  --border-light: 210 10% 82%;
+  --bg-subtle: 220 15% 92%;
+  --bg-hover: 188 86% 53% / 0.08;
+  --bg-glass: 0 0% 100% / 0.85;
+  --border-glass: 220 15% 85%;
+  --border-light: 220 15% 88%;
 
-  --text-primary: 210 10% 10%;
-  --text-secondary: 210 8% 32%;
-  --text-muted: 210 6% 50%;
+  --text-primary: 220 30% 10%;
+  --text-secondary: 220 15% 35%;
+  --text-muted: 220 10% 55%;
 
-  /* Bootstrap Blue primary */
-  --color-primary: 213 93% 52%;
-  --color-primary-hover: 213 93% 42%;
-  --color-secondary: 141 55% 42%;
-  --color-accent: 4 82% 56%;
-  --color-success: 141 55% 42%;
-  --color-danger: 4 82% 54%;
+  /* High tech colors */
+  --color-primary: 188 86% 45%; /* Technical Cyan */
+  --color-primary-hover: 188 86% 38%;
+  --color-secondary: 142 70% 40%; /* Tech Green */
+  --color-accent: 262 80% 50%; /* Electric Violet */
+  --color-success: 142 70% 40%;
+  --color-danger: 354 85% 50%;
   --color-warning: 38 92% 50%;
 
   /* Fonts */
   --font-main: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
-  /* Box Shadows — stronger for white theme */
-  --shadow-neon: 0 1px 4px rgba(0, 0, 0, 0.1);
-  --shadow-neon-strong: 0 6px 16px rgba(0, 0, 0, 0.13);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 5px rgba(0, 0, 0, 0.1);
+  /* Premium Tech Shadows */
+  --shadow-neon: 0 0 10px hsla(188, 86%, 53%, 0.15);
+  --shadow-neon-strong: 0 0 25px hsla(188, 86%, 53%, 0.3);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.03);
 
   /* Transitions */
-  --transition-smooth: all 0.2s ease;
-  --transition-bounce: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 [data-theme='dark'] {
-  --bg-main: 230 20% 10%;
-  --bg-card: 230 20% 14%;
-  --bg-subtle: 230 20% 8%;
-  --bg-hover: 230 15% 18%;
-  --bg-glass: 230 20% 14% / 0.9;
-  --border-glass: 230 10% 25%;
-  --border-light: 230 10% 20%;
+  /* Dark Theme - Deep cyber space and neon glow */
+  --bg-main: 224 45% 6%; /* #05070f - ultra dark navy */
+  --bg-card: 224 45% 10%; /* #090e1a */
+  --bg-subtle: 224 45% 4%;
+  --bg-hover: 188 86% 53% / 0.12;
+  --bg-glass: 224 45% 8% / 0.75;
+  --border-glass: 188 86% 53% / 0.18;
+  --border-light: 188 86% 53% / 0.08;
 
-  --text-primary: 210 17% 93%;
-  --text-secondary: 216 6% 63%;
-  --text-muted: 216 8% 46%;
+  --text-primary: 210 40% 98%;
+  --text-secondary: 215 20% 78%;
+  --text-muted: 215 15% 52%;
 
-  --color-primary: 213 93% 60%;
-  --color-primary-hover: 213 93% 70%;
-  --color-secondary: 141 55% 53%;
-  --color-accent: 4 82% 66%;
+  --color-primary: 188 86% 53%; /* Cyber Cyan */
+  --color-primary-hover: 188 86% 63%;
+  --color-secondary: 142 70% 50%; /* Emerald Tech */
+  --color-accent: 262 80% 63%; /* Neon Violet */
 
-  --shadow-neon: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-neon-strong: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-neon: 0 0 15px hsla(188, 86%, 53%, 0.25);
+  --shadow-neon-strong: 0 0 35px hsla(188, 86%, 53%, 0.45);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 /* Reset and Base Styles */

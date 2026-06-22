@@ -42,18 +42,25 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
   }, [serverIconUrl]);
 
   useEffect(() => {
-    if (!user?.email) {
-      setIsAdmin(false);
-      return;
+    let active = true;
+    async function checkAdmin() {
+      if (!user?.email) {
+        if (active) setIsAdmin(false);
+        return;
+      }
+      try {
+        const { data } = await supabase
+          .from('admin_users')
+          .select('id')
+          .eq('email', user.email)
+          .single();
+        if (active) setIsAdmin(!!data);
+      } catch {
+        if (active) setIsAdmin(false);
+      }
     }
-    (async () => {
-      const { data } = await supabase
-        .from('admin_users')
-        .select('id')
-        .eq('email', user.email)
-        .single();
-      setIsAdmin(!!data);
-    })();
+    checkAdmin();
+    return () => { active = false; };
   }, [user?.email]);
 
   useEffect(() => {
@@ -97,10 +104,11 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
 
   const navItems = [
     { name: 'Trang Chủ', path: '/' },
-    { name: 'Công Cụ', path: '/tools/hub' },
-    { name: 'CronJobs', path: '/cron-jobs' },
-    { name: 'Mã Nguồn', path: '/ma-nguon' },
-    { name: 'Bài Viết', path: '/blog' },
+    { name: 'Thiết Bị & Giải Pháp', path: '/ung-dung' },
+    { name: 'Mã Nguồn & Firmware', path: '/ma-nguon' },
+    { name: 'Hệ Thống Tự Động', path: '/cron-jobs' },
+    { name: 'Công Cụ Kỹ Thuật', path: '/tools/hub' },
+    { name: 'Tài Liệu', path: '/blog' },
   ];
 
   const handleLogout = async () => {
@@ -270,7 +278,7 @@ export default function Header({ siteName = 'App Store', siteIconUrl: serverIcon
             ref={searchRef}
             type="search"
             className={styles.searchInput}
-            placeholder="Tìm kiếm ứng dụng..."
+            placeholder="Tìm kiếm thiết bị, giải pháp, firmware..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

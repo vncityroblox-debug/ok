@@ -603,8 +603,11 @@ function GiftKeyModal({ user, onClose, onSaved }: {
   const fetchItems = useCallback(async (type: 'app' | 'source_code') => {
     setLoadingItems(true);
     try {
-      const table = type === 'app' ? 'apps' : 'source_codes';
-      const { data } = await supabase.from(table).select('id, name').order('name');
+      const { data } = await supabase
+        .from('apps')
+        .select('id, name')
+        .eq('app_type', type)
+        .order('name');
       setItems(data ?? []);
     } catch {
       setItems([]);

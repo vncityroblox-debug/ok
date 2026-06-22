@@ -41,8 +41,7 @@ export default function AdminDashboard() {
   const [activeUsers7d, setActiveUsers7d] = useState(0);
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [loginHistory, setLoginHistory] = useState<LoginRecord[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<ActivityLog[]>([]);
-  const [filteredLogins, setFilteredLogins] = useState<LoginRecord[]>([]);
+
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [activeTab, setActiveTab] = useState<'activity' | 'login'>('activity');
   const [search, setSearch] = useState('');
@@ -103,21 +102,29 @@ export default function AdminDashboard() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   useEffect(() => {
-    let r = [...activities];
-    if (search) { const q = search.toLowerCase(); r = r.filter(a => a.username?.toLowerCase().includes(q) || a.action?.toLowerCase().includes(q)); }
-    if (actionFilter !== 'all') r = r.filter(a => a.action === actionFilter);
-    if (dateFrom) r = r.filter(a => a.created_at?.slice(0, 10) >= dateFrom);
-    if (dateTo) r = r.filter(a => a.created_at?.slice(0, 10) <= dateTo);
-    setFilteredActivities(r); setVisibleCount(PAGE_SIZE);
-  }, [activities, search, actionFilter, dateFrom, dateTo]);
+    setVisibleCount(PAGE_SIZE);
+  }, [search, actionFilter, dateFrom, dateTo]);
 
-  useEffect(() => {
-    let r = [...loginHistory];
-    if (search) { const q = search.toLowerCase(); r = r.filter(l => l.username?.toLowerCase().includes(q) || l.ip_address?.toLowerCase().includes(q)); }
-    if (dateFrom) r = r.filter(l => l.created_at?.slice(0, 10) >= dateFrom);
-    if (dateTo) r = r.filter(l => l.created_at?.slice(0, 10) <= dateTo);
-    setFilteredLogins(r);
-  }, [loginHistory, search, dateFrom, dateTo]);
+  const filteredActivities = activities.filter(a => {
+    if (search) {
+      const q = search.toLowerCase();
+      if (!a.username?.toLowerCase().includes(q) && !a.action?.toLowerCase().includes(q)) return false;
+    }
+    if (actionFilter !== 'all' && a.action !== actionFilter) return false;
+    if (dateFrom && a.created_at?.slice(0, 10) < dateFrom) return false;
+    if (dateTo && a.created_at?.slice(0, 10) > dateTo) return false;
+    return true;
+  });
+
+  const filteredLogins = loginHistory.filter(l => {
+    if (search) {
+      const q = search.toLowerCase();
+      if (!l.username?.toLowerCase().includes(q) && !l.ip_address?.toLowerCase().includes(q)) return false;
+    }
+    if (dateFrom && l.created_at?.slice(0, 10) < dateFrom) return false;
+    if (dateTo && l.created_at?.slice(0, 10) > dateTo) return false;
+    return true;
+  });
 
   const currentList = activeTab === 'activity' ? filteredActivities : filteredLogins;
   const visibleList = currentList.slice(0, visibleCount);

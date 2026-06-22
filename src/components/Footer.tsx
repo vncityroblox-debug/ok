@@ -42,10 +42,10 @@ export default function Footer({ siteName = 'App Store', siteIconUrl: serverIcon
               <h4 style={{ marginBottom: '12px' }}>Về Chúng Tôi</h4>
             )}
             <p style={{ marginBottom: '16px' }}>
-              {siteDescription || 'Nền tảng chia sẻ ứng dụng an toàn và các bài viết công nghệ hữu ích hàng đầu dành cho bạn.'}
+              {siteDescription || 'Hệ thống cung cấp, chia sẻ thiết bị thông minh, giải pháp phần mềm, firmware và tài liệu kỹ thuật cao cấp.'}
             </p>
             <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>
-              Bảo mật tuyệt đối • Tải xuống tốc độ cao
+              Bảo mật tối đa • Kết nối tối ưu • Vận hành 24/7
             </p>
           </div>
 
@@ -56,25 +56,25 @@ export default function Footer({ siteName = 'App Store', siteIconUrl: serverIcon
                 <Link href="/">Trang Chủ</Link>
               </li>
               <li>
-                <Link href="/ma-nguon">Mã Nguồn</Link>
+                <Link href="/ung-dung">Thiết Bị & Giải Pháp</Link>
               </li>
               <li>
-                <Link href="/ung-dung">Ứng Dụng</Link>
+                <Link href="/ma-nguon">Mã Nguồn & Firmware</Link>
               </li>
               <li>
-                <Link href="/blog">Bài Viết</Link>
+                <Link href="/blog">Tài Liệu Kỹ Thuật</Link>
               </li>
             </ul>
           </div>
 
           <div className={styles.footerCol}>
-            <h4>Danh Mục</h4>
+            <h4>Phân Hệ Khác</h4>
             <ul>
               <li>
-                <Link href="/tien-ich">Tiện Ích</Link>
+                <Link href="/tools/hub">Công Cụ Kỹ Thuật</Link>
               </li>
               <li>
-                <Link href="/tien-ich/2fa">Lấy Mã 2FA</Link>
+                <Link href="/cron-jobs">Hệ Thống Tự Động</Link>
               </li>
             </ul>
           </div>

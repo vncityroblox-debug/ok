@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './components.module.css';
 
 interface Step {
@@ -42,6 +42,23 @@ export default function OnboardingTour() {
       content: 'Nhấp vào đây để xem các bài viết hướng dẫn chi tiết, thủ thuật công nghệ hoặc tin tức mới nhất.',
     },
   ];
+
+  const handleComplete = useCallback(() => {
+    setCurrentStep(-1);
+    localStorage.setItem('onboarding_completed', 'true');
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleComplete();
+    }
+  }, [currentStep, steps.length, handleComplete]);
+
+  const handleSkip = useCallback(() => {
+    handleComplete();
+  }, [handleComplete]);
 
   useEffect(() => {
     // Check if the user has completed the tour before
@@ -119,24 +136,7 @@ export default function OnboardingTour() {
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition);
     };
-  }, [currentStep]);
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleComplete();
-    }
-  };
-
-  const handleSkip = () => {
-    handleComplete();
-  };
-
-  const handleComplete = () => {
-    setCurrentStep(-1);
-    localStorage.setItem('onboarding_completed', 'true');
-  };
+  }, [currentStep, handleNext, steps]);
 
   if (currentStep < 0) return null;
 
