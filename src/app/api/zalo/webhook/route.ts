@@ -3,6 +3,10 @@ import { getSupabaseServer } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+export async function GET() {
+  return NextResponse.json({ status: 'ok', message: 'Zalo webhook is running' });
+}
+
 async function sendZaloMessage(zaloId: string, text: string) {
   const supabase = getSupabaseServer(true);
   const { data: config } = await supabase
