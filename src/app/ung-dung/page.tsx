@@ -69,7 +69,7 @@ function UngDungContent() {
   const filteredApps = apps.filter((app) => {
     const q = searchQuery.toLowerCase();
     if (!q) return true;
-    return app.name.toLowerCase().includes(q) || app.description.toLowerCase().includes(q);
+    return (app.name || '').toLowerCase().includes(q) || (app.description || '').toLowerCase().includes(q);
   });
 
   return (
