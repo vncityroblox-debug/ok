@@ -108,7 +108,9 @@ export default function AdminDashboard() {
   const filteredActivities = activities.filter(a => {
     if (search) {
       const q = search.toLowerCase();
-      if (!a.username?.toLowerCase().includes(q) && !a.action?.toLowerCase().includes(q)) return false;
+      const u = (a.username || '').toLowerCase();
+      const act = (a.action || '').toLowerCase();
+      if (!u.includes(q) && !act.includes(q)) return false;
     }
     if (actionFilter !== 'all' && a.action !== actionFilter) return false;
     if (dateFrom && a.created_at?.slice(0, 10) < dateFrom) return false;
@@ -119,7 +121,9 @@ export default function AdminDashboard() {
   const filteredLogins = loginHistory.filter(l => {
     if (search) {
       const q = search.toLowerCase();
-      if (!l.username?.toLowerCase().includes(q) && !l.ip_address?.toLowerCase().includes(q)) return false;
+      const u = (l.username || '').toLowerCase();
+      const ip = (l.ip_address || '').toLowerCase();
+      if (!u.includes(q) && !ip.includes(q)) return false;
     }
     if (dateFrom && l.created_at?.slice(0, 10) < dateFrom) return false;
     if (dateTo && l.created_at?.slice(0, 10) > dateTo) return false;

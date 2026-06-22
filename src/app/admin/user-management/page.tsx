@@ -536,9 +536,9 @@ export default function UserManagementPage() {
   const filteredUsers = allUsers.filter((u) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch = !q ||
-      u.email?.toLowerCase().includes(q) ||
-      u.username?.toLowerCase().includes(q) ||
-      u.full_name?.toLowerCase().includes(q);
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.username || '').toLowerCase().includes(q) ||
+      (u.full_name || '').toLowerCase().includes(q);
 
     const matchesFilter =
       filterType === 'all' ||
