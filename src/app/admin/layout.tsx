@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu } from 'lucide-react';
+import { Menu, Bell } from 'lucide-react';
 import AdminSidebar from '@/components/AdminSidebar';
 import styles from './admin.module.css';
 
@@ -31,6 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <button className={styles.hamburgerBtn} onClick={() => setSidebarOpen(true)} aria-label="Open menu">
           <Menu size={22} />
         </button>
+        <div className={styles.mobileTitle}>Admin Panel</div>
       </div>
 
       {sidebarOpen && <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />}

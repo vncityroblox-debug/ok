@@ -8,7 +8,7 @@ export async function GET(_req: NextRequest) {
     const supabaseAdmin = getSupabaseServer(true);
 
     const results = await Promise.allSettled([
-      supabaseAdmin.from('user_profiles').select('*').order('created_at', { ascending: false }),
+      supabaseAdmin.from('user_profiles').select('*, verification_code').order('created_at', { ascending: false }),
       supabaseAdmin.from('purchases').select('id, user_id'),
       supabaseAdmin.from('login_history').select('user_id, created_at').order('created_at', { ascending: false }),
     ]);

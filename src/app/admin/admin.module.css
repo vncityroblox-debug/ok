@@ -79,9 +79,49 @@
 .sidebarNav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
   padding: 0.5rem;
+  overflow-y: auto;
+}
+
+/* ── Nav Group ── */
+.navGroup {
+  margin-bottom: 4px;
+}
+
+.navGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: hsl(var(--text-muted));
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.navGroupHeader:hover {
+  color: hsl(var(--text-secondary));
+  background: hsl(var(--bg-hover));
+}
+
+.navGroupHeaderActive {
+  color: hsl(var(--color-primary));
+}
+
+.navGroupItems {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-left: 4px;
 }
 
 /* Mobile header (hamburger button) */
@@ -868,6 +908,60 @@
 .refreshBtn:hover {
   border-color: hsl(var(--color-primary));
   color: hsl(var(--color-primary));
+}
+
+/* Quick Actions Grid */
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.quickActionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  background: hsl(var(--bg-card));
+  border: 1px solid hsl(var(--border-glass));
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.quickActionCard:hover {
+  box-shadow: var(--shadow-neon-strong);
+  transform: translateY(-2px);
+  border-color: hsl(var(--color-primary));
+  text-decoration: none;
+}
+
+.quickActionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quickActionName {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: hsl(var(--text-primary));
+  text-align: center;
+}
+
+/* Mobile title */
+.mobileTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  color: hsl(var(--text-primary));
+  margin-left: 8px;
 }
 
 .statsCard {

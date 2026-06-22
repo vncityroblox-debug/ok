@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 interface AuthContextType {
   user: any | null;
   profile: any | null;
+  is_verified: boolean;
   loading: boolean;
   showAuth: boolean;
   requestAuth: () => void;
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const defaultAuth: AuthContextType = {
   user: null,
   profile: null,
+  is_verified: false,
   loading: true,
   showAuth: false,
   requestAuth: () => {},
@@ -97,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hideAuth = useCallback(() => setShowAuth(false), []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, showAuth, requestAuth, hideAuth, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, is_verified: profile?.is_verified || false, loading, showAuth, requestAuth, hideAuth, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

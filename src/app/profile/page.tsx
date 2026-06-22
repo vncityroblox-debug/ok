@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Phone, Clock, ShoppingCart, Download, Edit3, Save, X, ChevronDown, ChevronUp, Key } from 'lucide-react';
+import { User, Mail, Phone, Clock, ShoppingCart, Download, Edit3, Save, X, ChevronDown, ChevronUp, Key, ShieldCheck, Copy, CheckCircle } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { useAuth } from '@/components/AuthGuard';
 import { supabase } from '@/lib/supabase';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
-type Tab = 'profile' | 'history' | 'purchases' | 'keys';
+type Tab = 'profile' | 'history' | 'purchases' | 'keys' | 'zalo';
 
 interface LoginHistory {
   id: string;
@@ -41,6 +42,106 @@ function parseDevice(ua: string): string {
   if (/chrome/i.test(ua)) return 'Chrome';
   if (/firefox/i.test(ua)) return 'Firefox';
   return 'Trình duyệt khác';
+}
+
+function ZaloVerificationTab({ user, profile }: { user: any; profile: any }) {
+  const [zaloData, setZaloData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+    fetch(`/api/zalo/verify-status?user_id=${user.id}`)
+      .then(r => r.json())
+      .then(data => setZaloData(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  const verificationCode = profile?.verification_code || '';
+  const isVerified = profile?.is_verified || zaloData?.is_verified || false;
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(verificationCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px', color: 'hsl(var(--text-muted))' }}>
+        <p>Đang tải...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <ShieldCheck size={18} style={{ color: 'hsl(var(--color-primary))' }} />
+        Xác Thực Tài Khoản Qua Zalo
+      </h2>
+
+      {isVerified ? (
+        <div style={{ padding: '24px', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.08))', border: '2px solid rgba(16,185,129,0.3)', textAlign: 'center' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg, #10b981, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <CheckCircle size={32} color="#fff" />
+          </div>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px', color: '#10b981' }}>Đã Xác Thực!</h3>
+          <p style={{ color: 'hsl(var(--text-secondary))', fontSize: '0.9rem', marginBottom: '16px' }}>Tài khoản của bạn đã được xác thực qua Zalo.</p>
+          {zaloData?.zalo && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '10px 16px', borderRadius: '10px', background: 'hsl(var(--bg-card))', border: '1px solid hsl(var(--border-glass))' }}>
+              {zaloData.zalo.avatar_url && (
+                <img src={zaloData.zalo.avatar_url} alt="Zalo" style={{ width: '28px', height: '28px', borderRadius: '50%' }} />
+              )}
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{zaloData.zalo.display_name}</span>
+              <VerifiedBadge size="sm" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div>
+          <div style={{ padding: '24px', borderRadius: '16px', background: 'hsl(var(--bg-subtle))', border: '1px solid hsl(var(--border-glass))', marginBottom: '20px' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '12px' }}>Mã Xác Thực Của Bạn</h3>
+            <p style={{ color: 'hsl(var(--text-secondary))', fontSize: '0.85rem', marginBottom: '16px' }}>
+              Gửi tin nhắn sau đến Zalo Bot để xác thực tài khoản:
+            </p>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
+              padding: '14px 18px', borderRadius: '12px',
+              background: 'hsla(var(--color-primary) / 0.06)', border: '2px dashed hsla(var(--color-primary) / 0.3)',
+            }}>
+              <div>
+                <div style={{ fontSize: '0.78rem', color: 'hsl(var(--text-muted))', marginBottom: '4px' }}>Lệnh xác thực:</div>
+                <div style={{ fontFamily: "'Courier New', monospace", fontSize: '1.1rem', fontWeight: 700, color: 'hsl(var(--color-primary))', letterSpacing: '2px' }}>
+                  /xt {verificationCode}
+                </div>
+              </div>
+              <button onClick={copyCode} style={{
+                padding: '8px 16px', borderRadius: '8px', border: 'none',
+                background: copied ? '#10b981' : 'hsl(var(--color-primary))', color: '#fff',
+                fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                whiteSpace: 'nowrap',
+              }}>
+                {copied ? <><CheckCircle size={14} /> Đã copy</> : <><Copy size={14} /> Copy</>}
+              </button>
+            </div>
+          </div>
+
+          <div style={{ padding: '16px', borderRadius: '12px', background: 'hsl(var(--bg-card))', border: '1px solid hsl(var(--border-glass))' }}>
+            <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '10px' }}>Hướng Dẫn:</h4>
+            <ol style={{ paddingLeft: '20px', color: 'hsl(var(--text-secondary))', fontSize: '0.85rem', lineHeight: 1.8 }}>
+              <li>Mở Zalo và tìm đến <strong>Zalo Bot</strong> của hệ thống</li>
+              <li>Gửi tin nhắn: <code style={{ background: 'hsl(var(--bg-subtle))', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>/xt {verificationCode}</code></li>
+              <li>Bot sẽ xác nhận: "Xác thực thành công!"</li>
+              <li>Quay lại trang này, bấm <strong>Làm mới</strong> để cập nhật</li>
+            </ol>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ProfilePage() {
@@ -173,6 +274,7 @@ export default function ProfilePage() {
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'profile', label: 'Thông Tin Cá Nhân', icon: <User size={16} /> },
+    { key: 'zalo', label: 'Xác Thực Zalo', icon: <ShieldCheck size={16} /> },
     { key: 'history', label: 'Lịch Sử Đăng Nhập', icon: <Clock size={16} /> },
     { key: 'purchases', label: 'Lịch Sử Mua Hàng', icon: <ShoppingCart size={16} /> },
     { key: 'keys', label: 'Key Đã Tặng', icon: <Key size={16} /> },
@@ -620,6 +722,11 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
+          )}
+
+          {/* Tab 5: Zalo Verification */}
+          {activeTab === 'zalo' && (
+            <ZaloVerificationTab user={user} profile={profile} />
           )}
         </div>
       </section>

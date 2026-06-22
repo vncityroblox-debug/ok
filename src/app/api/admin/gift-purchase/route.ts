@@ -34,6 +34,19 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = getSupabaseServer(true);
 
+    const { data: targetProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('is_verified')
+      .eq('id', user_id)
+      .single();
+
+    if (targetProfile && !targetProfile.is_verified) {
+      return NextResponse.json(
+        { error: 'Người dùng chưa xác thực tài khoản qua Zalo.' },
+        { status: 403 }
+      );
+    }
+
     let item_name = '';
     const { data: item } = await supabaseAdmin
       .from('apps')

@@ -324,6 +324,21 @@ code, pre {
   background: hsl(var(--text-muted));
 }
 
+/* Verified Badge */
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 50px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+  color: #fff;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.35);
+  flex-shrink: 0;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

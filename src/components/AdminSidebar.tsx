@@ -15,14 +15,60 @@ import {
   UserCog,
   Users,
   X,
+  ShieldCheck,
+  MessageSquare,
+  ChevronDown,
+  Activity,
+  Clock,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import styles from '@/app/admin/admin.module.css';
+
+interface NavGroup {
+  label: string;
+  items: { name: string; path: string; icon: any }[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'Tổng Quát',
+    items: [
+      { name: 'Thống Kê', path: '/admin', icon: LayoutDashboard },
+      { name: 'Nhật Ký', path: '/admin/activity', icon: Activity },
+    ],
+  },
+  {
+    label: 'Nội Dung',
+    items: [
+      { name: 'Danh Mục', path: '/admin/categories', icon: FolderOpen },
+      { name: 'Ứng Dụng', path: '/admin/apps', icon: AppWindow },
+      { name: 'Mã Nguồn', path: '/admin/source-codes', icon: Terminal },
+      { name: 'Quản Lý Key', path: '/admin/keys', icon: KeyRound },
+      { name: 'Blog', path: '/admin/posts', icon: FileText },
+    ],
+  },
+  {
+    label: 'Người Dùng',
+    items: [
+      { name: 'Quản Lý Admin', path: '/admin/users', icon: UserCog },
+      { name: 'Người Dùng', path: '/admin/user-management', icon: Users },
+      { name: 'Xác Thực Zalo', path: '/admin/zalo-verification', icon: ShieldCheck },
+    ],
+  },
+  {
+    label: 'Hệ Thống',
+    items: [
+      { name: 'Cấu Hình Web', path: '/admin/settings', icon: Settings },
+      { name: 'Chatbot Zalo', path: '/admin/chatbot', icon: MessageSquare },
+    ],
+  },
+];
 
 export default function AdminSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const [logoUrl, setLogoUrl] = useState('');
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     (async () => {
@@ -37,17 +83,9 @@ export default function AdminSidebar({ isOpen, onClose }: { isOpen: boolean; onC
     })();
   }, []);
 
-  const menuItems = [
-    { name: 'Thống Kê', path: '/admin', icon: LayoutDashboard },
-    { name: 'Cấu Hình Web', path: '/admin/settings', icon: Settings },
-    { name: 'Danh Mục', path: '/admin/categories', icon: FolderOpen },
-    { name: 'Đăng Ứng Dụng', path: '/admin/apps', icon: AppWindow },
-    { name: 'Đăng Mã Nguồn', path: '/admin/source-codes', icon: Terminal },
-    { name: 'Quản Lý Key', path: '/admin/keys', icon: KeyRound },
-    { name: 'Viết Bài (Blog)', path: '/admin/posts', icon: FileText },
-    { name: 'Quản Lý Admin', path: '/admin/users', icon: UserCog },
-    { name: 'Quản Lý Người Dùng', path: '/admin/user-management', icon: Users },
-  ];
+  const toggleGroup = (label: string) => {
+    setCollapsedGroups(prev => ({ ...prev, [label]: !prev[label] }));
+  };
 
   const handleLogout = async () => {
     if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi Admin?')) {
@@ -72,25 +110,51 @@ export default function AdminSidebar({ isOpen, onClose }: { isOpen: boolean; onC
       </div>
 
       <nav className={styles.sidebarNav}>
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.path;
+        {navGroups.map((group) => {
+          const isCollapsed = collapsedGroups[group.label];
+          const hasActive = group.items.some(item => pathname === item.path);
+
           return (
-            <Link
-              key={item.path}
-              href={item.path}
-              className={`${styles.sidebarLink} ${isActive ? styles.activeSidebarLink : ''}`}
-              onClick={onClose}
-            >
-              <Icon size={20} />
-              <span>{item.name}</span>
-            </Link>
+            <div key={group.label} className={styles.navGroup}>
+              <button
+                className={`${styles.navGroupHeader} ${hasActive ? styles.navGroupHeaderActive : ''}`}
+                onClick={() => toggleGroup(group.label)}
+              >
+                <span>{group.label}</span>
+                <ChevronDown
+                  size={14}
+                  style={{
+                    transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0)',
+                    transition: 'transform 0.2s',
+                  }}
+                />
+              </button>
+              {!isCollapsed && (
+                <div className={styles.navGroupItems}>
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.path;
+                    return (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        className={`${styles.sidebarLink} ${isActive ? styles.activeSidebarLink : ''}`}
+                        onClick={onClose}
+                      >
+                        <Icon size={18} />
+                        <span>{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>
 
       <button onClick={handleLogout} className={styles.logoutBtn}>
-        <LogOut size={20} />
+        <LogOut size={18} />
         <span>Đăng xuất</span>
       </button>
     </aside>

@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import ImageLightbox from '@/components/ImageLightbox';
 import { supabase } from '@/lib/supabase';
-import { Lock, Unlock, Download, KeyRound, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
+import { Lock, Unlock, Download, KeyRound, ArrowLeft, Image as ImageIcon, X, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthGuard';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import styles from '../../home.module.css';
 
 interface AppDetails {
@@ -37,7 +38,7 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
   const [showTermsPopup, setShowTermsPopup] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const { user, requestAuth } = useAuth();
+  const { user, is_verified, requestAuth } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -315,6 +316,33 @@ export default function AppDetailPage({ params }: { params: Promise<{ slug: stri
                 textAlign: 'left'
               }}>
                 {successMessage}
+              </div>
+            )}
+
+            {/* Verification Warning */}
+            {user && !is_verified && (
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(239,68,68,0.08))',
+                border: '1.5px solid rgba(245,158,11,0.3)',
+                borderRadius: '12px',
+                padding: '14px 16px',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+              }}>
+                <ShieldCheck size={20} style={{ color: '#f59e0b', flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#f59e0b', marginBottom: '4px' }}>
+                    Cần Xác Thực Tài Khoản
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: 'hsl(var(--text-secondary))', lineHeight: 1.5 }}>
+                    Bạn cần xác thực tài khoản qua Zalo để tải xuống.{' '}
+                    <Link href="/profile" style={{ color: 'hsl(var(--color-primary))', fontWeight: 600 }}>
+                      Đến trang Profile để lấy mã xác thực →
+                    </Link>
+                  </div>
+                </div>
               </div>
             )}
 

@@ -55,13 +55,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: authErr.message }, { status: 400 });
     }
 
-    // Insert into user_profiles
+    // Insert into user_profiles with verification code
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let verifyCode = '';
+    for (let i = 0; i < 6; i++) verifyCode += chars.charAt(Math.floor(Math.random() * chars.length));
+
     const { data: profile, error: profileErr } = await supabaseAdmin
       .from('user_profiles')
       .insert({
         id: authUser.user.id,
         username,
         email,
+        verification_code: verifyCode,
       })
       .select()
       .single();

@@ -7,6 +7,7 @@ import {
   Mail, Phone, Clock, ShoppingCart, Key, ChevronDown, ChevronUp,
   X, Edit3, Gift, Activity, Ban, CheckCircle, ExternalLink,
 } from 'lucide-react';
+import VerifiedBadge from '@/components/VerifiedBadge';
 import styles from '../admin.module.css';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -17,6 +18,7 @@ interface UserProfile {
   full_name?: string;
   phone?: string;
   avatar_url?: string;
+  is_verified?: boolean;
   created_at: string;
   total_purchases: number;
   last_login: string | null;
@@ -725,7 +727,10 @@ export default function UserManagementPage() {
                         {u.username?.charAt(0)?.toUpperCase() || u.email?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 500, fontSize: '0.9rem' }}>{u.email}</div>
+                        <div style={{ fontWeight: 500, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          {u.email}
+                          {u.is_verified && <VerifiedBadge size="sm" />}
+                        </div>
                         {u.username && (
                           <div style={{ fontSize: '0.78rem', color: 'hsl(var(--text-muted))' }}>@{u.username}</div>
                         )}

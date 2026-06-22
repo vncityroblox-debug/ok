@@ -24,6 +24,29 @@ export async function POST(request: Request) {
     // We use the Service Role client because public RLS policy does not allow SELECT on `keys` and `app_keys`
     const supabase = getSupabaseServer(true);
 
+    // 0. Verify user is verified (if authenticated)
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.split(' ')[1];
+        const anonSupabase = getSupabaseServer(false);
+        const { data: { user } } = await anonSupabase.auth.getUser(token);
+        if (user) {
+          const { data: profile } = await getSupabaseServer(true)
+            .from('user_profiles')
+            .select('is_verified')
+            .eq('id', user.id)
+            .single();
+          if (profile && !profile.is_verified) {
+            return NextResponse.json(
+              { error: 'Vui lòng xác thực tài khoản qua Zalo để sử dụng tính năng này. Truy cập trang Profile để lấy mã xác thực.' },
+              { status: 403 }
+            );
+          }
+        }
+      } catch {}
+    }
+
     // 1. Fetch app and verify lock status
     const { data: app, error: appError } = await supabase
       .from('apps')
@@ -107,10 +130,10 @@ export async function POST(request: Request) {
     }
 
     // 4. Log purchase record (get user from auth header)
-    const authHeader = request.headers.get('authorization');
-    if (authHeader?.startsWith('Bearer ')) {
+    const purchaseAuthHeader = request.headers.get('authorization');
+    if (purchaseAuthHeader?.startsWith('Bearer ')) {
       try {
-        const token = authHeader.split(' ')[1];
+        const token = purchaseAuthHeader.split(' ')[1];
         const anonSupabase = getSupabaseServer(false);
         const { data: { user } } = await anonSupabase.auth.getUser(token);
         if (user) {
