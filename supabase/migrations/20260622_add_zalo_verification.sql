@@ -1,9 +1,33 @@
 -- Add is_verified and verification_code columns to user_profiles
 ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
-ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS verification_code TEXT UNIQUE DEFAULT '';
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS verification_code TEXT DEFAULT '';
 
--- Generate verification codes for existing users
-UPDATE user_profiles SET verification_code = upper(substring(md5(random()::text) from 1 for 6)) WHERE verification_code = '' OR verification_code IS NULL;
+-- Generate verification codes for all users with empty/null codes
+DO $$
+DECLARE
+  r RECORD;
+  chars TEXT := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  code TEXT;
+  i INT;
+BEGIN
+  FOR r IN SELECT id FROM user_profiles WHERE verification_code IS NULL OR verification_code = '' LOOP
+    code := '';
+    FOR i IN 1..6 LOOP
+      code := code || substr(chars, floor(random() * length(chars) + 1)::int, 1);
+    END LOOP;
+    UPDATE user_profiles SET verification_code = code WHERE id = r.id;
+  END LOOP;
+END $$;
+
+-- Now add UNIQUE constraint after all codes are generated
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'user_profiles_verification_code_key'
+  ) THEN
+    ALTER TABLE user_profiles ADD CONSTRAINT user_profiles_verification_code_key UNIQUE (verification_code);
+  END IF;
+END $$;
 
 -- Zalo verification table
 CREATE TABLE IF NOT EXISTS zalo_verifications (
